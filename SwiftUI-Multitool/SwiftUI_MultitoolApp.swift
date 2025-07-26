@@ -11,7 +11,7 @@ import SwiftUI
 struct SwiftUI_MultitoolApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            TimelineView()
         }
     }
 }

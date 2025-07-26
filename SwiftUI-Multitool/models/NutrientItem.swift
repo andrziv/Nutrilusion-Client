@@ -6,3 +6,9 @@
 //
 
 import Foundation
+
+struct NutrientItem {
+    var name: String
+    var amount: Double
+    var unit: String
+}
