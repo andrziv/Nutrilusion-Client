@@ -35,7 +35,9 @@ struct LoggerView: View {
                     .background(.gray)
                     .clipShape(RoundedRectangle(cornerSize: .init(width: 20, height: 20)))
                 }
-                
+                HStack {
+                    LogCurrentTimeButtonView()
+                }
             }
             .padding()
         }
@@ -116,6 +118,32 @@ struct PositionalButtonView: View {
                     .stroke(.green, lineWidth: 2)
             )
         
+    }
+}
+
+struct LogCurrentTimeButtonView: View {
+    @State private var currentTime = Date()
+    let timer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
+    
+    private var timeString: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "h:mm"
+        return formatter.string(from: currentTime)
+    }
+    
+    var body: some View {
+        Button(action: {
+            
+        }) {
+            Label("@ " + timeString, systemImage: "plus.circle.fill")
+              .padding(12)
+              .foregroundColor(.black)
+              .background(Color(red: 0.8, green: 0.8, blue: 1),
+                 in: RoundedRectangle(cornerRadius: 12))
+              .onReceive(timer) { _ in
+                  currentTime = Date()
+              }
+        }
     }
 }
 

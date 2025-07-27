@@ -30,7 +30,6 @@ struct TimelineLogView: View {
                         ZStack(alignment: .topLeading) {
                             TimelineView(hourSpacing: hourSpacing)
                                 .padding([.leading], 16)
-                            CurrentTimeIndicator(hourSpacing: hourSpacing)
                         }
                     }
                     .onAppear {
@@ -116,65 +115,6 @@ struct Line: Shape {
         path.move(to: CGPoint(x: 0, y: 0))
         path.addLine(to: CGPoint(x: rect.width, y: 0))
         return path
-    }
-}
-
-struct CurrentTimeIndicator: View {
-    @State private var currentTime = Date()
-    let timer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
-    
-    private var timeString: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "h:mm"
-        return formatter.string(from: currentTime)
-    }
-    
-    let hourSpacing: CGFloat
-    private let timelineHourHeight: CGFloat = 30
-    
-    private var indicatorOffset: CGFloat {
-        let calendar = Calendar.current
-        let components = calendar.dateComponents([.hour, .minute], from: currentTime)
-        let hour = CGFloat(components.hour ?? 0)
-        let minute = CGFloat(components.minute ?? 0)
-        
-        return (hour + minute / 60) * (hourSpacing + timelineHourHeight)
-    }
-    
-    var body: some View {
-        HStack {
-            ZStack(alignment: .topTrailing) {
-                GeometryReader() { geometry in
-                    Rectangle()
-                        .fill(Color(red: 0.8, green: 0.8, blue: 0.8, opacity: 0.4))
-                        .frame(height: indicatorOffset + 10)
-                        .cornerRadius(2)
-                    
-                    CurrentTimeView(timeString: timeString)
-                        .offset(x: geometry.size.width * 0.85, y: indicatorOffset)
-                }
-            }
-        }
-        .onReceive(timer) { _ in
-            currentTime = Date()
-        }
-    }
-}
-
-struct CurrentTimeView: View {
-    var timeString: String
-    
-    var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 4)
-                .fill(Color.gray)
-                .frame(width: 35, height: 20)
-            
-            Text(timeString)
-                .font(.caption2)
-                .fontWeight(.semibold)
-                .foregroundColor(.white)
-        }
     }
 }
 
