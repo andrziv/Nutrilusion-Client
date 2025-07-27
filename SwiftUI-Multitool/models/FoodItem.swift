@@ -137,8 +137,8 @@ struct MockData {
                 FoodItem(name: "Banana", calories: 80),
                 FoodItem(name: "Almond Milk", calories: 10)
             ],
-            servingAmount: 1.0,
-            servingUnit: "glass"
+            servingAmount: 350.0,
+            servingUnit: "mL"
         ),
         FoodItem(
             name: "Spaghetti Bolognese",

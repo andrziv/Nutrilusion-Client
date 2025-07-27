@@ -7,8 +7,7 @@
 
 import SwiftUI
 
-struct TaskListView: View {
-    let tasks = CalendarTask.sampleTasks
+struct TimelineLogView: View {
     let selectedDate: Date
     
     @State private var initialScrollPerformed = false
@@ -22,36 +21,17 @@ struct TaskListView: View {
     private var hourSpacing: CGFloat {
         defaultHourSpacing * timeSlotScale
     }
-
-
+    
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            VStack(alignment: .leading, spacing: 8) {
-                Text(dateFormatter.string(from: selectedDate))
-                    .font(.headline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.blue)
-                
-                Text("You have 5 tasks scheduled for today")
-                    .font(.callout)
-                    .foregroundColor(.green)
-            }
+        VStack {
             GeometryReader { geometry in
                 ScrollViewReader { scrollProxy in
                     ScrollView(.vertical, showsIndicators: false) {
-                        HStack(alignment: .top, spacing: 16) {
-                            
+                        ZStack(alignment: .topLeading) {
                             TimelineView(hourSpacing: hourSpacing)
-                            
+                                .padding([.leading], 16)
                             CurrentTimeIndicator(hourSpacing: hourSpacing)
-                            
-                            VStack(spacing: hourSpacing) {
-                                ForEach(tasks) { task in
-                                   // TaskView(task: task)
-                                }
-                            }.frame(maxWidth: .infinity)
                         }
-                        .frame(minHeight: geometry.size.height)
                     }
                     .onAppear {
                         if !initialScrollPerformed {
@@ -68,15 +48,6 @@ struct TaskListView: View {
                 }
             }
         }
-        .padding()
-        .background(
-            ZStack {
-                Color.white
-                RoundedRectangle(cornerRadius: 20)
-                    .stroke(Color.black, lineWidth: 1)
-            }
-        )
-        .cornerRadius(20)
     }
     
     var dateFormatter: DateFormatter = {
@@ -101,12 +72,12 @@ struct TimelineView: View {
     }
 }
 
-
 struct TimelineHourView: View {
     let hour: Int
+    var formattedHour: String = "%d:00"
     
     private var timeString: String {
-        String(format: "%d:00", hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour))
+        String(format: formattedHour, hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour))
     }
     
     private var amPm: String {
@@ -114,18 +85,39 @@ struct TimelineHourView: View {
     }
     
     var body: some View {
-        VStack(alignment: .trailing) {
-            Text(timeString)
-            Text(amPm)
+        VStack {
+            HStack {
+                Text(timeString + amPm)
+                    .font(.footnote)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.gray)
+                    .frame(height: 30)
+                    .id("hour-\(hour)")
+                Line()
+                    .stroke(style: StrokeStyle(lineWidth: 1, dash: [5]))
+                    .frame(height: 1)
+            }
+            HStack(alignment: .top, spacing: 5) {
+                VStack(spacing: 10) {
+                    ForEach(CalendarTask.sampleTasks, id: \.id) { task in
+                        if Calendar.current.component(.hour, from: task.startTime) == hour {
+                            TaskView(task: task)
+                        }
+                    }
+                }
+            }
         }
-        .font(.footnote)
-        .fontWeight(.semibold)
-        .foregroundColor(.blue)
-        .frame(height: 30)
-        .id("hour-\(hour)")
     }
 }
 
+struct Line: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.move(to: CGPoint(x: 0, y: 0))
+        path.addLine(to: CGPoint(x: rect.width, y: 0))
+        return path
+    }
+}
 
 struct CurrentTimeIndicator: View {
     @State private var currentTime = Date()
@@ -151,28 +143,16 @@ struct CurrentTimeIndicator: View {
     
     var body: some View {
         HStack {
-            ZStack(alignment: .top) {
-                Rectangle()
-                    .fill(Color.blue)
-                    .frame(width: 4)
-                    .cornerRadius(2)
-                
-                Rectangle()
-                    .fill(Color.teal)
-                    .frame(width: 4, height: indicatorOffset + 10)
-                    .cornerRadius(2)
-                
-                ZStack {
-                    RoundedRectangle(cornerRadius: 4)
-                        .fill(Color.teal)
-                        .frame(width: 35, height: 20)
+            ZStack(alignment: .topTrailing) {
+                GeometryReader() { geometry in
+                    Rectangle()
+                        .fill(Color(red: 0.8, green: 0.8, blue: 0.8, opacity: 0.4))
+                        .frame(height: indicatorOffset + 10)
+                        .cornerRadius(2)
                     
-                    Text(timeString)
-                        .font(.caption2)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.blue)
+                    CurrentTimeView(timeString: timeString)
+                        .offset(x: geometry.size.width * 0.85, y: indicatorOffset)
                 }
-                .offset(y: indicatorOffset)
             }
         }
         .onReceive(timer) { _ in
@@ -180,6 +160,25 @@ struct CurrentTimeIndicator: View {
         }
     }
 }
+
+struct CurrentTimeView: View {
+    var timeString: String
+    
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 4)
+                .fill(Color.gray)
+                .frame(width: 35, height: 20)
+            
+            Text(timeString)
+                .font(.caption2)
+                .fontWeight(.semibold)
+                .foregroundColor(.white)
+        }
+    }
+}
+
+
 
 
 struct TaskView: View {
@@ -191,11 +190,11 @@ struct TaskView: View {
                 Text(task.title)
                     .font(.subheadline)
                     .fontWeight(.semibold)
-                    .foregroundColor(.blue)
+                    .foregroundColor(.black)
                 
                 Text(task.description)
                     .font(.caption)
-                    .foregroundColor(.green)
+                    .foregroundColor(.gray)
             }
             Spacer()
             
@@ -203,7 +202,7 @@ struct TaskView: View {
                 
             }) {
                 Image(systemName: "plus.circle.fill")
-                    .foregroundColor(.white)
+                    .foregroundColor(.black)
                     .font(.system(size: 32))
             }
         }
@@ -213,7 +212,6 @@ struct TaskView: View {
     }
 }
 
-
 struct CalendarTask: Identifiable {
     let id = UUID()
     let title: String
@@ -222,7 +220,6 @@ struct CalendarTask: Identifiable {
     let duration: TimeInterval
     let color: Color
 }
-
 
 extension CalendarTask {
     static let sampleTasks: [CalendarTask] = {
@@ -235,9 +232,16 @@ extension CalendarTask {
         
         return [
             CalendarTask(
+                title: "Team Stand-up MeetingXXX",
+                description: "Review progress and plan tasks for the week",
+                startTime: time(hour: 9),
+                duration: 3600,
+                color: .purple
+            ),
+            CalendarTask(
                 title: "Team Stand-up Meeting",
                 description: "Review progress and plan tasks for the week",
-                startTime: time(hour: 9, minute: 30),
+                startTime: time(hour: 9, minute: 2),
                 duration: 3600,
                 color: .purple
             ),
@@ -278,6 +282,10 @@ extension CalendarTask {
 }
 
 
+
+
+
+
 #Preview{
-    TaskListView(selectedDate: Date())
+    TimelineLogView(selectedDate: Date())
 }
