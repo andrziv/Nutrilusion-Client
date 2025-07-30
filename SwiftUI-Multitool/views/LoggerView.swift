@@ -68,7 +68,7 @@ struct LoggerView: View {
                             }
                             .padding([.trailing, .leading], 15)
                             
-                            TimelineLogView(selectedDate: Date())
+                            TimelineLogView(selectedDate: selectedDay.date, loggedMealItems: .constant(MockData.loggedMeals))
                         }
                         .background(.white)
                         .clipShape(RoundedRectangle(cornerSize: .init(width: 20, height: 20)))

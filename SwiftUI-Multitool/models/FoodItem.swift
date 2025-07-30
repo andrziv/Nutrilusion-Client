@@ -15,6 +15,7 @@ struct FoodItem {
     var ingredientList: [FoodItem] = []
     var servingAmount: Double = 1.0
     var servingUnit: String = "x"
+    var servingUnitMultiple: String = "x"
 }
 
 struct MockData {
@@ -31,7 +32,8 @@ struct MockData {
             FoodItem(name: "Peanut Butter", calories: 230)
         ],
         servingAmount: 1.0,
-        servingUnit: "sandwich"
+        servingUnit: "sandwich",
+        servingUnitMultiple: "sandwiches"
     )
 
     static let foodItemList: [FoodItem] = [
@@ -45,7 +47,8 @@ struct MockData {
                 NutrientItem(name: "Carbohydrates", amount: 8.0, unit: "g")
             ],
             servingAmount: 1.0,
-            servingUnit: "cup"
+            servingUnit: "cup",
+            servingUnitMultiple: "cups"
         ),
         FoodItem(
             name: "Apple",
@@ -72,7 +75,8 @@ struct MockData {
                 FoodItem(name: "Cheese", calories: 50)
             ],
             servingAmount: 1.0,
-            servingUnit: "slice"
+            servingUnit: "slice",
+            servingUnitMultiple: "slices"
         ),
         FoodItem(
             name: "Chicken Salad",
@@ -88,7 +92,8 @@ struct MockData {
                 FoodItem(name: "Dressing", calories: 110)
             ],
             servingAmount: 1.0,
-            servingUnit: "bowl"
+            servingUnit: "bowl",
+            servingUnitMultiple: "bowls"
         ),
         FoodItem(
             name: "Oatmeal with Banana",
@@ -104,7 +109,8 @@ struct MockData {
                 FoodItem(name: "Milk", calories: 30)
             ],
             servingAmount: 1.0,
-            servingUnit: "bowl"
+            servingUnit: "bowl",
+            servingUnitMultiple: "bowls"
         ),
         FoodItem(
             name: "Cheeseburger",
@@ -121,7 +127,8 @@ struct MockData {
                 FoodItem(name: "Lettuce & Tomato", calories: 50)
             ],
             servingAmount: 1.0,
-            servingUnit: "burger"
+            servingUnit: "burger",
+            servingUnitMultiple: "burgers"
         ),
         FoodItem(
             name: "Smoothie (Berry Blast)",
@@ -138,7 +145,9 @@ struct MockData {
                 FoodItem(name: "Almond Milk", calories: 10)
             ],
             servingAmount: 350.0,
-            servingUnit: "mL"
+            servingUnit: "mL",
+            servingUnitMultiple: "mL"
+            
         ),
         FoodItem(
             name: "Spaghetti Bolognese",
@@ -154,7 +163,8 @@ struct MockData {
                 FoodItem(name: "Parmesan", calories: 100)
             ],
             servingAmount: 1.0,
-            servingUnit: "plate"
+            servingUnit: "plate",
+            servingUnitMultiple: "plates"
         ),
         FoodItem(
             name: "Veggie Wrap",
@@ -170,7 +180,8 @@ struct MockData {
                 FoodItem(name: "Hummus", calories: 50)
             ],
             servingAmount: 1.0,
-            servingUnit: "wrap"
+            servingUnit: "wrap",
+            servingUnitMultiple: "wraps"
         )
     ]
 }

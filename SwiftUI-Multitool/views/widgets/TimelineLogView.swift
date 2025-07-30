@@ -9,6 +9,7 @@ import SwiftUI
 
 struct TimelineLogView: View {
     let selectedDate: Date
+    @Binding var loggedMealItems: [LoggedMealItem]
     
     @State private var initialScrollPerformed = false
     @State private var timeSlotScale: CGFloat = 1.0
@@ -28,7 +29,9 @@ struct TimelineLogView: View {
                 ScrollViewReader { scrollProxy in
                     ScrollView(.vertical, showsIndicators: false) {
                         ZStack(alignment: .topLeading) {
-                            TimelineView(hourSpacing: hourSpacing)
+                            TimelineView(loggedMealItems: loggedMealItems,
+                                         selectedDate: selectedDate,
+                                         hourSpacing: hourSpacing)
                                 .padding([.leading, .trailing], 16)
                         }
                     }
@@ -59,12 +62,18 @@ struct TimelineLogView: View {
 
 
 struct TimelineView: View {
+    var loggedMealItems: [LoggedMealItem]
+    let selectedDate: Date
     let hourSpacing: CGFloat
     
     var body: some View {
         VStack(alignment: .trailing, spacing: hourSpacing) {
+            let filteredMeals = loggedMealItems.filter {
+                let calendar = Calendar.current
+                return calendar.isDate($0.date, inSameDayAs: selectedDate)
+            }
             ForEach(0..<25) { hour in
-                TimelineHourView(hour: hour)
+                TimelineHourView(hour: hour, loggedMealItems: filteredMeals)
             }
         }
         .padding(.bottom, 40)
@@ -74,6 +83,7 @@ struct TimelineView: View {
 struct TimelineHourView: View {
     let hour: Int
     var formattedHour: String = "%d:00"
+    var loggedMealItems: [LoggedMealItem]
     
     private var timeString: String {
         String(format: formattedHour, hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour))
@@ -97,9 +107,9 @@ struct TimelineHourView: View {
                     .frame(height: 1)
             }
             VStack(spacing: 10) {
-                ForEach(CalendarTask.sampleTasks, id: \.id) { task in
-                    if Calendar.current.component(.hour, from: task.startTime) == hour {
-                        TaskView(task: task)
+                ForEach(loggedMealItems, id: \.id) { meal in
+                    if Calendar.current.component(.hour, from: meal.date) == hour {
+                        LoggedMealItemView(loggedItem: meal)
                     }
                 }
             }
@@ -109,129 +119,6 @@ struct TimelineHourView: View {
     }
 }
 
-struct TaskView: View {
-    let task: CalendarTask
-    
-    private func amPm(hour: Int) -> String {
-        hour < 12 ? "AM" : "PM"
-    }
-    
-    var body: some View {
-        Button {
-            
-        } label: {
-            VStack(alignment: .center) {
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        Text(task.title)
-                            .font(.headline)
-                            .fontWeight(.bold)
-                            .foregroundColor(.white)
-                        
-                        Spacer()
-                        
-                        let calendar = Calendar.current
-                        let date = task.startTime
-                        let hour = calendar.component(.hour, from: date)
-                        let minute = calendar.component(.minute, from: date)
-                        
-                        Text("\(hour > 12 ? hour - 12 : hour):\(minute < 10 ? "0" : "")\(minute) \(amPm(hour: hour))")
-                            .font(.subheadline)
-                            .fontWeight(.semibold)
-                            .foregroundColor((Color(red: 0.85, green: 0.85, blue: 0.85)))
-                    }
-                    
-                    Text(task.description)
-                        .font(.caption)
-                        .foregroundColor(Color(red: 0.85, green: 0.85, blue: 0.85))
-                }
-                Spacer()
-                
-                Image(systemName: "ellipsis")
-                    .foregroundColor(.white)
-                    .font(.system(size: 20))
-            }
-            .padding()
-            .background(LinearGradient(colors: [.black, .black, .black, .black, task.color], startPoint: .leading, endPoint: .trailing))
-            .cornerRadius(30)
-        }
-    }
-}
-
-struct CalendarTask: Identifiable {
-    let id = UUID()
-    let title: String
-    let description: String
-    let startTime: Date
-    let duration: TimeInterval
-    let color: Color
-}
-
-extension CalendarTask {
-    static let sampleTasks: [CalendarTask] = {
-        let calendar = Calendar.current
-        let now = Date()
-        
-        func time(hour: Int, minute: Int = 0) -> Date {
-            calendar.date(bySettingHour: hour, minute: minute, second: 0, of: now) ?? now
-        }
-        
-        return [
-            CalendarTask(
-                title: "Team Stand-up MeetingXXX",
-                description: "Review progress and plan tasks for the week",
-                startTime: time(hour: 9),
-                duration: 3600,
-                color: .purple
-            ),
-            CalendarTask(
-                title: "Team Stand-up Meeting",
-                description: "Review progress and plan tasks for the week",
-                startTime: time(hour: 9, minute: 2),
-                duration: 3600,
-                color: .purple
-            ),
-            
-            CalendarTask(
-                title: "Client Call",
-                description: "Discuss project updates and next steps with the client",
-                startTime: time(hour: 11),
-                duration: 1800,
-                color: .green
-            ),
-            
-            CalendarTask(
-                title: "Gym Workout",
-                description: "Go for a 1 hour workout session",
-                startTime: time(hour: 13),
-                duration: 3600,
-                color: .pink
-            ),
-            
-            CalendarTask(
-                title: "Vet Appointment",
-                description: "Take the dog to the vet for a check-up",
-                startTime: time(hour: 15, minute: 30),
-                duration: 1800,
-                color: .orange
-            ),
-            
-            CalendarTask(
-                title: "Design Review",
-                description: "Go over the latest UI updates",
-                startTime: time(hour: 22),
-                duration: 3600,
-                color: .blue
-            )
-        ]
-    }()
-}
-
-
-
-
-
-
 #Preview{
-    TimelineLogView(selectedDate: Date())
+    TimelineLogView(selectedDate: Date(), loggedMealItems: .constant(MockData.loggedMeals))
 }
