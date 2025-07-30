@@ -27,7 +27,7 @@ extension MockData {
             emblemColour: .purple
         ),
         LoggedMealItem(
-            date: Calendar.current.date(byAdding: .hour, value: -1, to: Date()) ?? Date(),
+            date: Calendar.current.date(byAdding: .minute, value: -90, to: Date()) ?? Date(),
             meal: foodItemList[3], // Lasagna
             servingMultiple: 1.5,
             importantNutrients: foodItemList[3].nutritionList,

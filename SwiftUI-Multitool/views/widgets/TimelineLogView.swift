@@ -72,8 +72,9 @@ struct TimelineView: View {
                 let calendar = Calendar.current
                 return calendar.isDate($0.date, inSameDayAs: selectedDate)
             }
+            var filteredSortedMeals = filteredMeals.sorted { $0.date < $1.date }
             ForEach(0..<25) { hour in
-                TimelineHourView(hour: hour, loggedMealItems: filteredMeals)
+                TimelineHourView(hour: hour, loggedMealItems: filteredSortedMeals)
             }
         }
         .padding(.bottom, 40)
