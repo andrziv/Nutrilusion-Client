@@ -7,9 +7,37 @@
 
 import SwiftUI
 
+struct SelectedDay {
+    var day: WeekDayType
+    var date: Date
+}
+
+struct WeekDayType: Hashable {
+    let id: String = UUID().uuidString
+    let name: String
+    let shortform: String
+    
+    private init(_ name: String, _ shortform: String) {
+        self.name = name
+        self.shortform = shortform
+    }
+}
+
+extension WeekDayType {
+    static let monday = WeekDayType("Monday", "Mon")
+    static let tuesday = WeekDayType("Tuesday", "Tue")
+    static let wednesday = WeekDayType("Wednesday", "Wed")
+    static let thursday = WeekDayType("Thursday", "Thur")
+    static let friday = WeekDayType("Friday", "Fri")
+    static let saturday = WeekDayType("Saturday", "Sat")
+    static let sunday = WeekDayType("Sunday", "Sun")
+    static let fullWeek = [monday, tuesday, wednesday, thursday, friday, saturday, sunday]
+}
+
 struct LoggerView: View {
     
-    @State var selectedDay = "Monday"
+    let currentDate = Date()
+    @State var selectedDay = SelectedDay(day: WeekDayType.fullWeek[Calendar.current.component(.weekday, from: Date()) - 1], date: Date())
     
     var body: some View {
         ZStack {
@@ -17,26 +45,37 @@ struct LoggerView: View {
                            startPoint: .topLeading,
                            endPoint: .bottomTrailing)
             .ignoresSafeArea()
+            
             VStack {
                 VStack {
-                    Text(selectedDay)
-                    VStack {
+                    VStack() {
                         WeekDayButtonSet(selectedDay: $selectedDay)
                             .frame(maxWidth: .infinity)
                         
-                        TimelineLogView(selectedDate: Date())
-                            .background(.white)
-                            .clipShape(RoundedRectangle(cornerSize: .init(width: 20, height: 20)))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 20)
-                                    .stroke(.gray, lineWidth: 2)
-                            )
+                        VStack {
+                            VStack(alignment: .leading) {
+                                HStack {
+                                    Image(systemName: "list.clipboard")
+                                    Text("Logged Food for " + selectedDay.date.formatted(dateMonthDayYearFormat()))
+                                }
+                                .padding(.top, 10)
+                                .font(.system(size: 14))
+                                .foregroundStyle(.gray)
+                                
+                                Line()
+                                    .frame(height: 1)
+                                    .background(.gray)
+                            }
+                            .padding([.trailing, .leading], 15)
+                            
+                            TimelineLogView(selectedDate: Date())
+                        }
+                        .background(.white)
+                        .clipShape(RoundedRectangle(cornerSize: .init(width: 20, height: 20)))
                     }
-                    .background(.gray)
-                    .clipShape(RoundedRectangle(cornerSize: .init(width: 20, height: 20)))
                 }
                 HStack {
-                    LogCurrentTimeButtonView()
+                    LogCurrentTimeButton()
                 }
             }
             .padding()
@@ -44,84 +83,49 @@ struct LoggerView: View {
     }
 }
 
-
 struct WeekDayButtonSet: View {
     
-    @Binding var selectedDay: String
+    @Binding var selectedDay: SelectedDay
+    
+    private func positionType(_ index: Int) -> Position {
+        if index == 0 {
+            return .left
+        } else if index >= 6 {
+            return .right
+        } else {
+            return .mid
+        }
+    }
     
     var body: some View {
         HStack(spacing: 0) {
-            Button {
-                selectedDay = "Monday"
-            } label: {
-                PositionalButtonView(text: "Mon", position: -1)
-            }
-            Button {
-                selectedDay = "Tuesday"
-            } label: {
-                PositionalButtonView(text: "Tue", position: 0)
-            }
-            Button {
-                selectedDay = "Wednesday"
-            } label: {
-                PositionalButtonView(text: "Wed", position: 0)
-            }
-            Button {
-                selectedDay = "Thursday"
-            } label: {
-                PositionalButtonView(text: "Thur", position: 0)
-            }
-            Button {
-                selectedDay = "Friday"
-            } label: {
-                PositionalButtonView(text: "Fri", position: 0)
-            }
-            Button {
-                selectedDay = "Saturday"
-            } label: {
-                PositionalButtonView(text: "Sat", position: 0)
-            }
-            Button {
-                selectedDay = "Sunday"
-            } label: {
-                PositionalButtonView(text: "Sun", position: 1)
+            let currentWeekDay = Calendar.current.component(.weekday, from: Date())
+            let currentDayIndex = currentWeekDay == 1 ? 7 : currentWeekDay - 1
+            let selectedWeekDay = Calendar.current.component(.weekday, from: selectedDay.date)
+            let selectedDayIndex = selectedWeekDay == 1 ? 7 : selectedWeekDay - 1
+            
+            ForEach(0..<WeekDayType.fullWeek.count, id: \.self) { index in
+                let day = WeekDayType.fullWeek[index]
+                let date = Calendar.current.date(byAdding: .day, value: index - (currentDayIndex - 1), to: Date())!
+                let calendarDay = Calendar.current.component(.day, from: date)
+                
+                Button {
+                    selectedDay.day = day
+                    selectedDay.date = date
+                } label: {
+                    PositionalButtonView(toptext:  String(calendarDay),
+                                         maintext: day.shortform,
+                                         position: positionType(index),
+                                         isSelected: selectedDayIndex - 1 == index)
+                }
             }
         }
+        .background(.white)
+        .clipShape(RoundedRectangle(cornerRadius: 20))
     }
 }
 
-struct PositionalButtonView: View {
-    var text: String
-    var position: Int
-    
-    private func getPositionShape() -> AnyShape {
-        if position < 0 {
-            return AnyShape(UnevenRoundedRectangle(cornerRadii: .init(topLeading: 20, bottomLeading: 20)))
-        } else if position == 0 {
-            return AnyShape(Rectangle())
-        } else {
-            return AnyShape(UnevenRoundedRectangle(cornerRadii: .init(bottomTrailing: 20, topTrailing: 20)))
-        }
-    }
-    
-    var body: some View {
-        Text(text)
-            .frame(maxWidth: .infinity, maxHeight: 40)
-            .background(.white)
-            .foregroundColor(.gray)
-            .font(.system(size: 20, weight: .bold, design: .default))
-            .clipShape(
-                getPositionShape()
-            )
-            .overlay(
-                getPositionShape()
-                    .stroke(.green, lineWidth: 2)
-            )
-        
-    }
-}
-
-struct LogCurrentTimeButtonView: View {
+struct LogCurrentTimeButton: View {
     @State private var currentTime = Date()
     let timer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
     
@@ -136,13 +140,13 @@ struct LogCurrentTimeButtonView: View {
             
         }) {
             Label("@ " + timeString, systemImage: "plus.circle.fill")
-              .padding(12)
-              .foregroundColor(.black)
-              .background(Color(red: 0.8, green: 0.8, blue: 1),
-                 in: RoundedRectangle(cornerRadius: 12))
-              .onReceive(timer) { _ in
-                  currentTime = Date()
-              }
+                .padding(12)
+                .foregroundColor(.black)
+                .background(Color(red: 0.8, green: 0.8, blue: 1),
+                            in: RoundedRectangle(cornerRadius: 12))
+                .onReceive(timer) { _ in
+                    currentTime = Date()
+                }
         }
     }
 }

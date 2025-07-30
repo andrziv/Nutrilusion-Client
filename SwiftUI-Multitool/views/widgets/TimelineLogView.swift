@@ -29,7 +29,7 @@ struct TimelineLogView: View {
                     ScrollView(.vertical, showsIndicators: false) {
                         ZStack(alignment: .topLeading) {
                             TimelineView(hourSpacing: hourSpacing)
-                                .padding([.leading], 16)
+                                .padding([.leading, .trailing], 16)
                         }
                     }
                     .onAppear {
@@ -96,59 +96,65 @@ struct TimelineHourView: View {
                     .stroke(style: StrokeStyle(lineWidth: 1, dash: [5]))
                     .frame(height: 1)
             }
-            HStack(alignment: .top, spacing: 5) {
-                VStack(spacing: 10) {
-                    ForEach(CalendarTask.sampleTasks, id: \.id) { task in
-                        if Calendar.current.component(.hour, from: task.startTime) == hour {
-                            TaskView(task: task)
-                        }
+            VStack(spacing: 10) {
+                ForEach(CalendarTask.sampleTasks, id: \.id) { task in
+                    if Calendar.current.component(.hour, from: task.startTime) == hour {
+                        TaskView(task: task)
                     }
                 }
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.vertical,15)
     }
 }
-
-struct Line: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        path.move(to: CGPoint(x: 0, y: 0))
-        path.addLine(to: CGPoint(x: rect.width, y: 0))
-        return path
-    }
-}
-
-
-
 
 struct TaskView: View {
     let task: CalendarTask
     
+    private func amPm(hour: Int) -> String {
+        hour < 12 ? "AM" : "PM"
+    }
+    
     var body: some View {
-        HStack(alignment: .top) {
-            VStack(alignment: .leading, spacing: 8) {
-                Text(task.title)
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.black)
-                
-                Text(task.description)
-                    .font(.caption)
-                    .foregroundColor(.gray)
-            }
-            Spacer()
+        Button {
             
-            Button(action: {
+        } label: {
+            VStack(alignment: .center) {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Text(task.title)
+                            .font(.headline)
+                            .fontWeight(.bold)
+                            .foregroundColor(.white)
+                        
+                        Spacer()
+                        
+                        let calendar = Calendar.current
+                        let date = task.startTime
+                        let hour = calendar.component(.hour, from: date)
+                        let minute = calendar.component(.minute, from: date)
+                        
+                        Text("\(hour > 12 ? hour - 12 : hour):\(minute < 10 ? "0" : "")\(minute) \(amPm(hour: hour))")
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                            .foregroundColor((Color(red: 0.85, green: 0.85, blue: 0.85)))
+                    }
+                    
+                    Text(task.description)
+                        .font(.caption)
+                        .foregroundColor(Color(red: 0.85, green: 0.85, blue: 0.85))
+                }
+                Spacer()
                 
-            }) {
-                Image(systemName: "plus.circle.fill")
-                    .foregroundColor(.black)
-                    .font(.system(size: 32))
+                Image(systemName: "ellipsis")
+                    .foregroundColor(.white)
+                    .font(.system(size: 20))
             }
+            .padding()
+            .background(LinearGradient(colors: [.black, .black, .black, .black, task.color], startPoint: .leading, endPoint: .trailing))
+            .cornerRadius(30)
         }
-        .padding()
-        .background(task.color)
-        .cornerRadius(10)
     }
 }
 
@@ -213,7 +219,7 @@ extension CalendarTask {
             CalendarTask(
                 title: "Design Review",
                 description: "Go over the latest UI updates",
-                startTime: time(hour: 17),
+                startTime: time(hour: 22),
                 duration: 3600,
                 color: .blue
             )
