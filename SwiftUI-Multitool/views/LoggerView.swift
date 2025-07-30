@@ -41,10 +41,7 @@ struct LoggerView: View {
     
     var body: some View {
         ZStack {
-            LinearGradient(colors: [Color(red: 0.9, green: 0.9, blue: 0.9)],
-                           startPoint: .topLeading,
-                           endPoint: .bottomTrailing)
-            .ignoresSafeArea()
+            LoggerBackgroundView()
             
             VStack {
                 VStack {
@@ -53,20 +50,7 @@ struct LoggerView: View {
                             .frame(maxWidth: .infinity)
                         
                         VStack {
-                            VStack(alignment: .leading) {
-                                HStack {
-                                    Image(systemName: "list.clipboard")
-                                    Text("Logged Food for " + selectedDay.date.formatted(dateMonthDayYearFormat()))
-                                }
-                                .padding(.top, 10)
-                                .font(.system(size: 14))
-                                .foregroundStyle(.gray)
-                                
-                                Line()
-                                    .frame(height: 1)
-                                    .background(.gray)
-                            }
-                            .padding([.trailing, .leading], 15)
+                            TimelineLogHeader(selectedDay: selectedDay)
                             
                             TimelineLogView(selectedDate: selectedDay.date, loggedMealItems: .constant(MockData.loggedMeals))
                         }
@@ -80,6 +64,15 @@ struct LoggerView: View {
             }
             .padding()
         }
+    }
+}
+
+struct LoggerBackgroundView: View {
+    var body: some View {
+        LinearGradient(colors: [Color(red: 0.9, green: 0.9, blue: 0.9)],
+                       startPoint: .topLeading,
+                       endPoint: .bottomTrailing)
+        .ignoresSafeArea()
     }
 }
 
@@ -122,6 +115,27 @@ struct WeekDayButtonSet: View {
         }
         .background(.white)
         .clipShape(RoundedRectangle(cornerRadius: 20))
+    }
+}
+
+struct TimelineLogHeader: View {
+    let selectedDay: SelectedDay
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            HStack {
+                Image(systemName: "list.clipboard")
+                Text("Logged Food for " + selectedDay.date.formatted(dateMonthDayYearFormat()))
+            }
+            .padding(.top, 10)
+            .font(.system(size: 14))
+            .foregroundStyle(.gray)
+            
+            Line()
+                .frame(height: 1)
+                .background(.gray)
+        }
+        .padding([.trailing, .leading], 15)
     }
 }
 

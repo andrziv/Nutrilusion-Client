@@ -16,6 +16,7 @@ struct LoggedMealItemView: View {
     }
     
     var body: some View {
+        let mixedColour = loggedItem.emblemColour.mix(with: .black, by: 0.3)
         VStack(alignment: .center, spacing: 10) {
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
@@ -50,13 +51,13 @@ struct LoggedMealItemView: View {
                     let isUnitMultiple = servingTotal > 1
                     Label("\(isInteger ? String(Int(servingTotal)) : String(format: "%.1f", servingTotal)) \(isUnitMultiple ? loggedItem.meal.servingUnitMultiple : loggedItem.meal.servingUnit)", systemImage: "dot.square")
                 }
-                .foregroundStyle(.gray)
+                .foregroundStyle(.white)
                 .font(.caption)
             }
         }
         .padding()
-        .background(LinearGradient(colors: [.black, .black, .black, .black, loggedItem.emblemColour], startPoint: .leading, endPoint: .trailing))
-        .cornerRadius(30)
+        .background(LinearGradient(colors: [mixedColour, mixedColour, mixedColour, mixedColour, loggedItem.emblemColour], startPoint: .leading, endPoint: .trailing))
+        .cornerRadius(10)
     }
 }
 
