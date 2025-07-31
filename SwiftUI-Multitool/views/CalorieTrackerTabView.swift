@@ -37,11 +37,6 @@ enum TabbedItems: Int, CaseIterable{
 
 struct CalorieTrackerTabView: View {
     @State private var selectedTab: TabbedItems = .logger
-    @Namespace private var animationNamespace
-    @State private var tabSwitchTrigger = UUID() // Used to re-trigger the animation
-    
-    private let tabBarHeight: CGFloat = 60
-    private let floatingOffset: CGFloat = 12
     
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -51,9 +46,7 @@ struct CalorieTrackerTabView: View {
                 // kludge around TabView because getting around the fixed-window of the main screens is too complicated.
                 ZStack {
                     contentView(for: selectedTab)
-                        .id(tabSwitchTrigger) // Re-trigger animation on tab change
-                        .transition(.scale(scale: 0.98).combined(with: .opacity))
-                        .animation(.spring(response: 4, dampingFraction: 2), value: tabSwitchTrigger)
+                        .transition(.scale(scale: 0.99).combined(with: .opacity))
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 
@@ -61,9 +54,8 @@ struct CalorieTrackerTabView: View {
                 HStack(spacing: 30) {
                     ForEach(TabbedItems.allCases, id: \.self) { item in
                         Button {
-                            withAnimation {
+                            withAnimation(.snappy) {
                                 selectedTab = item
-                                tabSwitchTrigger = UUID() // force new animation
                             }
                         } label: {
                             CustomTabItem(
