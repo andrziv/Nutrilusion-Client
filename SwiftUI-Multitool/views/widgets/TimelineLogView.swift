@@ -32,7 +32,7 @@ struct TimelineLogView: View {
                             TimelineView(loggedMealItems: loggedMealItems,
                                          selectedDate: selectedDate,
                                          hourSpacing: hourSpacing)
-                                .padding([.leading, .trailing], 16)
+                            .padding([.leading, .trailing], 16)
                         }
                     }
                     .onAppear {
@@ -44,7 +44,6 @@ struct TimelineLogView: View {
                             
                             scrollProxy.scrollTo("hour-\(targetHour)", anchor: .top)
                             initialScrollPerformed = true
-                            
                         }
                     }
                 }
@@ -86,6 +85,7 @@ struct TimelineHourView: View {
     var formattedHour: String = "%d:00"
     var loggedMealItems: [LoggedMealItem]
     
+    
     private var timeString: String {
         String(format: formattedHour, hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour))
     }
@@ -95,6 +95,10 @@ struct TimelineHourView: View {
     }
     
     var body: some View {
+        let filteredHourMealItems = loggedMealItems.filter({
+            Calendar.current.component(.hour, from: $0.date) == hour
+        })
+        
         VStack {
             HStack {
                 Text(timeString + amPm)
@@ -108,15 +112,12 @@ struct TimelineHourView: View {
                     .frame(height: 1)
             }
             VStack(spacing: 10) {
-                ForEach(loggedMealItems, id: \.id) { meal in
-                    if Calendar.current.component(.hour, from: meal.date) == hour {
-                        LoggedMealItemView(loggedItem: meal)
-                    }
+                ForEach(filteredHourMealItems, id: \.id) { meal in
+                    LoggedMealItemView(loggedItem: meal)
                 }
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.vertical,15)
+        .padding(.vertical, filteredHourMealItems.isEmpty ? 15 : 0)
     }
 }
 

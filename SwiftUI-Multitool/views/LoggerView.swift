@@ -40,39 +40,60 @@ struct LoggerView: View {
     @State var selectedDay = SelectedDay(day: WeekDayType.fullWeek[Calendar.current.component(.weekday, from: Date()) - 1], date: Date())
     
     var body: some View {
-        ZStack {
-            LoggerBackgroundView()
-            
+        VStack {
             VStack {
-                VStack {
-                    VStack() {
-                        WeekDayButtonSet(selectedDay: $selectedDay)
-                            .frame(maxWidth: .infinity)
+                VStack() {
+                    WeekDayButtonSet(selectedDay: $selectedDay)
+                        .frame(maxWidth: .infinity)
+                    
+                    VStack {
+                        TimelineLogHeader(selectedDay: selectedDay)
                         
-                        VStack {
-                            TimelineLogHeader(selectedDay: selectedDay)
-                            
-                            TimelineLogView(selectedDate: selectedDay.date, loggedMealItems: .constant(MockData.loggedMeals))
-                        }
-                        .background(.white)
-                        .clipShape(RoundedRectangle(cornerSize: .init(width: 20, height: 20)))
+                        TimelineLogView(selectedDate: selectedDay.date, loggedMealItems: .constant(MockData.loggedMeals))
                     }
-                }
-                HStack {
-                    LogCurrentTimeButton()
+                    .background(.white)
+                    .clipShape(RoundedRectangle(cornerSize: .init(width: 20, height: 20)))
                 }
             }
-            .padding()
+            
+            HStack {
+                HStack {
+                    VStack(spacing: 4) {
+                        Label("3800", systemImage: "flame.fill")
+                            .font(.subheadline)
+                            .scaledToFit()
+                            .minimumScaleFactor(0.6)
+                        ProgressView(value: 1.2)
+                    }
+                    VStack(spacing: 4) {
+                        Label("100", systemImage: "p.circle.fill")
+                            .font(.subheadline)
+                            .scaledToFit()
+                            .minimumScaleFactor(0.6)
+                        ProgressView(value: 1)
+                    }
+                    VStack(spacing: 4) {
+                        Label("100", systemImage: "f.circle.fill")
+                            .font(.subheadline)
+                            .scaledToFit()
+                            .minimumScaleFactor(0.6)
+                        ProgressView(value: 1)
+                    }
+                    VStack(spacing: 4) {
+                        Label("100", systemImage: "c.circle.fill")
+                            .font(.subheadline)
+                            .scaledToFit()
+                            .minimumScaleFactor(0.6)
+                        ProgressView(value: 1)
+                    }
+                }
+                .padding(12)
+                .background(.white, in: RoundedRectangle(cornerRadius: 12))
+                
+                LogCurrentTimeButton()
+            }
         }
-    }
-}
-
-struct LoggerBackgroundView: View {
-    var body: some View {
-        LinearGradient(colors: [Color(red: 0.9, green: 0.9, blue: 0.9)],
-                       startPoint: .topLeading,
-                       endPoint: .bottomTrailing)
-        .ignoresSafeArea()
+        .padding()
     }
 }
 
@@ -156,8 +177,10 @@ struct LogCurrentTimeButton: View {
             Label("@ " + timeString, systemImage: "plus.circle.fill")
                 .padding(12)
                 .foregroundColor(.black)
+                .frame(maxHeight: 50)
                 .background(Color(red: 0.8, green: 0.8, blue: 1),
                             in: RoundedRectangle(cornerRadius: 12))
+                .fixedSize(horizontal: true, vertical: false)
                 .onReceive(timer) { _ in
                     currentTime = Date()
                 }
