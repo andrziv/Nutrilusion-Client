@@ -35,7 +35,7 @@ enum TabbedItems: Int, CaseIterable{
     }
 }
 
-struct CalorieTrackerTabView: View {
+struct MealTrackerTabView: View {
     @State private var selectedTab: TabbedItems = .logger
     
     var body: some View {
@@ -96,7 +96,7 @@ struct BackgroundView: View {
     }
 }
 
-extension CalorieTrackerTabView {
+extension MealTrackerTabView {
     func CustomTabItem(imageName: String, title: String, isActive: Bool) -> some View{
         HStack {
             Label(title, systemImage: imageName)
@@ -110,5 +110,5 @@ extension CalorieTrackerTabView {
 }
 
 #Preview {
-    CalorieTrackerTabView()
+    MealTrackerTabView()
 }
