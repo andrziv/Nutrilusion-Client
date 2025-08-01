@@ -17,5 +17,6 @@ extension NutrientImageMapping {
         "Carbohydrates": "c.circle.fill",
         "Protein": "p.circle.fill",
         "Fat": "f.circle.fill",
+        "Fiber": "tree.fill",
         "Calories": "flame.fill"]
 }

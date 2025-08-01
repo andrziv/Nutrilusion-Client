@@ -174,26 +174,16 @@ struct ScaledTotalNutrientStatView: View {
     
     var body: some View {
         if nutrientOfInterest == "Calories" {
-            Label(String(sumCalories(mealItems)),
+            Label(RoundingDouble(sumCalories(mealItems)),
                   systemImage: NutrientImageMapping.allCases["Calories"] ?? "questionmark.diamond.fill")
             .labelStyle(CustomLabel(spacing: 3))
         } else {
-            Label(String(sumNutrients(nutrientOfInterest, mealItems)),
-                          systemImage: NutrientImageMapping.allCases[nutrientOfInterest] ?? "questionmark.diamond.fill")
+            Label(RoundingDouble(sumNutrients(nutrientOfInterest, mealItems)),
+                  systemImage: NutrientImageMapping.allCases[nutrientOfInterest] ?? "questionmark.diamond.fill")
             .labelStyle(CustomLabel(spacing: 3))
         }
     }
 }
-
-struct CustomLabel: LabelStyle {
-    var spacing: Double = 0.0
-
-    func makeBody(configuration: Configuration) -> some View {
-        HStack(spacing: spacing) {
-            configuration.icon
-            configuration.title
-        }
-    }}
 
 struct LogCurrentTimeButton: View {
     @State private var currentTime = Date()

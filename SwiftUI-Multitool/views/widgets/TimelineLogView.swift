@@ -139,9 +139,9 @@ struct TotalNutrientStatView: View {
     
     var body: some View {
         if nutrientOfInterest == "Calories" {
-            Label(String(sumCalories(mealItems)), systemImage: NutrientImageMapping.allCases["Calories"] ?? "questionmark.diamond.fill")
+            Label(RoundingDouble(sumCalories(mealItems)), systemImage: NutrientImageMapping.allCases["Calories"] ?? "questionmark.diamond.fill")
         } else {
-            Label(String(sumNutrients(nutrientOfInterest, mealItems)), systemImage: NutrientImageMapping.allCases[nutrientOfInterest] ?? "questionmark.diamond.fill")
+            Label(RoundingDouble(sumNutrients(nutrientOfInterest, mealItems)), systemImage: NutrientImageMapping.allCases[nutrientOfInterest] ?? "questionmark.diamond.fill")
         }
     }
 }

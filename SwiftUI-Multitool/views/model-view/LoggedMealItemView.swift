@@ -41,14 +41,17 @@ struct LoggedMealItemView: View {
                 
                 let shownNutrients = min(3, loggedItem.meal.nutritionList.count)
                 VStack(alignment: .leading) {
-                    HStack(spacing: 10) {
+                    HStack(spacing: 15) {
                         NutrientStatView(nutrientOfInterest: "Calories", mealItem: loggedItem)
+                            .labelStyle(CustomLabel(spacing: 7))
                         ForEach(0..<shownNutrients, id: \.self) { index in
                             NutrientStatView(nutrientOfInterest: loggedItem.meal.nutritionList[index].name, mealItem: loggedItem)
+                                .labelStyle(CustomLabel(spacing: 7))
                         }
                     }
                     
                     ServingSizeView(mealItem: loggedItem)
+                        .labelStyle(CustomLabel(spacing: 5))
                 }
                 .foregroundStyle(.white)
                 .font(.footnote)
@@ -66,9 +69,9 @@ struct NutrientStatView: View {
     
     var body: some View {
         if nutrientOfInterest == "Calories" {
-            Label(String(getCalories(mealItem)), systemImage: NutrientImageMapping.allCases["Calories"] ?? "questionmark.diamond.fill")
+            Label(RoundingDouble(getCalories(mealItem)), systemImage: NutrientImageMapping.allCases["Calories"] ?? "questionmark.diamond.fill")
         } else {
-            Label(String(getNutrientValue(nutrientOfInterest, mealItem)), systemImage: NutrientImageMapping.allCases[nutrientOfInterest] ?? "questionmark.diamond.fill")
+            Label(RoundingDouble(getNutrientValue(nutrientOfInterest, mealItem)), systemImage: NutrientImageMapping.allCases[nutrientOfInterest] ?? "questionmark.diamond.fill")
         }
     }
 }
@@ -78,9 +81,8 @@ struct ServingSizeView: View {
     
     var body: some View {
         let servingTotal = mealItem.servingMultiple * mealItem.meal.servingAmount
-        let isInteger = servingTotal.truncatingRemainder(dividingBy: 1) == 0
         let isUnitMultiple = servingTotal > 1
-        Label("\(isInteger ? String(Int(servingTotal)) : String(format: "%.1f", servingTotal)) " +
+        Label("\(RoundingDouble(servingTotal)) " +
               "\(isUnitMultiple ? mealItem.meal.servingUnitMultiple : mealItem.meal.servingUnit)",
               systemImage: "dot.square")
     }
