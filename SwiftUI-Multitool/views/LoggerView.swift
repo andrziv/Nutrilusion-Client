@@ -38,8 +38,15 @@ struct LoggerView: View {
     
     let currentDate = Date()
     @State var selectedDay = SelectedDay(day: WeekDayType.fullWeek[Calendar.current.component(.weekday, from: Date()) - 1], date: Date())
+    @State var loggedMealItems: [LoggedMealItem] = MockData.loggedMeals
     
     var body: some View {
+        let filteredMeals = loggedMealItems.filter {
+            let calendar = Calendar.current
+            return calendar.isDate($0.date, inSameDayAs: selectedDay.date)
+        }
+        let filteredSortedMeals = filteredMeals.sorted { $0.date < $1.date }
+        
         VStack {
             VStack {
                 VStack() {
@@ -48,8 +55,8 @@ struct LoggerView: View {
                     
                     VStack {
                         TimelineLogHeader(selectedDay: selectedDay)
-                        
-                        TimelineLogView(selectedDate: selectedDay.date, loggedMealItems: .constant(MockData.loggedMeals))
+                            .padding([.trailing, .leading], 15)
+                        TimelineLogView(selectedDate: selectedDay.date, loggedMealItems: .constant(filteredSortedMeals))
                     }
                     .background(.white)
                     .clipShape(RoundedRectangle(cornerSize: .init(width: 20, height: 20)))
@@ -57,38 +64,9 @@ struct LoggerView: View {
             }
             
             HStack {
-                HStack {
-                    VStack(spacing: 4) {
-                        Label("3800", systemImage: "flame.fill")
-                            .font(.subheadline)
-                            .scaledToFit()
-                            .minimumScaleFactor(0.6)
-                        ProgressView(value: 1.2)
-                    }
-                    VStack(spacing: 4) {
-                        Label("100", systemImage: "p.circle.fill")
-                            .font(.subheadline)
-                            .scaledToFit()
-                            .minimumScaleFactor(0.6)
-                        ProgressView(value: 1)
-                    }
-                    VStack(spacing: 4) {
-                        Label("100", systemImage: "f.circle.fill")
-                            .font(.subheadline)
-                            .scaledToFit()
-                            .minimumScaleFactor(0.6)
-                        ProgressView(value: 1)
-                    }
-                    VStack(spacing: 4) {
-                        Label("100", systemImage: "c.circle.fill")
-                            .font(.subheadline)
-                            .scaledToFit()
-                            .minimumScaleFactor(0.6)
-                        ProgressView(value: 1)
-                    }
-                }
-                .padding(12)
-                .background(.white, in: RoundedRectangle(cornerRadius: 12))
+                DailyStatProgressView(mealItems: filteredSortedMeals)
+                    .padding(12)
+                    .background(.white, in: RoundedRectangle(cornerRadius: 12))
                 
                 LogCurrentTimeButton()
             }
@@ -156,9 +134,66 @@ struct TimelineLogHeader: View {
                 .frame(height: 1)
                 .background(.gray)
         }
-        .padding([.trailing, .leading], 15)
     }
 }
+
+struct DailyStatProgressView: View {
+    var mealItems: [LoggedMealItem]
+    
+    var body: some View {
+        HStack {
+            DailyNutrientProgressView(nutrientOfInterest: "Calories", mealItems: mealItems)
+            DailyNutrientProgressView(nutrientOfInterest: "Protein", mealItems: mealItems)
+            DailyNutrientProgressView(nutrientOfInterest: "Fat", mealItems: mealItems)
+            DailyNutrientProgressView(nutrientOfInterest: "Carbohydrates", mealItems: mealItems)
+        }
+        .frame(maxHeight: 25)
+    }
+}
+
+struct DailyNutrientProgressView: View {
+    var nutrientOfInterest: String
+    var mealItems: [LoggedMealItem]
+    var progress: Double = 1
+    
+    var body: some View {
+        VStack(spacing: 4) {
+            ScaledTotalNutrientStatView(nutrientOfInterest: nutrientOfInterest, mealItems: mealItems)
+                .scaledToFit()
+                .minimumScaleFactor(0.4)
+                .frame(maxWidth: .infinity)
+                .font(.caption2)
+            ProgressView(value: progress)
+        }
+    }
+}
+
+struct ScaledTotalNutrientStatView: View {
+    var nutrientOfInterest: String
+    var mealItems: [LoggedMealItem]
+    
+    var body: some View {
+        if nutrientOfInterest == "Calories" {
+            Label(String(sumCalories(mealItems)),
+                  systemImage: NutrientImageMapping.allCases["Calories"] ?? "questionmark.diamond.fill")
+            .labelStyle(CustomLabel(spacing: 3))
+        } else {
+            Label(String(sumNutrients(nutrientOfInterest, mealItems)),
+                          systemImage: NutrientImageMapping.allCases[nutrientOfInterest] ?? "questionmark.diamond.fill")
+            .labelStyle(CustomLabel(spacing: 3))
+        }
+    }
+}
+
+struct CustomLabel: LabelStyle {
+    var spacing: Double = 0.0
+
+    func makeBody(configuration: Configuration) -> some View {
+        HStack(spacing: spacing) {
+            configuration.icon
+            configuration.title
+        }
+    }}
 
 struct LogCurrentTimeButton: View {
     @State private var currentTime = Date()

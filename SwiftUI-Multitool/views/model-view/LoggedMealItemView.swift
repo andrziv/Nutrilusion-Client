@@ -40,24 +40,49 @@ struct LoggedMealItemView: View {
                 }
                 
                 let shownNutrients = min(3, loggedItem.meal.nutritionList.count)
-                
-                HStack(spacing: 20) {
-                    ForEach(0..<shownNutrients, id: \.self) { index in
-                        Label(String(loggedItem.meal.nutritionList[index].amount), systemImage: "flame.fill")
+                VStack(alignment: .leading) {
+                    HStack(spacing: 10) {
+                        NutrientStatView(nutrientOfInterest: "Calories", mealItem: loggedItem)
+                        ForEach(0..<shownNutrients, id: \.self) { index in
+                            NutrientStatView(nutrientOfInterest: loggedItem.meal.nutritionList[index].name, mealItem: loggedItem)
+                        }
                     }
                     
-                    let servingTotal = loggedItem.servingMultiple * loggedItem.meal.servingAmount
-                    let isInteger = servingTotal.truncatingRemainder(dividingBy: 1) == 0
-                    let isUnitMultiple = servingTotal > 1
-                    Label("\(isInteger ? String(Int(servingTotal)) : String(format: "%.1f", servingTotal)) \(isUnitMultiple ? loggedItem.meal.servingUnitMultiple : loggedItem.meal.servingUnit)", systemImage: "dot.square")
+                    ServingSizeView(mealItem: loggedItem)
                 }
                 .foregroundStyle(.white)
-                .font(.caption)
+                .font(.footnote)
             }
         }
         .padding()
         .background(LinearGradient(colors: [mixedColour, mixedColour, mixedColour, mixedColour, loggedItem.emblemColour], startPoint: .leading, endPoint: .trailing))
         .cornerRadius(10)
+    }
+}
+
+struct NutrientStatView: View {
+    var nutrientOfInterest: String
+    var mealItem: LoggedMealItem
+    
+    var body: some View {
+        if nutrientOfInterest == "Calories" {
+            Label(String(getCalories(mealItem)), systemImage: NutrientImageMapping.allCases["Calories"] ?? "questionmark.diamond.fill")
+        } else {
+            Label(String(getNutrientValue(nutrientOfInterest, mealItem)), systemImage: NutrientImageMapping.allCases[nutrientOfInterest] ?? "questionmark.diamond.fill")
+        }
+    }
+}
+
+struct ServingSizeView: View {
+    var mealItem: LoggedMealItem
+    
+    var body: some View {
+        let servingTotal = mealItem.servingMultiple * mealItem.meal.servingAmount
+        let isInteger = servingTotal.truncatingRemainder(dividingBy: 1) == 0
+        let isUnitMultiple = servingTotal > 1
+        Label("\(isInteger ? String(Int(servingTotal)) : String(format: "%.1f", servingTotal)) " +
+              "\(isUnitMultiple ? mealItem.meal.servingUnitMultiple : mealItem.meal.servingUnit)",
+              systemImage: "dot.square")
     }
 }
 

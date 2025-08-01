@@ -50,13 +50,6 @@ struct TimelineLogView: View {
             }
         }
     }
-    
-    var dateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "EEEE, MMMM d, yyyy"
-        return formatter
-    }()
-    
 }
 
 
@@ -67,13 +60,8 @@ struct TimelineView: View {
     
     var body: some View {
         VStack(alignment: .trailing, spacing: hourSpacing) {
-            let filteredMeals = loggedMealItems.filter {
-                let calendar = Calendar.current
-                return calendar.isDate($0.date, inSameDayAs: selectedDate)
-            }
-            let filteredSortedMeals = filteredMeals.sorted { $0.date < $1.date }
             ForEach(0..<25) { hour in
-                TimelineHourView(hour: hour, loggedMealItems: filteredSortedMeals)
+                TimelineHourView(hour: hour, loggedMealItems: loggedMealItems)
             }
         }
         .padding(.bottom, 40)
@@ -107,9 +95,7 @@ struct TimelineHourView: View {
                     .foregroundColor(.gray)
                     .frame(height: 30)
                     .id("hour-\(hour)")
-                Line()
-                    .stroke(style: StrokeStyle(lineWidth: 1, dash: [5]))
-                    .frame(height: 1)
+                TimelineHourStatView(mealItems: filteredHourMealItems)
             }
             VStack(spacing: 10) {
                 ForEach(filteredHourMealItems, id: \.id) { meal in
@@ -118,6 +104,45 @@ struct TimelineHourView: View {
             }
         }
         .padding(.vertical, filteredHourMealItems.isEmpty ? 15 : 0)
+    }
+}
+
+struct TimelineHourStatView: View {
+    var mealItems: [LoggedMealItem]
+    
+    var body: some View {
+        ZStack {
+            Line()
+                .stroke(style: StrokeStyle(lineWidth: 1, dash: [5]))
+                .frame(height: 1)
+            if mealItems.count > 0 {
+                HStack {
+                    TotalNutrientStatView(nutrientOfInterest: "Calories", mealItems: mealItems)
+                    TotalNutrientStatView(nutrientOfInterest: "Protein", mealItems: mealItems)
+                    TotalNutrientStatView(nutrientOfInterest: "Fat", mealItems: mealItems)
+                    TotalNutrientStatView(nutrientOfInterest: "Carbohydrates", mealItems: mealItems)
+                }
+                .font(.caption)
+                .foregroundStyle(.gray)
+                .padding(.horizontal, 5)
+                .background(.white)
+                .cornerRadius(15)
+                
+            }
+        }
+    }
+}
+
+struct TotalNutrientStatView: View {
+    var nutrientOfInterest: String
+    var mealItems: [LoggedMealItem]
+    
+    var body: some View {
+        if nutrientOfInterest == "Calories" {
+            Label(String(sumCalories(mealItems)), systemImage: NutrientImageMapping.allCases["Calories"] ?? "questionmark.diamond.fill")
+        } else {
+            Label(String(sumNutrients(nutrientOfInterest, mealItems)), systemImage: NutrientImageMapping.allCases[nutrientOfInterest] ?? "questionmark.diamond.fill")
+        }
     }
 }
 
