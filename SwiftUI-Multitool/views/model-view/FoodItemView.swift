@@ -51,15 +51,27 @@ struct MinimizedFoodItemView: View {
         } label: {
             VStack(alignment: .center, spacing: 10) {
                 VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        Text(foodItem.name)
-                            .font(.headline)
-                            .fontWeight(.bold)
-                            .foregroundColor(textColor)
+                    VStack {
+                        HStack {
+                            Text(foodItem.name)
+                                .font(.headline)
+                                .fontWeight(.bold)
+                                .foregroundColor(textColor)
+                            
+                            Spacer()
+                            
+                            ServingSizeView(foodItem: foodItem)
+                                .labelStyle(CustomLabel(spacing: 5))
+                                .foregroundStyle(subtextColor)
+                                .font(.footnote)
+                        }
+                        Line()
+                            .frame(height: 1)
+                            .background(.gray)
                     }
                     
-                    let shownNutrients = min(3, foodItem.nutritionList.count)
-                    VStack(alignment: .leading) {
+                    HStack {
+                        let shownNutrients = min(3, foodItem.nutritionList.count)
                         HStack(spacing: 15) {
                             CalorieStatView(foodItem: foodItem)
                                 .labelStyle(CustomLabel(spacing: 7))
@@ -68,17 +80,23 @@ struct MinimizedFoodItemView: View {
                                     .labelStyle(CustomLabel(spacing: 7))
                             }
                         }
+                        .foregroundStyle(subtextColor)
+                        .font(.footnote)
                         
-                        ServingSizeView(foodItem: foodItem)
-                            .labelStyle(CustomLabel(spacing: 5))
+                        Spacer()
+                        
+                        Image(systemName: "chevron.down")
+                            .foregroundStyle(textColor)
+                            .font(.callout)
+                            .padding(.horizontal)
+                            .padding(.vertical, 4)
+                            .overlay(content: {
+                                RoundedRectangle(cornerRadius: 100)
+                                    .fill(Color.gray)
+                                    .opacity(0.2)
+                            })
                     }
-                    .foregroundStyle(subtextColor)
-                    .font(.footnote)
                 }
-                
-                OpenButtonView()
-                    .foregroundStyle(textColor)
-                    .font(.callout)
             }
             .frame(maxWidth: .infinity)
             .padding()

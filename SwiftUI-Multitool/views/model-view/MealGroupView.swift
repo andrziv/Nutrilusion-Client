@@ -119,7 +119,6 @@ struct ExpandedMealGroupView: View {
                                 heavyMixedColour: heavyMixedColour)
         }
         
-   //     .cornerRadius(15)
     }
 }
 
