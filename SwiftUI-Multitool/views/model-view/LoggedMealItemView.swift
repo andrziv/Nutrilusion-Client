@@ -35,22 +35,21 @@ struct LoggedMealItemView: View {
                     Text("\(hour > 12 ? hour - 12 : hour):\(minute < 10 ? "0" : "")\(minute) \(amPm(hour: hour))")
                         .font(.subheadline)
                         .fontWeight(.semibold)
-                        .foregroundColor((Color(red: 0.85, green: 0.85, blue: 0.85)))
-                    
+                        .foregroundColor(Color(red: 0.85, green: 0.85, blue: 0.85))
                 }
                 
                 let shownNutrients = min(3, loggedItem.meal.nutritionList.count)
                 VStack(alignment: .leading) {
                     HStack(spacing: 15) {
-                        NutrientStatView(nutrientOfInterest: "Calories", mealItem: loggedItem)
+                        MealCalorieStatView(mealItem: loggedItem)
                             .labelStyle(CustomLabel(spacing: 7))
                         ForEach(0..<shownNutrients, id: \.self) { index in
-                            NutrientStatView(nutrientOfInterest: loggedItem.meal.nutritionList[index].name, mealItem: loggedItem)
+                            MealNutrientItemView(nutrientOfInterest: loggedItem.meal.nutritionList[index], mealItem: loggedItem)
                                 .labelStyle(CustomLabel(spacing: 7))
                         }
                     }
                     
-                    ServingSizeView(mealItem: loggedItem)
+                    MealServingSizeView(mealItem: loggedItem)
                         .labelStyle(CustomLabel(spacing: 5))
                 }
                 .foregroundStyle(.white)
@@ -60,31 +59,6 @@ struct LoggedMealItemView: View {
         .padding()
         .background(LinearGradient(colors: [mixedColour, mixedColour, mixedColour, mixedColour, loggedItem.emblemColour], startPoint: .leading, endPoint: .trailing))
         .cornerRadius(10)
-    }
-}
-
-struct NutrientStatView: View {
-    var nutrientOfInterest: String
-    var mealItem: LoggedMealItem
-    
-    var body: some View {
-        if nutrientOfInterest == "Calories" {
-            Label(RoundingDouble(getCalories(mealItem)), systemImage: NutrientImageMapping.allCases["Calories"] ?? "questionmark.diamond.fill")
-        } else {
-            Label(RoundingDouble(getNutrientValue(nutrientOfInterest, mealItem)), systemImage: NutrientImageMapping.allCases[nutrientOfInterest] ?? "questionmark.diamond.fill")
-        }
-    }
-}
-
-struct ServingSizeView: View {
-    var mealItem: LoggedMealItem
-    
-    var body: some View {
-        let servingTotal = mealItem.servingMultiple * mealItem.meal.servingAmount
-        let isUnitMultiple = servingTotal > 1
-        Label("\(RoundingDouble(servingTotal)) " +
-              "\(isUnitMultiple ? mealItem.meal.servingUnitMultiple : mealItem.meal.servingUnit)",
-              systemImage: "dot.square")
     }
 }
 

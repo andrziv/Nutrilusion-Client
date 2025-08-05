@@ -7,7 +7,8 @@
 
 import Foundation
 
-struct MealGroup {
+struct MealGroup: Identifiable {
+    let id: UUID = UUID()
     var name: String
     var meals: [FoodItem]
     var colour: String

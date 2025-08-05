@@ -8,8 +8,17 @@
 import SwiftUI
 
 struct RecipeListView: View {
+    var mealGroups: [MealGroup] = MockData.mealGroupList
+    @State private var searchText: String = ""
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        ScrollView {
+            LazyVStack(spacing: 10) {
+                ForEach(mealGroups) { mealGroup in
+                    MealGroupView(group: mealGroup, isExpanded: true)
+                }
+            }
+        }
     }
 }
 

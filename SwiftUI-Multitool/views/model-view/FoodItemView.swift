@@ -7,54 +7,98 @@
 
 import SwiftUI
 
-// TODO: make it use FoodItems...
 struct FoodItemView: View {
+    @State var foodItem: FoodItem
+    @State var isExpanded: Bool = false
+    var textColor: Color = .black
+    var subtextColor: Color = .gray
+    var backgroundColor: Color = .white
     
-    let loggedItem: LoggedMealItem
+    var body: some View {
+        if isExpanded {
+            ExpandedFoodItemView(foodItem: foodItem,
+                                 textColor: textColor,
+                                 subtextColor: subtextColor,
+                                 backgroundColor: backgroundColor,
+                                 isExpanded: $isExpanded)
+        } else {
+            MinimizedFoodItemView(foodItem: foodItem,
+                                  textColor: textColor,
+                                  subtextColor: subtextColor,
+                                  backgroundColor: backgroundColor,
+                                  isExpanded: $isExpanded)
+        }
+    }
+}
+
+
+struct MinimizedFoodItemView: View {
+    let foodItem: FoodItem
+    var textColor: Color = .black
+    var subtextColor: Color = .gray
+    var backgroundColor: Color = .white
+    @Binding var isExpanded: Bool
     
     private func amPm(hour: Int) -> String {
         hour < 12 ? "AM" : "PM"
     }
     
     var body: some View {
-        VStack(alignment: .center, spacing: 10) {
-            VStack(alignment: .leading, spacing: 8) {
-                HStack {
-                    Text(loggedItem.meal.name)
-                        .font(.headline)
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
-                }
-                
-                let shownNutrients = min(3, loggedItem.meal.nutritionList.count)
-                
-                HStack(spacing: 20) {
-                    ForEach(0..<shownNutrients, id: \.self) { index in
-                        Label(String(loggedItem.meal.nutritionList[index].amount), systemImage: "flame.fill")
+        Button {
+            withAnimation() {
+                isExpanded = true
+            }
+        } label: {
+            VStack(alignment: .center, spacing: 10) {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Text(foodItem.name)
+                            .font(.headline)
+                            .fontWeight(.bold)
+                            .foregroundColor(textColor)
                     }
                     
-                    let servingTotal = loggedItem.servingMultiple * loggedItem.meal.servingAmount
-                    let isInteger = servingTotal.truncatingRemainder(dividingBy: 1) == 0
-                    Label("\(isInteger ? String(Int(servingTotal)) : String(format: "%.1f", servingTotal)) \(loggedItem.meal.servingUnit)", systemImage: "dot.square")
+                    let shownNutrients = min(3, foodItem.nutritionList.count)
+                    VStack(alignment: .leading) {
+                        HStack(spacing: 15) {
+                            CalorieStatView(foodItem: foodItem)
+                                .labelStyle(CustomLabel(spacing: 7))
+                            ForEach(0..<shownNutrients, id: \.self) { index in
+                                NutrientItemView(nutrientOfInterest: foodItem.nutritionList[index], foodItem: foodItem)
+                                    .labelStyle(CustomLabel(spacing: 7))
+                            }
+                        }
+                        
+                        ServingSizeView(foodItem: foodItem)
+                            .labelStyle(CustomLabel(spacing: 5))
+                    }
+                    .foregroundStyle(subtextColor)
+                    .font(.footnote)
                 }
-                .foregroundStyle(.gray)
-                .font(.caption)
+                
+                OpenButtonView()
+                    .foregroundStyle(textColor)
+                    .font(.callout)
             }
-            
-            
-            Image(systemName: "ellipsis")
-                .foregroundColor(.white)
-                .font(.system(size: 20))
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(backgroundColor)
+            .overlay( /// apply a rounded border
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(.gray, lineWidth: 0.5)
+            )
+            .cornerRadius(10)
         }
-        .padding()
-        .background(LinearGradient(colors: [.black, .black, .black, .black, loggedItem.emblemColour], startPoint: .leading, endPoint: .trailing))
-        .cornerRadius(30)
     }
 }
 
 struct ExpandedFoodItemView: View {
     
-    let loggedItem: LoggedMealItem
+    let foodItem: FoodItem
+    var textColor: Color = .black
+    var subtextColor: Color = .gray
+    var backgroundColor: Color = .white
+    @Binding var isExpanded: Bool
     
     private func amPm(hour: Int) -> String {
         hour < 12 ? "AM" : "PM"
@@ -64,39 +108,85 @@ struct ExpandedFoodItemView: View {
         VStack(alignment: .center, spacing: 10) {
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
-                    Text(loggedItem.meal.name)
+                    Text(foodItem.name)
                         .font(.headline)
                         .fontWeight(.bold)
-                        .foregroundColor(.white)
+                        .foregroundColor(textColor)
                 }
                 
-                let shownNutrients = min(3, loggedItem.meal.nutritionList.count)
-                
-                HStack(spacing: 20) {
-                    ForEach(0..<shownNutrients, id: \.self) { index in
-                        Label(String(loggedItem.meal.nutritionList[index].amount), systemImage: "flame.fill")
-                    }
+                VStack(alignment: .leading, spacing: 15) {
+                    ServingSizeView(foodItem: foodItem, viewType: .txt)
+                        .labelStyle(CustomLabel(spacing: 5))
                     
-                    let servingTotal = loggedItem.servingMultiple * loggedItem.meal.servingAmount
-                    let isInteger = servingTotal.truncatingRemainder(dividingBy: 1) == 0
-                    Label("\(isInteger ? String(Int(servingTotal)) : String(format: "%.1f", servingTotal)) \(loggedItem.meal.servingUnit)", systemImage: "dot.square")
+                    Text("Nutritional Information")
+                        .fontWeight(.heavy)
+                        .font(.subheadline)
+                    
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 10) {
+                            CalorieStatView(foodItem: foodItem, viewType: .txt)
+                                .fontWeight(.bold)
+                            ForEach(foodItem.nutritionList) { nutrient in
+                                NutrientItemView(nutrientOfInterest: nutrient, foodItem: foodItem, viewType: .txt)
+                                    .fontWeight(.semibold)
+                                ForEach(nutrient.childNutrients) { childNutrient in
+                                    HStack {
+                                        Image(systemName: "arrow.turn.down.right")
+                                        NutrientItemView(nutrientOfInterest: childNutrient, foodItem: foodItem, viewType: .txt)
+                                            .fontWeight(.light)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .frame(maxHeight: 300)
                 }
-                .foregroundStyle(.gray)
-                .font(.caption)
+                .foregroundStyle(subtextColor)
+                .font(.footnote)
             }
             
-            
-            Image(systemName: "ellipsis")
-                .foregroundColor(.white)
-                .font(.system(size: 20))
+            ZStack(alignment: .trailing) {
+                Button {
+                    withAnimation {
+                        isExpanded = false
+                    }
+                } label: {
+                    CloseButtonView()
+                        .foregroundStyle(textColor)
+                        .font(.callout)
+                        .frame(maxWidth: .infinity)
+                }
+                
+                Button {
+                    // TODO: Fill out later when recipe editing becomes available
+                } label: {
+                    Image(systemName: "pencil")
+                        .foregroundStyle(textColor)
+                        .font(.callout)
+                        .padding(.horizontal)
+                        .padding(.vertical, 4)
+                        .overlay(content: {
+                            RoundedRectangle(cornerRadius: 100)
+                                .fill(Color.gray)
+                                .opacity(0.2)
+                        })
+                }
+            }
         }
-        .padding()
-        .background(LinearGradient(colors: [.black, .black, .black, .black, loggedItem.emblemColour], startPoint: .leading, endPoint: .trailing))
-        .cornerRadius(30)
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal)
+        .padding(.top)
+        .padding(.bottom, 10)
+        .background(backgroundColor)
+        .overlay( /// apply a rounded border
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(.gray, lineWidth: 0.5)
+        )
+        .cornerRadius(10)
     }
 }
 
 #Preview {
-    FoodItemView(loggedItem: MockData.loggedMeals[0])
-    ExpandedFoodItemView(loggedItem: MockData.loggedMeals[0])
+    FoodItemView(foodItem: MockData.foodItemList[0], backgroundColor: .white)
+    FoodItemView(foodItem: MockData.foodItemList[0], isExpanded: true, backgroundColor: .white)
 }

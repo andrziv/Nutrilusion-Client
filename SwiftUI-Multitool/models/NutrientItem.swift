@@ -7,8 +7,19 @@
 
 import Foundation
 
-struct NutrientItem {
+struct NutrientItem: Identifiable {
+    var id: UUID = UUID()
     var name: String
     var amount: Double
     var unit: String
+    var childNutrients: [NutrientItem] = []
+    
+    func getChildNutrientValue(_ nutrientType: String) -> NutrientItem? {
+        for nutrient in childNutrients {
+            if nutrient.name == nutrientType {
+                return nutrient
+            }
+        }
+        return nil
+    }
 }

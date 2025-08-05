@@ -9,6 +9,7 @@ import Foundation
 
 // Used for both Recipes and Ingredients
 struct FoodItem {
+    let id: UUID = UUID()
     var name: String
     var calories: Int
     var nutritionList: [NutrientItem] = []
@@ -16,6 +17,17 @@ struct FoodItem {
     var servingAmount: Double = 1.0
     var servingUnit: String = "x"
     var servingUnitMultiple: String = "x"
+    
+    func getNutrientValue(_ nutrientType: String) -> NutrientItem? {
+        for nutrient in nutritionList {
+            if nutrient.name == nutrientType {
+                return nutrient
+            } else if let childNutrient = nutrient.getChildNutrientValue(nutrientType) {
+                return childNutrient
+            }
+        }
+        return nil
+    }
 }
 
 struct MockData {
@@ -24,8 +36,12 @@ struct MockData {
         calories: 350,
         nutritionList: [
             NutrientItem(name: "Protein", amount: 12.0, unit: "g"),
-            NutrientItem(name: "Fat", amount: 18.0, unit: "g"),
-            NutrientItem(name: "Carbohydrates", amount: 30.0, unit: "g")
+            NutrientItem(name: "Fat", amount: 18.0, unit: "g",
+                         childNutrients: [NutrientItem(name: "Trans Fat", amount: 0.0, unit: "g"),
+                                          NutrientItem(name: "Saturated Fat", amount: 1.0, unit: "g")]),
+            NutrientItem(name: "Carbohydrates", amount: 30.0, unit: "g",
+                         childNutrients: [NutrientItem(name: "Dietary Fiber", amount: 0.0, unit: "g"),
+                                          NutrientItem(name: "Sugar", amount: 1.0, unit: "g")])
         ],
         ingredientList: [
             FoodItem(name: "Bread Slice", calories: 120),
@@ -35,7 +51,7 @@ struct MockData {
         servingUnit: "sandwich",
         servingUnitMultiple: "sandwiches"
     )
-
+    
     static let foodItemList: [FoodItem] = [
         sampleFoodItem,
         FoodItem(
@@ -43,8 +59,12 @@ struct MockData {
             calories: 150,
             nutritionList: [
                 NutrientItem(name: "Protein", amount: 15.0, unit: "g"),
-                NutrientItem(name: "Fat", amount: 4.0, unit: "g"),
-                NutrientItem(name: "Carbohydrates", amount: 8.0, unit: "g")
+                NutrientItem(name: "Fat", amount: 4.0, unit: "g",
+                             childNutrients: [NutrientItem(name: "Trans Fat", amount: 0.0, unit: "g"),
+                                              NutrientItem(name: "Saturated Fat", amount: 1.0, unit: "g")]),
+                NutrientItem(name: "Carbohydrates", amount: 8.0, unit: "g",
+                             childNutrients: [NutrientItem(name: "Dietary Fiber", amount: 0.0, unit: "g"),
+                                              NutrientItem(name: "Sugar", amount: 1.0, unit: "g")])
             ],
             servingAmount: 1.0,
             servingUnit: "cup",
@@ -54,8 +74,9 @@ struct MockData {
             name: "Apple",
             calories: 95,
             nutritionList: [
-                NutrientItem(name: "Carbohydrates", amount: 25.0, unit: "g"),
-                NutrientItem(name: "Fiber", amount: 4.0, unit: "g")
+                NutrientItem(name: "Carbohydrates", amount: 25.0, unit: "g",
+                             childNutrients: [NutrientItem(name: "Dietary Fiber", amount: 4.0, unit: "g"),
+                                              NutrientItem(name: "Sugar", amount: 1.0, unit: "g")])
             ],
             servingAmount: 1.0,
             servingUnit: "x"
@@ -65,8 +86,12 @@ struct MockData {
             calories: 450,
             nutritionList: [
                 NutrientItem(name: "Protein", amount: 20.0, unit: "g"),
-                NutrientItem(name: "Fat", amount: 25.0, unit: "g"),
-                NutrientItem(name: "Carbohydrates", amount: 35.0, unit: "g")
+                NutrientItem(name: "Fat", amount: 25.0, unit: "g",
+                             childNutrients: [NutrientItem(name: "Trans Fat", amount: 0.0, unit: "g"),
+                                              NutrientItem(name: "Saturated Fat", amount: 1.0, unit: "g")]),
+                NutrientItem(name: "Carbohydrates", amount: 35.0, unit: "g",
+                             childNutrients: [NutrientItem(name: "Dietary Fiber", amount: 0.0, unit: "g"),
+                                              NutrientItem(name: "Sugar", amount: 1.0, unit: "g")])
             ],
             ingredientList: [
                 FoodItem(name: "Pasta Sheets", calories: 150),
@@ -83,8 +108,12 @@ struct MockData {
             calories: 320,
             nutritionList: [
                 NutrientItem(name: "Protein", amount: 28.0, unit: "g"),
-                NutrientItem(name: "Fat", amount: 18.0, unit: "g"),
-                NutrientItem(name: "Carbohydrates", amount: 10.0, unit: "g")
+                NutrientItem(name: "Fat", amount: 18.0, unit: "g",
+                             childNutrients: [NutrientItem(name: "Trans Fat", amount: 0.0, unit: "g"),
+                                              NutrientItem(name: "Saturated Fat", amount: 1.0, unit: "g")]),
+                NutrientItem(name: "Carbohydrates", amount: 10.0, unit: "g",
+                             childNutrients: [NutrientItem(name: "Dietary Fiber", amount: 0.0, unit: "g"),
+                                              NutrientItem(name: "Sugar", amount: 1.0, unit: "g")])
             ],
             ingredientList: [
                 FoodItem(name: "Grilled Chicken", calories: 180),
@@ -100,8 +129,12 @@ struct MockData {
             calories: 270,
             nutritionList: [
                 NutrientItem(name: "Protein", amount: 6.0, unit: "g"),
-                NutrientItem(name: "Fat", amount: 5.0, unit: "g"),
-                NutrientItem(name: "Carbohydrates", amount: 50.0, unit: "g")
+                NutrientItem(name: "Fat", amount: 5.0, unit: "g",
+                             childNutrients: [NutrientItem(name: "Trans Fat", amount: 0.0, unit: "g"),
+                                              NutrientItem(name: "Saturated Fat", amount: 1.0, unit: "g")]),
+                NutrientItem(name: "Carbohydrates", amount: 50.0, unit: "g",
+                             childNutrients: [NutrientItem(name: "Dietary Fiber", amount: 0.0, unit: "g"),
+                                              NutrientItem(name: "Sugar", amount: 1.0, unit: "g")])
             ],
             ingredientList: [
                 FoodItem(name: "Oats", calories: 150),
@@ -117,8 +150,12 @@ struct MockData {
             calories: 500,
             nutritionList: [
                 NutrientItem(name: "Protein", amount: 25.0, unit: "g"),
-                NutrientItem(name: "Fat", amount: 30.0, unit: "g"),
-                NutrientItem(name: "Carbohydrates", amount: 35.0, unit: "g")
+                NutrientItem(name: "Fat", amount: 30.0, unit: "g",
+                             childNutrients: [NutrientItem(name: "Trans Fat", amount: 0.0, unit: "g"),
+                                              NutrientItem(name: "Saturated Fat", amount: 1.0, unit: "g")]),
+                NutrientItem(name: "Carbohydrates", amount: 35.0, unit: "g",
+                             childNutrients: [NutrientItem(name: "Dietary Fiber", amount: 0.0, unit: "g"),
+                                              NutrientItem(name: "Sugar", amount: 1.0, unit: "g")])
             ],
             ingredientList: [
                 FoodItem(name: "Beef Patty", calories: 220),
@@ -135,8 +172,9 @@ struct MockData {
             calories: 200,
             nutritionList: [
                 NutrientItem(name: "Protein", amount: 5.0, unit: "g"),
-                NutrientItem(name: "Carbohydrates", amount: 40.0, unit: "g"),
-                NutrientItem(name: "Fiber", amount: 5.0, unit: "g")
+                NutrientItem(name: "Carbohydrates", amount: 40.0, unit: "g",
+                             childNutrients: [NutrientItem(name: "Dietary Fiber", amount: 5.0, unit: "g"),
+                                              NutrientItem(name: "Sugar", amount: 1.0, unit: "g")])
             ],
             ingredientList: [
                 FoodItem(name: "Strawberries", calories: 50),
@@ -154,8 +192,12 @@ struct MockData {
             calories: 550,
             nutritionList: [
                 NutrientItem(name: "Protein", amount: 22.0, unit: "g"),
-                NutrientItem(name: "Fat", amount: 20.0, unit: "g"),
-                NutrientItem(name: "Carbohydrates", amount: 60.0, unit: "g")
+                NutrientItem(name: "Fat", amount: 20.0, unit: "g",
+                             childNutrients: [NutrientItem(name: "Trans Fat", amount: 0.0, unit: "g"),
+                                              NutrientItem(name: "Saturated Fat", amount: 1.0, unit: "g")]),
+                NutrientItem(name: "Carbohydrates", amount: 60.0, unit: "g",
+                             childNutrients: [NutrientItem(name: "Dietary Fiber", amount: 0.0, unit: "g"),
+                                              NutrientItem(name: "Sugar", amount: 1.0, unit: "g")])
             ],
             ingredientList: [
                 FoodItem(name: "Spaghetti", calories: 200),
@@ -171,8 +213,12 @@ struct MockData {
             calories: 280,
             nutritionList: [
                 NutrientItem(name: "Protein", amount: 8.0, unit: "g"),
-                NutrientItem(name: "Fat", amount: 10.0, unit: "g"),
-                NutrientItem(name: "Carbohydrates", amount: 35.0, unit: "g")
+                NutrientItem(name: "Fat", amount: 10.0, unit: "g",
+                             childNutrients: [NutrientItem(name: "Trans Fat", amount: 0.0, unit: "g"),
+                                              NutrientItem(name: "Saturated Fat", amount: 1.0, unit: "g")]),
+                NutrientItem(name: "Carbohydrates", amount: 35.0, unit: "g",
+                             childNutrients: [NutrientItem(name: "Dietary Fiber", amount: 0.0, unit: "g"),
+                                              NutrientItem(name: "Sugar", amount: 1.0, unit: "g")])
             ],
             ingredientList: [
                 FoodItem(name: "Tortilla", calories: 130),

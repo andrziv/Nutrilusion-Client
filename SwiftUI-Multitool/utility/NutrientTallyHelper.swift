@@ -28,10 +28,10 @@ func sumNutrients(_ nutrientType: String, _ foods: [LoggedMealItem]) -> Double {
 }
 
 func getNutrientValue(_ nutrientType: String, _ food: LoggedMealItem) -> Double {
-    for nutrient in food.importantNutrients {
-        if nutrient.name == nutrientType {
-            return food.servingMultiple * nutrient.amount
-        }
+    if let nutrient = food.meal.getNutrientValue(nutrientType) {
+        return food.servingMultiple * nutrient.amount
     }
-    return 0.0
+    return 0
 }
+
+
