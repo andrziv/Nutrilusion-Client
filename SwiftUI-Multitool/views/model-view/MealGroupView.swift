@@ -29,14 +29,8 @@ struct MinimizedMealGroupView: View {
         let mixedColour = emblemColour.mix(with: Color(.systemGray6), by: 0.3)
         let medMixedColour = emblemColour.mix(with: Color(.systemGray6), by: 0.45)
         let heavyMixedColour = emblemColour.mix(with: Color(.systemGray6), by: 0.6)
-        VStack(alignment: .center) {
-            HStack {
-                Text(group.name)
-                
-                Spacer()
-                
-                Image(systemName: "plus.circle")
-            }
+        VStack(alignment: .center, spacing: 10) {
+            Text(group.name)
             .foregroundStyle(.black)
             .font(.title3)
             .fontWeight(.bold)

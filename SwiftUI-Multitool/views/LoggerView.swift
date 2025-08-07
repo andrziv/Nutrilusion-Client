@@ -35,10 +35,10 @@ extension WeekDayType {
 }
 
 struct LoggerView: View {
-    
     let currentDate = Date()
-    @State var selectedDay = SelectedDay(day: WeekDayType.fullWeek[Calendar.current.component(.weekday, from: Date()) - 1], date: Date())
-    @State var loggedMealItems: [LoggedMealItem] = MockData.loggedMeals
+    @State private var selectedDay = SelectedDay(day: WeekDayType.fullWeek[Calendar.current.component(.weekday, from: Date()) - 1], date: Date())
+    @State private var loggedMealItems: [LoggedMealItem] = MockData.loggedMeals
+    @State private var isShowingRecipesMenu: Bool = false
     
     var body: some View {
         let filteredMeals = loggedMealItems.filter {
@@ -68,10 +68,17 @@ struct LoggerView: View {
                     .padding(12)
                     .background(.white, in: RoundedRectangle(cornerRadius: 12))
                 
-                LogCurrentTimeButton()
+                Button {
+                    isShowingRecipesMenu = true
+                } label: {
+                    LogCurrentTimeButton()
+                }
             }
         }
         .padding()
+        .sheet(isPresented: $isShowingRecipesMenu) {
+            RecipeListView()
+        }
     }
 }
 
@@ -196,20 +203,16 @@ struct LogCurrentTimeButton: View {
     }
     
     var body: some View {
-        Button(action: {
-            
-        }) {
-            Label("@ " + timeString, systemImage: "plus.circle.fill")
-                .padding(12)
-                .foregroundColor(.black)
-                .frame(maxHeight: 50)
-                .background(Color(red: 0.8, green: 0.8, blue: 1),
-                            in: RoundedRectangle(cornerRadius: 12))
-                .fixedSize(horizontal: true, vertical: false)
-                .onReceive(timer) { _ in
-                    currentTime = Date()
-                }
-        }
+        Label("@ " + timeString, systemImage: "plus.circle.fill")
+            .padding(12)
+            .foregroundColor(.black)
+            .frame(maxHeight: 50)
+            .background(Color(red: 0.8, green: 0.8, blue: 1),
+                        in: RoundedRectangle(cornerRadius: 12))
+            .fixedSize(horizontal: true, vertical: false)
+            .onReceive(timer) { _ in
+                currentTime = Date()
+            }
     }
 }
 

@@ -25,33 +25,31 @@ struct TimelineLogView: View {
     
     var body: some View {
         VStack {
-            GeometryReader { geometry in
-                ScrollViewReader { scrollProxy in
-                    ScrollView(.vertical, showsIndicators: false) {
-                        ZStack(alignment: .topLeading) {
-                            TimelineView(loggedMealItems: loggedMealItems,
-                                         selectedDate: selectedDate,
-                                         hourSpacing: hourSpacing)
-                            .padding([.leading, .trailing], 16)
-                        }
+            ScrollViewReader { scrollProxy in
+                ScrollView(.vertical, showsIndicators: false) {
+                    ZStack(alignment: .topLeading) {
+                        TimelineView(loggedMealItems: loggedMealItems,
+                                     selectedDate: selectedDate,
+                                     hourSpacing: hourSpacing)
+                        .padding([.leading, .trailing], 16)
                     }
-                    .onAppear {
-                        if !initialScrollPerformed {
-                            let calendar = Calendar.current
-                            let currentHour = calendar.component(.hour, from: Date())
-                            
-                            let targetHour = max(currentHour - 2, 0)
-                            
-                            scrollProxy.scrollTo("hour-\(targetHour)", anchor: .top)
-                            initialScrollPerformed = true
-                        }
+                }
+                .onAppear {
+                    if !initialScrollPerformed {
+                        let calendar = Calendar.current
+                        let currentHour = calendar.component(.hour, from: Date())
+                        
+                        // target one hour before current for user to see a recent time
+                        let targetHour = max(currentHour - 1, 0)
+                        
+                        scrollProxy.scrollTo("hour-\(targetHour)", anchor: .top)
+                        initialScrollPerformed = true
                     }
                 }
             }
         }
     }
 }
-
 
 struct TimelineView: View {
     var loggedMealItems: [LoggedMealItem]

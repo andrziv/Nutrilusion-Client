@@ -89,42 +89,13 @@ private func contentView(for tab: TabbedItems) -> some View {
 
 struct BackgroundView: View {
     var body: some View {
-        SwiftUI.TimelineView(.animation) { context in
-            let time = context.date.timeIntervalSince1970
-            let offsetX = Float(sin(time)) * 0.1
-            let offsetY = Float(cos(time)) * 0.1
-            
-            MeshGradient(
-                width: 4,
-                height: 4,
-                points: [
-                    [0.0, 0.0],
-                    [0.3, 0.0],
-                    [0.7, 0.0],
-                    [1.0, 0.0],
-                    [0.0, 0.3],
-                    [0.2 + offsetX, 0.4 + offsetY],
-                    [0.7 + offsetX, 0.2 + offsetY],
-                    [1.0, 0.3],
-                    [0.0, 0.7],
-                    [0.3 + offsetX, 0.8],
-                    [0.7 + offsetX, 0.6],
-                    [1.0, 0.7],
-                    [0.0, 1.0],
-                    [0.3, 1.0],
-                    [0.7, 1.0],
-                    [1.0, 1.0]
-                ],
-                colors: [
-                    .purple, .indigo, .purple, .yellow,
-                    .pink, .purple, .pink, .yellow,
-                    .orange, .pink, .yellow, .orange,
-                    .yellow, .orange, .pink, .purple
-                ]
-            )
-        }
-        .ignoresSafeArea()
-        .blur(radius: 100)
+        AnimatedBackgroundGradient(colours: [
+            .white, .white, .white, .white,
+            .blue, .blue, .white, .blue,
+            .white, .white, .blue, .white,
+            .white, .blue, .white, .white
+        ], radius: 100)
+        .ignoresSafeArea(edges: .all)
     }
 }
 
