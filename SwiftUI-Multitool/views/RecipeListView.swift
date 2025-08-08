@@ -39,7 +39,7 @@ struct RecipeListView: View {
                 SearchPopupView(screenMode: $mode)
                     .transition(.move(edge: .bottom))
             } else if mode == .addCategory {
-                SearchPopupView(screenMode: $mode)
+                addCategoryPopupView(screenMode: $mode)
                     .transition(.move(edge: .bottom))
             } else if mode == .addRecipe {
                 SearchPopupView(screenMode: $mode)
@@ -50,6 +50,50 @@ struct RecipeListView: View {
 }
 
 struct SearchPopupView: View {
+    @Binding var screenMode: RecipeListViewMode
+    @State var searchString: String = ""
+    var mealGroups: [MealGroup] = MockData.mealGroupList
+    
+    var body: some View {
+        VStack {
+            TextField("Search for Recipe Names... eg: Lasagna", text: $searchString)
+                .font(.headline)
+                .padding()
+                .overlay( /// apply a rounded border
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(.gray, lineWidth: 0.5)
+                )
+            
+            let filteredMeals = mealGroups
+                .flatMap(\.meals)
+                .filter { $0.name.lowercased().contains(searchString.lowercased()) }
+                .reduce(into: [FoodItem]()) { result, meal in
+                    if !result.contains(where: { $0.id == meal.id }) {
+                        result.append(meal)
+                    }
+                }
+            
+            ScrollView {
+                LazyVStack(spacing: 10) {
+                    ForEach(filteredMeals) { meal in
+                        FoodItemView(foodItem: meal)
+                    }
+                }
+            }
+            
+            Button("Dismiss") {
+                screenMode = .normal
+            }
+        }
+        .padding()
+        .background(.ultraThinMaterial)
+        .cornerRadius(10)
+        .shadow(radius: 5)
+        .ignoresSafeArea(edges: .bottom)
+    }
+}
+
+struct addCategoryPopupView: View {
     @Binding var screenMode: RecipeListViewMode
     @State var searchString: String = ""
     var mealGroups: [MealGroup] = MockData.mealGroupList
