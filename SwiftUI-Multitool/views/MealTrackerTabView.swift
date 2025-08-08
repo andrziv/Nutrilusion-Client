@@ -67,7 +67,7 @@ struct MealTrackerTabView: View {
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: 50)
-                .background(.white)
+                .background(.regularMaterial)
                 .cornerRadius(20)
                 .padding(.horizontal)
             }

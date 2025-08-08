@@ -96,7 +96,7 @@ struct SearchPopupView: View {
                 }
             }
             .padding()
-            .background(.white)
+            .background(.regularMaterial)
             .cornerRadius(10)
             .shadow(radius: 5)
             .ignoresSafeArea(edges: .bottom)

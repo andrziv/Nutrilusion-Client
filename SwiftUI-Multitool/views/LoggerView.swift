@@ -52,13 +52,13 @@ struct LoggerView: View {
                 VStack() {
                     WeekDayButtonSet(selectedDay: $selectedDay)
                         .frame(maxWidth: .infinity)
-                    
+
                     VStack {
                         TimelineLogHeader(selectedDay: selectedDay)
                             .padding([.trailing, .leading], 15)
                         TimelineLogView(selectedDate: selectedDay.date, loggedMealItems: .constant(filteredSortedMeals))
                     }
-                    .background(.white)
+                    .background(.regularMaterial)
                     .clipShape(RoundedRectangle(cornerSize: .init(width: 20, height: 20)))
                 }
             }
@@ -66,7 +66,7 @@ struct LoggerView: View {
             HStack {
                 DailyStatProgressView(mealItems: filteredSortedMeals)
                     .padding(12)
-                    .background(.white, in: RoundedRectangle(cornerRadius: 12))
+                    .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
                 
                 Button {
                     isShowingRecipesMenu = true
@@ -115,11 +115,12 @@ struct WeekDayButtonSet: View {
                     PositionalButtonView(toptext:  String(calendarDay),
                                          maintext: day.shortform,
                                          position: positionType(index),
-                                         isSelected: selectedDayIndex - 1 == index)
+                                         isSelected: selectedDayIndex - 1 == index,
+                                         background: .regularMaterial)
                 }
             }
         }
-        .background(.white)
+        .background(.clear)
         .clipShape(RoundedRectangle(cornerRadius: 20))
     }
 }

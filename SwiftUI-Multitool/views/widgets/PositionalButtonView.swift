@@ -21,12 +21,12 @@ extension Position {
     static let right = Position(AnyShape(UnevenRoundedRectangle(cornerRadii: .init(bottomTrailing: 20, topTrailing: 20))))
 }
 
-struct PositionalButtonView: View {
+struct PositionalButtonView<S: ShapeStyle>: View {
     var toptext: String = ""
     var maintext: String
     var position: Position
     var isSelected: Bool = false
-    var background: Color = .white
+    var background: S
     var foreground: Color = .gray
     
     var body: some View {
@@ -37,7 +37,7 @@ struct PositionalButtonView: View {
                 .font(.system(size: isSelected ? 16 : 14, weight: isSelected ? .medium : .light, design: .default))
         }
         .foregroundStyle(isSelected ? .black : .secondary)
-        .padding([.top, .bottom], 10)
+        .padding([.top, .bottom], isSelected ? 8 : 10)
         .frame(maxWidth: .infinity)
         .background(background)
         .foregroundColor(foreground)
