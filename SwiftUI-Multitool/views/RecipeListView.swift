@@ -58,10 +58,9 @@ struct SearchPopupView: View {
                 .focused($searchFocus)
                 .font(.headline)
                 .padding()
-                .overlay( /// apply a rounded border
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(.gray, lineWidth: 0.5)
-                )
+                .background(RoundedRectangle(cornerRadius: 10)
+                    .stroke(.gray, lineWidth: 0.5)
+                    .fill(.white))
                 .onAppear {
                     withAnimation {
                         searchFocus = true
@@ -100,13 +99,15 @@ struct AddCategoryPopupView: View {
     
     var body: some View {
         VStack {
+            Spacer()
+            
             TextField("Group name... eg: Breakfast", text: $searchString)
                 .font(.headline)
                 .padding()
-                .overlay( /// apply a rounded border
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(.gray, lineWidth: 0.5)
-                )
+                .background(RoundedRectangle(cornerRadius: 10)
+                    .stroke(.gray, lineWidth: 0.5)
+                    .fill(.white))
+            
             ColorPicker("", selection: .constant(.blue))
             
             
