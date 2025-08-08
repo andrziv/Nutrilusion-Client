@@ -36,13 +36,13 @@ struct RecipeListView: View {
             
             // Popups from submenu
             if mode == .search {
-                SearchPopupView(screenMode: $mode)
+                SearchPopupView(screenMode: $mode, mealGroups: mealGroups)
                     .transition(.move(edge: .bottom))
             } else if mode == .addCategory {
-                addCategoryPopupView(screenMode: $mode)
+                AddCategoryPopupView(screenMode: $mode, mealGroups: mealGroups)
                     .transition(.move(edge: .bottom))
             } else if mode == .addRecipe {
-                SearchPopupView(screenMode: $mode)
+                SearchPopupView(screenMode: $mode, mealGroups: mealGroups)
                     .transition(.move(edge: .bottom))
             }
         }
@@ -51,18 +51,26 @@ struct RecipeListView: View {
 
 struct SearchPopupView: View {
     @Binding var screenMode: RecipeListViewMode
-    @State var searchString: String = ""
-    var mealGroups: [MealGroup] = MockData.mealGroupList
+    var mealGroups: [MealGroup]
+    
+    @State private var searchString: String = ""
+    @FocusState private var searchFocus: Bool
     
     var body: some View {
         VStack {
             TextField("Search for Recipe Names... eg: Lasagna", text: $searchString)
+                .focused($searchFocus)
                 .font(.headline)
                 .padding()
                 .overlay( /// apply a rounded border
                     RoundedRectangle(cornerRadius: 10)
                         .stroke(.gray, lineWidth: 0.5)
                 )
+                .onAppear {
+                    withAnimation {
+                        searchFocus = true
+                    }
+                }
             
             let filteredMeals = mealGroups
                 .flatMap(\.meals)
@@ -93,58 +101,32 @@ struct SearchPopupView: View {
     }
 }
 
-struct addCategoryPopupView: View {
+struct AddCategoryPopupView: View {
     @Binding var screenMode: RecipeListViewMode
     @State var searchString: String = ""
-    var mealGroups: [MealGroup] = MockData.mealGroupList
-    
-    struct VisualEffectView: UIViewRepresentable {
-        var effect: UIVisualEffect?
-        func makeUIView(context: UIViewRepresentableContext<Self>) -> UIVisualEffectView { UIVisualEffectView() }
-        func updateUIView(_ uiView: UIVisualEffectView, context: UIViewRepresentableContext<Self>) { uiView.effect = effect }
-    }
+    var mealGroups: [MealGroup]
     
     var body: some View {
-        ZStack {
-            VisualEffectView(effect: UIBlurEffect(style: .light))
-                .ignoresSafeArea(edges: .bottom)
+        VStack {
+            TextField("Search for Recipe Names... eg: Lasagna", text: $searchString)
+                .font(.headline)
+                .padding()
+                .overlay( /// apply a rounded border
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(.gray, lineWidth: 0.5)
+                )
+            ColorPicker("", selection: .constant(.blue))
+
             
-            VStack {
-                TextField("Search for Recipe Names... eg: Lasagna", text: $searchString)
-                    .font(.headline)
-                    .padding()
-                    .overlay( /// apply a rounded border
-                        RoundedRectangle(cornerRadius: 10)
-                            .stroke(.gray, lineWidth: 0.5)
-                    )
-                
-                let filteredMeals = mealGroups
-                    .flatMap(\.meals)
-                    .filter { $0.name.lowercased().contains(searchString.lowercased()) }
-                    .reduce(into: [FoodItem]()) { result, meal in
-                        if !result.contains(where: { $0.id == meal.id }) {
-                            result.append(meal)
-                        }
-                    }
-                
-                ScrollView {
-                    LazyVStack(spacing: 10) {
-                        ForEach(filteredMeals) { meal in
-                            FoodItemView(foodItem: meal)
-                        }
-                    }
-                }
-                
-                Button("Dismiss") {
-                    screenMode = .normal
-                }
+            Button("Dismiss") {
+                screenMode = .normal
             }
-            .padding()
-            .background(.regularMaterial)
-            .cornerRadius(10)
-            .shadow(radius: 5)
-            .ignoresSafeArea(edges: .bottom)
         }
+        .padding()
+        .background(.ultraThinMaterial)
+        .cornerRadius(10)
+        .shadow(radius: 5)
+        .ignoresSafeArea(edges: .bottom)
     }
 }
 
