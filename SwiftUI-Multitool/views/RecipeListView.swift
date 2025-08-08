@@ -24,12 +24,8 @@ struct RecipeListView: View {
     
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
-            ScrollView {
-                LazyVStack(spacing: 10) {
-                    ForEach(mealGroups) { mealGroup in
-                        MealGroupView(group: mealGroup, isExpanded: true)
-                    }
-                }
+            LazyVScroll(items: mealGroups) { mealGroup in
+                MealGroupView(group: mealGroup, isExpanded: true)
             }
             
             FloatingActionButtonToolbar(isShowingSubMenu: $showAddSubMenu, recipeListScreenMode: $mode)
@@ -81,12 +77,8 @@ struct SearchPopupView: View {
                     }
                 }
             
-            ScrollView {
-                LazyVStack(spacing: 10) {
-                    ForEach(filteredMeals) { meal in
-                        FoodItemView(foodItem: meal)
-                    }
-                }
+            LazyVScroll(items: filteredMeals) { meal in
+                FoodItemView(foodItem: meal)
             }
             
             Button("Dismiss") {
@@ -108,7 +100,7 @@ struct AddCategoryPopupView: View {
     
     var body: some View {
         VStack {
-            TextField("Search for Recipe Names... eg: Lasagna", text: $searchString)
+            TextField("Group name... eg: Breakfast", text: $searchString)
                 .font(.headline)
                 .padding()
                 .overlay( /// apply a rounded border
@@ -116,7 +108,7 @@ struct AddCategoryPopupView: View {
                         .stroke(.gray, lineWidth: 0.5)
                 )
             ColorPicker("", selection: .constant(.blue))
-
+            
             
             Button("Dismiss") {
                 screenMode = .normal
