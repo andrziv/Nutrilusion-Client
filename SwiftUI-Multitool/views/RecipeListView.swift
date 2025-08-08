@@ -52,6 +52,7 @@ struct RecipeListView: View {
 struct SearchPopupView: View {
     @Binding var screenMode: RecipeListViewMode
     @State var searchString: String = ""
+    var mealGroups: [MealGroup] = MockData.mealGroupList
     
     struct VisualEffectView: UIViewRepresentable {
         var effect: UIVisualEffect?
@@ -65,18 +66,40 @@ struct SearchPopupView: View {
                 .ignoresSafeArea(edges: .bottom)
             
             VStack {
-                TextField("Search for Recipe Names... eg: Greek Yogurt", text: $searchString)
+                TextField("Search for Recipe Names... eg: Lasagna", text: $searchString)
                     .font(.headline)
-                Button("Dismiss") {
-                    withAnimation {
-                        screenMode = .normal
+                    .padding()
+                    .overlay( /// apply a rounded border
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(.gray, lineWidth: 0.5)
+                    )
+                
+                let filteredMeals = mealGroups
+                    .flatMap(\.meals)
+                    .filter { $0.name.lowercased().contains(searchString.lowercased()) }
+                    .reduce(into: [FoodItem]()) { result, meal in
+                        if !result.contains(where: { $0.id == meal.id }) {
+                            result.append(meal)
+                        }
                     }
+                
+                ScrollView {
+                    LazyVStack(spacing: 10) {
+                        ForEach(filteredMeals) { meal in
+                            FoodItemView(foodItem: meal)
+                        }
+                    }
+                }
+                
+                Button("Dismiss") {
+                    screenMode = .normal
                 }
             }
             .padding()
             .background(.white)
             .cornerRadius(10)
             .shadow(radius: 5)
+            .ignoresSafeArea(edges: .bottom)
         }
     }
 }

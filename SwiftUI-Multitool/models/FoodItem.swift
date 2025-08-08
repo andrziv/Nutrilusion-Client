@@ -8,7 +8,7 @@
 import Foundation
 
 // Used for both Recipes and Ingredients
-struct FoodItem {
+struct FoodItem: Identifiable {
     let id: UUID = UUID()
     var name: String
     var calories: Int

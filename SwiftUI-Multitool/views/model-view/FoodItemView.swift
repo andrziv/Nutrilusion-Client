@@ -15,19 +15,24 @@ struct FoodItemView: View {
     var backgroundColor: Color = .white
     
     var body: some View {
-        if isExpanded {
-            ExpandedFoodItemView(foodItem: foodItem,
-                                 textColor: textColor,
-                                 subtextColor: subtextColor,
-                                 backgroundColor: backgroundColor,
-                                 isExpanded: $isExpanded)
-        } else {
-            MinimizedFoodItemView(foodItem: foodItem,
-                                  textColor: textColor,
-                                  subtextColor: subtextColor,
-                                  backgroundColor: backgroundColor,
-                                  isExpanded: $isExpanded)
+        ZStack {
+            if isExpanded {
+                ExpandedFoodItemView(foodItem: foodItem,
+                                     textColor: textColor,
+                                     subtextColor: subtextColor,
+                                     backgroundColor: backgroundColor,
+                                     isExpanded: $isExpanded)
+                .transition(.opacity)
+            } else {
+                MinimizedFoodItemView(foodItem: foodItem,
+                                      textColor: textColor,
+                                      subtextColor: subtextColor,
+                                      backgroundColor: backgroundColor,
+                                      isExpanded: $isExpanded)
+                .transition(.opacity)
+            }
         }
+        .animation(.spring(), value: isExpanded)
     }
 }
 
