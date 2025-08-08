@@ -10,6 +10,8 @@ import SwiftUI
 struct AnimatedBackgroundGradient: View {
     var colours: [Color]
     var radius: CGFloat = 15
+    var cornerRadius: CGFloat = 15
+    var clipToShape: Bool = true
     
     var body: some View {
         SwiftUI.TimelineView(.animation) { context in
@@ -17,7 +19,7 @@ struct AnimatedBackgroundGradient: View {
             let offsetX = Float(sin(time)) * 0.1
             let offsetY = Float(cos(time)) * 0.1
             
-            MeshGradient(
+            let gradient = MeshGradient(
                 width: 4,
                 height: 4,
                 points: [
@@ -39,7 +41,14 @@ struct AnimatedBackgroundGradient: View {
                     [1.0, 1.0]
                 ],
                 colors: colours
-            )
-        }.blur(radius: radius)
+            ).blur(radius: radius)
+            
+            if clipToShape {
+                gradient.clipShape(RoundedRectangle(cornerRadius: cornerRadius))
+            } else {
+                gradient
+            }
+        }
     }
 }
+
