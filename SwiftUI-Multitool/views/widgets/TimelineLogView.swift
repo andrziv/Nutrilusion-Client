@@ -109,11 +109,14 @@ struct TimelineHourStatView: View {
     var mealItems: [LoggedMealItem]
     
     var body: some View {
-        ZStack {
-            Line()
-                .stroke(style: StrokeStyle(lineWidth: 1, dash: [5]))
-                .frame(height: 1)
-            if mealItems.count > 0 {
+        if mealItems.count > 0 {
+            HStack(spacing: 8) {
+                Line()
+                    .stroke(style: StrokeStyle(lineWidth: 1, dash: [5]))
+                    .frame(height: 1)
+                    .frame(maxWidth: .infinity)
+                    .layoutPriority(0)
+                
                 HStack {
                     TotalNutrientStatView(nutrientOfInterest: "Calories", mealItems: mealItems)
                     TotalNutrientStatView(nutrientOfInterest: "Protein", mealItems: mealItems)
@@ -123,9 +126,20 @@ struct TimelineHourStatView: View {
                 .font(.caption)
                 .foregroundStyle(.gray)
                 .padding(.horizontal, 5)
-                .background(.white)
+                .background(.thinMaterial)
                 .clipShape(RoundedRectangle(cornerRadius: 15))
+                .layoutPriority(1)  // priority for no info squashing between lines
+                
+                Line()
+                    .stroke(style: StrokeStyle(lineWidth: 1, dash: [5]))
+                    .frame(height: 1)
+                    .frame(maxWidth: .infinity)
+                    .layoutPriority(0)
             }
+        } else {
+            Line()
+                .stroke(style: StrokeStyle(lineWidth: 1, dash: [5]))
+                .frame(height: 1)
         }
     }
 }

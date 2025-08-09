@@ -67,7 +67,7 @@ struct MealTrackerTabView: View {
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: 50)
-                .background(.regularMaterial)
+                .background(.thinMaterial)
                 .clipShape(RoundedRectangle(cornerRadius: 20))
                 .padding(.horizontal)
             }
@@ -89,13 +89,9 @@ private func contentView(for tab: TabbedItems) -> some View {
 
 struct BackgroundView: View {
     var body: some View {
-        AnimatedBackgroundGradient(colours: [
-            .white, .white, .white, .white,
-            .blue, .blue, .white, .blue,
-            .white, .white, .blue, .white,
-            .white, .blue, .white, .white
-        ], radius: 100)
-        .ignoresSafeArea(edges: .all)
+        LocationAwareBackground()
+            .overlay(.ultraThinMaterial)
+            .ignoresSafeArea(edges: .all)
     }
 }
 
