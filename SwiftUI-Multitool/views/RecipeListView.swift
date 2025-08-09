@@ -97,7 +97,7 @@ struct SearchPopupView: View {
         }
         .padding()
         .background(.ultraThinMaterial)
-        .cornerRadius(10)
+        .clipShape(RoundedRectangle(cornerRadius: 10))
         .shadow(radius: 5)
         .ignoresSafeArea(edges: .bottom)
     }
@@ -167,7 +167,7 @@ struct AddCategoryPopupView: View {
         }
         .padding()
         .background(.ultraThinMaterial)
-        .cornerRadius(10)
+        .clipShape(RoundedRectangle(cornerRadius: 10))
         .shadow(radius: 5)
         .ignoresSafeArea(edges: .bottom)
     }

@@ -64,7 +64,7 @@ struct LoggedMealItemView: View {
             mixed, mixed, mixed, emblem,
             mixed, mixed, mixed, emblem
         ], radius: 0, cornerRadius: 10))
-        .cornerRadius(10)
+        .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 }
 

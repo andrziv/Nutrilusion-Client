@@ -68,7 +68,7 @@ struct MealTrackerTabView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: 50)
                 .background(.regularMaterial)
-                .cornerRadius(20)
+                .clipShape(RoundedRectangle(cornerRadius: 20))
                 .padding(.horizontal)
             }
         }
@@ -108,7 +108,7 @@ extension MealTrackerTabView {
         }
         .padding(10)
         .background(isActive ? .blue.opacity(0.4) : .clear)
-        .cornerRadius(15)
+        .clipShape(RoundedRectangle(cornerRadius: 15))
     }
 }
 

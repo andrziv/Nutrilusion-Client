@@ -124,8 +124,7 @@ struct TimelineHourStatView: View {
                 .foregroundStyle(.gray)
                 .padding(.horizontal, 5)
                 .background(.white)
-                .cornerRadius(15)
-                
+                .clipShape(RoundedRectangle(cornerRadius: 15))
             }
         }
     }

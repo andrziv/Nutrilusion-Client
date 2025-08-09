@@ -205,7 +205,7 @@ struct ExpandedFoodItemView: View {
             RoundedRectangle(cornerRadius: 10)
                 .stroke(.gray, lineWidth: 0.5)
         )
-        .cornerRadius(10)
+        .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 }
 
