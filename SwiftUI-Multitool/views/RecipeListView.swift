@@ -45,6 +45,22 @@ struct RecipeListView: View {
     }
 }
 
+struct PopupTextField: View {
+    @Binding var textBinding: String
+    var placeholder: String
+    var outline: Color = .gray
+    var background: Color = .white
+    
+    var body: some View {
+        TextField(placeholder, text: $textBinding)
+            .font(.headline)
+            .padding()
+            .background(RoundedRectangle(cornerRadius: 10)
+                .stroke(outline, lineWidth: 0.5)
+                .fill(background))
+    }
+}
+
 struct SearchPopupView: View {
     @Binding var screenMode: RecipeListViewMode
     var mealGroups: [MealGroup]
@@ -54,13 +70,8 @@ struct SearchPopupView: View {
     
     var body: some View {
         VStack {
-            TextField("Search for Recipe Names... eg: Lasagna", text: $searchString)
+            PopupTextField(textBinding: $searchString, placeholder: "Search for Recipe Names... eg: Lasagna")
                 .focused($searchFocus)
-                .font(.headline)
-                .padding()
-                .background(RoundedRectangle(cornerRadius: 10)
-                    .stroke(.gray, lineWidth: 0.5)
-                    .fill(.white))
                 .onAppear {
                     withAnimation {
                         searchFocus = true
@@ -142,12 +153,7 @@ struct AddCategoryPopupView: View {
             
             Spacer()
             
-            TextField("Group name... eg: Breakfast", text: $searchString)
-                .font(.headline)
-                .padding()
-                .background(RoundedRectangle(cornerRadius: 10)
-                    .stroke(colourPicked, lineWidth: 0.5)
-                    .fill(.white))
+            PopupTextField(textBinding: $searchString, placeholder: "Group name... eg: Breakfast", outline: colourPicked)
             
             ColorPicker("Colour of the Group Header", selection: $colourPicked)
                 .fontWeight(.medium)
