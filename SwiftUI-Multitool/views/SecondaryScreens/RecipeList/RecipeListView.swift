@@ -16,7 +16,7 @@ enum RecipeListViewMode {
 
 // TODO: refactor and get rid of all the magic numbers used for testing
 struct RecipeListView: View {
-    var mealGroups: [MealGroup] = MockData.mealGroupList
+    @State var mealGroups: [MealGroup] = MockData.mealGroupList
     @State private var searchText: String = ""
     @State private var showAddSubMenu: Bool = false
     @State private var mode: RecipeListViewMode = .normal
@@ -35,141 +35,13 @@ struct RecipeListView: View {
                 SearchPopupView(screenMode: $mode, mealGroups: mealGroups)
                     .transition(.move(edge: .bottom))
             } else if mode == .addCategory {
-                AddCategoryPopupView(screenMode: $mode, mealGroups: mealGroups)
+                AddCategoryPopupView(screenMode: $mode, mealGroups: $mealGroups)
                     .transition(.move(edge: .bottom))
             } else if mode == .addRecipe {
                 SearchPopupView(screenMode: $mode, mealGroups: mealGroups)
                     .transition(.move(edge: .bottom))
             }
         }
-    }
-}
-
-struct PopupTextField: View {
-    @Binding var textBinding: String
-    var placeholder: String
-    var outline: Color = .gray
-    var background: Color = .white
-    
-    var body: some View {
-        TextField(placeholder, text: $textBinding)
-            .font(.headline)
-            .padding()
-            .background(RoundedRectangle(cornerRadius: 10)
-                .stroke(outline, lineWidth: 0.5)
-                .fill(background))
-    }
-}
-
-struct SearchPopupView: View {
-    @Binding var screenMode: RecipeListViewMode
-    var mealGroups: [MealGroup]
-    
-    @State private var searchString: String = ""
-    @FocusState private var searchFocus: Bool
-    
-    var body: some View {
-        VStack {
-            PopupTextField(textBinding: $searchString, placeholder: "Search for Recipe Names... eg: Lasagna")
-                .focused($searchFocus)
-                .onAppear {
-                    withAnimation {
-                        searchFocus = true
-                    }
-                }
-            
-            let filteredMeals = mealGroups
-                .flatMap(\.meals)
-                .filter { $0.name.lowercased().contains(searchString.lowercased()) }
-                .reduce(into: [FoodItem]()) { result, meal in
-                    if !result.contains(where: { $0.id == meal.id }) {
-                        result.append(meal)
-                    }
-                }
-            
-            LazyVScroll(items: filteredMeals) { meal in
-                FoodItemView(foodItem: meal)
-            }
-            
-            Button("Dismiss") {
-                screenMode = .normal
-            }
-        }
-        .padding()
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 10))
-        .shadow(radius: 5)
-        .ignoresSafeArea(edges: .bottom)
-    }
-}
-
-struct AddCategoryPopupView: View {
-    @Binding var screenMode: RecipeListViewMode
-    var mealGroups: [MealGroup]
-    
-    @State private var searchString: String = ""
-    @State private var colourPicked: Color = .blue
-    
-    var body: some View {
-        VStack {
-            ZStack(alignment: .top) {
-                MealGroupView(group: MealGroup(name: searchString, meals: [MockData.sampleFoodItem], colour: colourPicked.toHex()!))
-                    .id(searchString + (colourPicked.toHex() ?? ""))
-                    .padding(.vertical)
-                
-                HStack {
-                    Spacer()
-                    
-                    VStack {
-                        Spacer()
-                        
-                        Text("Preview")
-                            .font(.headline)
-                            .fontWeight(.bold)
-                            .foregroundStyle(.secondary)
-                            .padding(4)
-                            .background(RoundedRectangle(cornerRadius: 10)
-                                .fill(Color.gray)
-                                .opacity(0.2))
-                            .padding(4)
-                    }
-                }
-                .phaseAnimator([1.0, 0]) { content, phase in
-                    content.opacity(phase)
-                } animation: { _ in
-                        .easeInOut(duration: 5.0)
-                }
-                
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(.white)
-                    .randomNoiseShader()
-                    .opacity(0.1)
-                    .background(RoundedRectangle(cornerRadius: 10)
-                        .stroke(.clear, lineWidth: 1))
-                
-            }
-            .background(RoundedRectangle(cornerRadius: 10).fill(.white))
-            .frame(maxHeight: 500)
-            
-            Spacer()
-            
-            PopupTextField(textBinding: $searchString, placeholder: "Group name... eg: Breakfast", outline: colourPicked)
-            
-            ColorPicker("Colour of the Group Header", selection: $colourPicked)
-                .fontWeight(.medium)
-                .foregroundStyle(.secondary)
-            
-            Spacer()
-            
-            Button("Dismiss") {
-                screenMode = .normal
-            }
-        }
-        .padding()
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 10))
-        .shadow(radius: 5)
-        .ignoresSafeArea(edges: .bottom)
     }
 }
 
@@ -253,15 +125,15 @@ struct ReLiSubMenu: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            SubMenuButton(title: "Search Recipe", icon: "magnifyingglass") {
+            ImagedButton(title: "Search Recipe", icon: "magnifyingglass") {
                 screenMode = .search
                 showingCustomMenu = false
             }
-            SubMenuButton(title: "Add Category", icon: "folder.badge.plus") {
+            ImagedButton(title: "Add Category", icon: "folder.badge.plus") {
                 screenMode = .addCategory
                 showingCustomMenu = false
             }
-            SubMenuButton(title: "Add Recipe", icon: "plus.circle") {
+            ImagedButton(title: "Add Recipe", icon: "plus.circle") {
                 screenMode = .addRecipe
                 showingCustomMenu = false
             }
@@ -276,9 +148,12 @@ struct ReLiSubMenu: View {
     }
 }
 
-struct SubMenuButton: View {
+struct ImagedButton: View {
     let title: String
     let icon: String
+    var fontColour: Color = .primary
+    var circleColor: Color = .blue
+    var cornerRadius: CGFloat = 12
     let action: () -> Void
     
     var body: some View {
@@ -288,16 +163,16 @@ struct SubMenuButton: View {
                     .frame(width: 28, height: 28)
                     .background(
                         Circle()
-                            .fill(.blue.opacity(0.2))
+                            .fill(circleColor.opacity(0.2))
                     )
                 Text(title)
                     .font(.headline)
             }
-            .foregroundColor(.primary)
+            .foregroundColor(fontColour)
             .padding(.vertical, 8)
             .padding(.horizontal, 12)
             .background(
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                     .fill(.white.opacity(0.6))
             )
         }

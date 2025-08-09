@@ -25,7 +25,7 @@ extension MockData {
         colour: "#0095ff"
     )
     
-    static let mealGroupList: [MealGroup] = [
+    static var mealGroupList: [MealGroup] = [
         sampleMealGroup,
         .init(
             name: "Lunch",
