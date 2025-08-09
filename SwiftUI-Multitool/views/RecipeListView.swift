@@ -94,22 +94,66 @@ struct SearchPopupView: View {
 
 struct AddCategoryPopupView: View {
     @Binding var screenMode: RecipeListViewMode
-    @State var searchString: String = ""
     var mealGroups: [MealGroup]
+    
+    @State private var searchString: String = ""
+    @State private var colourPicked: Color = .blue
     
     var body: some View {
         VStack {
+            ZStack(alignment: .top) {
+                MealGroupView(group: MealGroup(name: searchString, meals: [MockData.sampleFoodItem], colour: colourPicked.toHex()!))
+                    .id(searchString + (colourPicked.toHex() ?? ""))
+                    .padding(.vertical)
+                
+                HStack {
+                    Spacer()
+                    
+                    VStack {
+                        Spacer()
+                        
+                        Text("Preview")
+                            .font(.headline)
+                            .fontWeight(.bold)
+                            .foregroundStyle(.secondary)
+                            .padding(4)
+                            .background(RoundedRectangle(cornerRadius: 10)
+                                .fill(Color.gray)
+                                .opacity(0.2))
+                            .padding(4)
+                    }
+                }
+                .phaseAnimator([1.0, 0]) { content, phase in
+                    content.opacity(phase)
+                } animation: { _ in
+                        .easeInOut(duration: 5.0)
+                }
+                
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(.white)
+                    .randomNoiseShader()
+                    .opacity(0.1)
+                    .background(RoundedRectangle(cornerRadius: 10)
+                        .stroke(.clear, lineWidth: 1))
+                
+            }
+            .background(RoundedRectangle(cornerRadius: 10).fill(.white))
+            .frame(maxHeight: 500)
+            
             Spacer()
             
             TextField("Group name... eg: Breakfast", text: $searchString)
                 .font(.headline)
                 .padding()
                 .background(RoundedRectangle(cornerRadius: 10)
-                    .stroke(.gray, lineWidth: 0.5)
+                    .stroke(colourPicked, lineWidth: 0.5)
                     .fill(.white))
             
-            ColorPicker("", selection: .constant(.blue))
+            ColorPicker("Colour of the Group Header", selection: $colourPicked)
+                .fontWeight(.medium)
+                .foregroundStyle(.secondary)
             
+            Spacer()
             
             Button("Dismiss") {
                 screenMode = .normal
@@ -177,7 +221,7 @@ struct FloatingActionButtonToolbar: View {
                             // glass-like blur (SwiftUI normal blur no bueno)
                             Circle()
                                 .fill(.white.opacity(0.1))
-                                .background(.ultraThinMaterial,
+                                .background(.thinMaterial,
                                             in: Circle()
                                 )
                         }
@@ -220,21 +264,7 @@ struct ReLiSubMenu: View {
         .background(
             // Glassy background with blur + gradient
             RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .fill(
-                    LinearGradient(
-                        gradient: Gradient(colors: [
-                            .white.opacity(0.9),
-                            .blue.opacity(0.15)
-                        ]),
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .background(
-                    Color(.systemBackground)
-                        .opacity(0.8)
-                        .blur(radius: 10)
-                )
+                .fill(.ultraThinMaterial)
                 .shadow(color: .black.opacity(0.15), radius: 10, x: 0, y: 5)
         )
     }

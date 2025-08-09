@@ -28,9 +28,9 @@ struct TimelineLogView: View {
             ScrollViewReader { scrollProxy in
                 ScrollView(.vertical, showsIndicators: false) {
                     ZStack(alignment: .topLeading) {
-                        TimelineView(loggedMealItems: loggedMealItems,
-                                     selectedDate: selectedDate,
-                                     hourSpacing: hourSpacing)
+                        TimelineDayView(loggedMealItems: loggedMealItems,
+                                        selectedDate: selectedDate,
+                                        hourSpacing: hourSpacing)
                         .padding([.leading, .trailing], 16)
                     }
                 }
@@ -51,7 +51,7 @@ struct TimelineLogView: View {
     }
 }
 
-struct TimelineView: View {
+struct TimelineDayView: View {
     var loggedMealItems: [LoggedMealItem]
     let selectedDate: Date
     let hourSpacing: CGFloat

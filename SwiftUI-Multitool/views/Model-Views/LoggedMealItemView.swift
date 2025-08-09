@@ -16,7 +16,8 @@ struct LoggedMealItemView: View {
     }
     
     var body: some View {
-        let mixedColour = loggedItem.emblemColour.mix(with: .black, by: 0.3)
+        let emblem = loggedItem.emblemColour
+        let mixed = emblem.mix(with: .black, by: 0.3)
         VStack(alignment: .center, spacing: 10) {
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
@@ -57,7 +58,12 @@ struct LoggedMealItemView: View {
             }
         }
         .padding()
-        .background(LinearGradient(colors: [mixedColour, mixedColour, mixedColour, mixedColour, loggedItem.emblemColour], startPoint: .leading, endPoint: .trailing))
+        .background(AnimatedBackgroundGradient(colours: [
+            mixed, mixed, mixed, emblem,
+            mixed, mixed, mixed, emblem,
+            mixed, mixed, mixed, emblem,
+            mixed, mixed, mixed, emblem
+        ], radius: 0, cornerRadius: 10))
         .cornerRadius(10)
     }
 }

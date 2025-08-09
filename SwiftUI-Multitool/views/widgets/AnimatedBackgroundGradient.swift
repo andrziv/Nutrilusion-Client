@@ -14,7 +14,7 @@ struct AnimatedBackgroundGradient: View {
     var clipToShape: Bool = true
     
     var body: some View {
-        SwiftUI.TimelineView(.animation) { context in
+        TimelineView(.animation) { context in
             let time = context.date.timeIntervalSince1970
             let offsetX = Float(sin(time)) * 0.1
             let offsetY = Float(cos(time)) * 0.1
