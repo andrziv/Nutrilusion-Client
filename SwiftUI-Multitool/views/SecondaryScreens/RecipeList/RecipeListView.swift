@@ -148,38 +148,7 @@ struct ReLiSubMenu: View {
     }
 }
 
-struct ImagedButton: View {
-    let title: String
-    let icon: String
-    var fontColour: Color = .primary
-    var circleColor: Color = .blue
-    var cornerRadius: CGFloat = 12
-    let action: () -> Void
-    
-    var body: some View {
-        Button(action: action) {
-            HStack(spacing: 10) {
-                Image(systemName: icon)
-                    .frame(width: 28, height: 28)
-                    .background(
-                        Circle()
-                            .fill(circleColor.opacity(0.2))
-                    )
-                Text(title)
-                    .font(.headline)
-            }
-            .foregroundColor(fontColour)
-            .padding(.vertical, 8)
-            .padding(.horizontal, 12)
-            .background(
-                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                    .fill(.white.opacity(0.6))
-            )
-        }
-        .buttonStyle(PlainButtonStyle())
-        .hoverEffect(.highlight)
-    }
-}
+
 
 #Preview {
     RecipeListView()

@@ -22,22 +22,16 @@ struct AddCategoryPopupView: View {
                     .id(searchString + (colourPicked.toHex() ?? ""))
                     .padding(.vertical)
                 
-                HStack {
-                    Spacer()
-                    
-                    VStack {
-                        Spacer()
-                        
-                        Text("Preview")
-                            .font(.headline)
-                            .fontWeight(.bold)
-                            .foregroundStyle(.secondary)
-                            .padding(4)
-                            .background(RoundedRectangle(cornerRadius: 10)
-                                .fill(Color.gray)
-                                .opacity(0.2))
-                            .padding(4)
-                    }
+                BottomTrailing {
+                    Text("Preview")
+                        .font(.headline)
+                        .fontWeight(.bold)
+                        .foregroundStyle(.secondary)
+                        .padding(4)
+                        .background(RoundedRectangle(cornerRadius: 10)
+                            .fill(Color.gray)
+                            .opacity(0.2))
+                        .padding(4)
                 }
                 .phaseAnimator([1.0, 0]) { content, phase in
                     content.opacity(phase)
@@ -58,7 +52,7 @@ struct AddCategoryPopupView: View {
             
             Spacer()
             
-            PopupTextField(textBinding: $searchString, placeholder: "Group name... eg: Breakfast", outline: colourPicked)
+            BasicTextField(textBinding: $searchString, placeholder: "Group name... eg: Breakfast", outline: colourPicked)
             
             ColorPicker("Colour of the Group Header", selection: $colourPicked)
                 .fontWeight(.medium)
@@ -70,7 +64,7 @@ struct AddCategoryPopupView: View {
                 ImagedButton(title: "Dismiss", icon: "xmark", circleColor: .clear, cornerRadius: 10) {
                     screenMode = .normal
                 }
-
+                
                 ImagedButton(title: "Create Category", icon: "plus", circleColor: .clear, cornerRadius: 10) {
                     // TODO: Change this to use CoreData later...
                     mealGroups.append(MealGroup(name: searchString, meals: [], colour: colourPicked.toHex()!))
@@ -80,10 +74,10 @@ struct AddCategoryPopupView: View {
             
             Spacer(minLength: 5)
         }
-        .padding()
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 10))
-        .shadow(radius: 5)
-        .ignoresSafeArea(edges: .bottom)
+        .basicBackground()
     }
+}
+
+#Preview {
+    AddCategoryPopupView(screenMode: .constant(.addCategory), mealGroups: .constant(MockData.mealGroupList))
 }

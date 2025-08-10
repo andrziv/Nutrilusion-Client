@@ -7,13 +7,8 @@
 
 import SwiftUI
 
-struct PopupView: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
-    }
-}
 
-struct PopupTextField: View {
+struct BasicTextField: View {
     @Binding var textBinding: String
     var placeholder: String
     var outline: Color = .gray
@@ -30,5 +25,5 @@ struct PopupTextField: View {
 }
 
 #Preview {
-    PopupView()
+    BasicTextField(textBinding: .constant("Hello"), placeholder: "Placeholder Text...")
 }

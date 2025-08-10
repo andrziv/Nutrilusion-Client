@@ -17,7 +17,7 @@ struct SearchPopupView: View {
     
     var body: some View {
         VStack {
-            PopupTextField(textBinding: $searchString, placeholder: "Search for Recipe Names... eg: Lasagna")
+            BasicTextField(textBinding: $searchString, placeholder: "Search for Recipe Names... eg: Lasagna")
                 .focused($searchFocus)
                 .onAppear {
                     withAnimation {
@@ -42,10 +42,10 @@ struct SearchPopupView: View {
                 screenMode = .normal
             }
         }
-        .padding()
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 10))
-        .shadow(radius: 5)
-        .ignoresSafeArea(edges: .bottom)
+        .basicBackground()
     }
+}
+
+#Preview {
+    SearchPopupView(screenMode: .constant(.addCategory), mealGroups: MockData.mealGroupList)
 }
