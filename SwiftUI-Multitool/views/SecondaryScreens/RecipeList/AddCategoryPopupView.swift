@@ -17,46 +17,17 @@ struct AddCategoryPopupView: View {
     
     var body: some View {
         VStack {
-            ZStack(alignment: .top) {
-                MealGroupView(group: MealGroup(name: searchString, meals: [MockData.sampleFoodItem], colour: colourPicked.toHex()!))
-                    .id(searchString + (colourPicked.toHex() ?? ""))
-                    .padding(.vertical)
-                
-                BottomTrailing {
-                    Text("Preview")
-                        .font(.headline)
-                        .fontWeight(.bold)
-                        .foregroundStyle(.secondary)
-                        .padding(4)
-                        .background(RoundedRectangle(cornerRadius: 10)
-                            .fill(Color.gray)
-                            .opacity(0.2))
-                        .padding(4)
-                }
-                .phaseAnimator([1.0, 0]) { content, phase in
-                    content.opacity(phase)
-                } animation: { _ in
-                        .easeInOut(duration: 5.0)
-                }
-                
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(.white)
-                    .randomNoiseShader()
-                    .opacity(0.1)
-                    .background(RoundedRectangle(cornerRadius: 10)
-                        .stroke(.clear, lineWidth: 1))
-                
-            }
-            .background(RoundedRectangle(cornerRadius: 10).fill(.white))
-            .frame(maxHeight: 500)
+            MealGroupPreviewView(searchString: $searchString, colourPicked: $colourPicked)
+                .background(RoundedRectangle(cornerRadius: 10).fill(.white))
+                .frame(maxHeight: 500)
             
             Spacer()
             
-            BasicTextField(textBinding: $searchString, placeholder: "Group name... eg: Breakfast", outline: colourPicked)
-            
-            ColorPicker("Colour of the Group Header", selection: $colourPicked)
-                .fontWeight(.medium)
-                .foregroundStyle(.secondary)
+            HStack {
+                BasicTextField(textBinding: $searchString, placeholder: "Group name... eg: Breakfast", outline: colourPicked)
+                
+                SquareColourPickerView(selection: $colourPicked)
+            }
             
             Spacer()
             
@@ -75,6 +46,25 @@ struct AddCategoryPopupView: View {
             Spacer(minLength: 5)
         }
         .basicBackground()
+    }
+}
+
+struct MealGroupPreviewView: View {
+    @Binding var searchString: String
+    @Binding var colourPicked: Color
+    
+    var body: some View {
+        ZStack(alignment: .top) {
+            MealGroupView(group: MealGroup(name: searchString, meals: [MockData.sampleFoodItem], colour: colourPicked.toHex()!))
+                .id(searchString + (colourPicked.toHex() ?? ""))
+                .padding(.vertical)
+            
+            BottomTrailing {
+                BreathingTextBoxView(text: "Preview")
+            }
+            
+            StaticNoiseBox()
+        }
     }
 }
 
