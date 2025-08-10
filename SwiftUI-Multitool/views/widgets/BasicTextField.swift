@@ -12,7 +12,7 @@ struct BasicTextField: View {
     @Binding var textBinding: String
     var placeholder: String
     var outline: Color = .gray
-    var background: Color = .white
+    var background: Color = .backgroundColour
     
     var body: some View {
         TextField(placeholder, text: $textBinding)

@@ -10,9 +10,9 @@ import SwiftUI
 struct FoodItemView: View {
     @State var foodItem: FoodItem
     @State var isExpanded: Bool = false
-    var textColor: Color = .black
-    var subtextColor: Color = .gray
-    var backgroundColor: Color = .white
+    var textColor: Color = .primaryText
+    var subtextColor: Color = .secondaryText
+    var backgroundColor: Color = .backgroundColour
     
     var body: some View {
         ZStack {
@@ -39,9 +39,9 @@ struct FoodItemView: View {
 
 struct MinimizedFoodItemView: View {
     let foodItem: FoodItem
-    var textColor: Color = .black
-    var subtextColor: Color = .gray
-    var backgroundColor: Color = .white
+    var textColor: Color
+    var subtextColor: Color
+    var backgroundColor: Color
     @Binding var isExpanded: Bool
     
     private func amPm(hour: Int) -> String {
@@ -61,7 +61,7 @@ struct MinimizedFoodItemView: View {
                             Text(foodItem.name)
                                 .font(.headline)
                                 .fontWeight(.bold)
-                                .foregroundColor(textColor)
+                                .foregroundStyle(textColor)
                             
                             Spacer()
                             
@@ -72,7 +72,7 @@ struct MinimizedFoodItemView: View {
                         }
                         Line()
                             .frame(height: 1)
-                            .background(.gray)
+                            .background(.secondaryText)
                     }
                     
                     HStack {
@@ -97,7 +97,7 @@ struct MinimizedFoodItemView: View {
                             .padding(.vertical, 4)
                             .overlay(content: {
                                 RoundedRectangle(cornerRadius: 100)
-                                    .fill(Color.gray)
+                                    .fill(.secondaryText)
                                     .opacity(0.2)
                             })
                     }
@@ -108,7 +108,7 @@ struct MinimizedFoodItemView: View {
             .background(backgroundColor)
             .overlay( /// apply a rounded border
                 RoundedRectangle(cornerRadius: 10)
-                    .stroke(.gray, lineWidth: 0.5)
+                    .stroke(.secondaryText, lineWidth: 0.5)
             )
             .cornerRadius(10)
         }
@@ -118,9 +118,9 @@ struct MinimizedFoodItemView: View {
 struct ExpandedFoodItemView: View {
     
     let foodItem: FoodItem
-    var textColor: Color = .black
-    var subtextColor: Color = .gray
-    var backgroundColor: Color = .white
+    var textColor: Color
+    var subtextColor: Color
+    var backgroundColor: Color
     @Binding var isExpanded: Bool
     
     private func amPm(hour: Int) -> String {
@@ -134,7 +134,7 @@ struct ExpandedFoodItemView: View {
                     Text(foodItem.name)
                         .font(.headline)
                         .fontWeight(.bold)
-                        .foregroundColor(textColor)
+                        .foregroundStyle(textColor)
                 }
                 
                 VStack(alignment: .leading, spacing: 15) {
@@ -190,7 +190,7 @@ struct ExpandedFoodItemView: View {
                         .padding(.vertical, 4)
                         .overlay(content: {
                             RoundedRectangle(cornerRadius: 100)
-                                .fill(Color.gray)
+                                .fill(.secondaryText)
                                 .opacity(0.2)
                         })
                 }
@@ -203,13 +203,13 @@ struct ExpandedFoodItemView: View {
         .background(backgroundColor)
         .overlay( /// apply a rounded border
             RoundedRectangle(cornerRadius: 10)
-                .stroke(.gray, lineWidth: 0.5)
+                .stroke(.secondaryText, lineWidth: 0.5)
         )
         .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 }
 
 #Preview {
-    FoodItemView(foodItem: MockData.foodItemList[0], backgroundColor: .white)
-    FoodItemView(foodItem: MockData.foodItemList[0], isExpanded: true, backgroundColor: .white)
+    FoodItemView(foodItem: MockData.foodItemList[0], backgroundColor: .backgroundColour)
+    FoodItemView(foodItem: MockData.foodItemList[0], isExpanded: true, backgroundColor: .backgroundColour)
 }

@@ -18,7 +18,7 @@ struct AddCategoryPopupView: View {
     var body: some View {
         VStack {
             MealGroupPreviewView(searchString: $searchString, colourPicked: $colourPicked)
-                .background(RoundedRectangle(cornerRadius: 10).fill(.white))
+                .background(RoundedRectangle(cornerRadius: 10).fill(.backgroundColour))
                 .frame(maxHeight: 500)
             
             Spacer()

@@ -24,7 +24,7 @@ struct LoggedMealItemView: View {
                     Text(loggedItem.meal.name)
                         .font(.headline)
                         .fontWeight(.bold)
-                        .foregroundColor(.white)
+                        .foregroundStyle(.white)
                     
                     Spacer()
                     
@@ -36,7 +36,7 @@ struct LoggedMealItemView: View {
                     Text("\(hour > 12 ? hour - 12 : hour):\(minute < 10 ? "0" : "")\(minute) \(amPm(hour: hour))")
                         .font(.subheadline)
                         .fontWeight(.semibold)
-                        .foregroundColor(Color(red: 0.85, green: 0.85, blue: 0.85))
+                        .foregroundStyle(Color(red: 0.85, green: 0.85, blue: 0.85))
                 }
                 
                 let shownNutrients = min(3, loggedItem.meal.nutritionList.count)

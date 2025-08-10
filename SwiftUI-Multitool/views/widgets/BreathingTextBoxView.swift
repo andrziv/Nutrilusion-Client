@@ -15,10 +15,10 @@ struct BreathingTextBoxView: View {
         Text(text)
             .font(.headline)
             .fontWeight(.bold)
-            .foregroundStyle(.secondary)
+            .foregroundStyle(.secondaryText)
             .padding(4)
             .background(RoundedRectangle(cornerRadius: 10)
-                .fill(Color.gray)
+                .fill(.gray)
                 .opacity(0.2))
             .padding(4)
             .phaseAnimator([1.0, 0]) { content, phase in

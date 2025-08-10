@@ -22,31 +22,59 @@ extension Position {
 }
 
 struct PositionalButtonView<S: ShapeStyle>: View {
-    var toptext: String = ""
-    var maintext: String
+    var topText: String = ""
+    var mainText: String
     var position: Position
     var isSelected: Bool = false
+
+    // Configurable styles
     var background: S
-    var foreground: Color = .gray
-    
+    var foreground: Color = .primaryText
+    var selectedForeground: Color = .primaryText
+    var borderColor: Color = .blue
+    var borderWidth: CGFloat = 2
+    var selectedBackground: AnyShapeStyle = AnyShapeStyle(Color.blue.opacity(0.2))
+
+    // Font settings
+    var topFontSize: CGFloat = 10
+    var topFontSizeSelected: CGFloat = 12
+    var mainFontSize: CGFloat = 14
+    var mainFontSizeSelected: CGFloat = 16
+    var topFontWeight: Font.Weight = .light
+    var topFontWeightSelected: Font.Weight = .medium
+    var mainFontWeight: Font.Weight = .light
+    var mainFontWeightSelected: Font.Weight = .medium
+
+    // Padding
+    var verticalPadding: CGFloat = 10
+    var verticalPaddingSelected: CGFloat = 8
+
     var body: some View {
         VStack {
-            Text(toptext)
-                .font(.system(size: isSelected ? 12 : 10, weight: isSelected ? .medium : .light, design: .default))
-            Text(maintext)
-                .font(.system(size: isSelected ? 16 : 14, weight: isSelected ? .medium : .light, design: .default))
+            if !topText.isEmpty {
+                Text(topText)
+                    .font(.system(
+                        size: isSelected ? topFontSizeSelected : topFontSize,
+                        weight: isSelected ? topFontWeightSelected : topFontWeight
+                    ))
+            }
+            Text(mainText)
+                .font(.system(
+                    size: isSelected ? mainFontSizeSelected : mainFontSize,
+                    weight: isSelected ? mainFontWeightSelected : mainFontWeight
+                ))
         }
-        .foregroundStyle(isSelected ? .black : .secondary)
-        .padding([.top, .bottom], isSelected ? 8 : 10)
+        .foregroundStyle(isSelected ? selectedForeground : foreground)
+        .padding(.vertical, isSelected ? verticalPaddingSelected : verticalPadding)
         .frame(maxWidth: .infinity)
-        .background(background)
-        .foregroundColor(foreground)
-        .clipShape(
-            position.shape
-        )
+        .background(isSelected ? selectedBackground : AnyShapeStyle(background))
+        .clipShape(position.shape)
+        .shadow(color: isSelected ? .primaryText.opacity(0.15) : .clear, radius: isSelected ? 4 : 0)
+        .animation(.easeInOut(duration: 0.2), value: isSelected)
     }
 }
 
+
 #Preview {
-    PositionalButtonView(maintext: "mon", position: .left, background: .black, foreground: .white)
+    PositionalButtonView(mainText: "mon", position: .left, background: .backgroundColour, foreground: .primaryText)
 }

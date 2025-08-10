@@ -34,7 +34,7 @@ struct MinimizedMealGroupView: View {
         
         VStack(alignment: .center, spacing: 10) {
             Text(group.name)
-                .foregroundStyle(.black)
+                .foregroundStyle(.primaryText)
                 .font(.title3.weight(.bold))
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
@@ -45,7 +45,7 @@ struct MinimizedMealGroupView: View {
                 }
             } label: {
                 OpenButtonView()
-                    .foregroundStyle(emblem.mix(with: .black, by: 0.3))
+                    .foregroundStyle(emblem.mix(with: .primaryText, by: 0.3))
                     .fontWeight(.bold)
                     .frame(maxWidth: .infinity)
             }
@@ -54,7 +54,7 @@ struct MinimizedMealGroupView: View {
         .background(AnimatedBackgroundGradient(colours: [
             emblem, emblem, medium, medium,
             emblem, emblem, medium, medium,
-            mixed, mixed, .white, heavy,
+            mixed, mixed, .backgroundColour, heavy,
             mixed, mixed, heavy, heavy
         ]).shadow(color: emblem.opacity(0.3), radius: 8, x: 0, y: 4))
         .padding(.horizontal)
@@ -71,7 +71,7 @@ struct ExpandedMealGroupView: View {
         VStack(spacing: 0) {
             HStack {
                 Text(group.name)
-                    .foregroundStyle(.black)
+                    .foregroundStyle(.primaryText)
                     .font(.title3.weight(.bold))
                 Spacer()
                 Button {
@@ -81,7 +81,7 @@ struct ExpandedMealGroupView: View {
                 } label: {
                     Image(systemName: "xmark.circle.fill")
                         .font(.title2)
-                        .foregroundStyle(emblem.mix(with: .black, by: 0.3))
+                        .foregroundStyle(emblem.mix(with: .primaryText, by: 0.3))
                         .shadow(radius: 2)
                 }
             }
@@ -90,7 +90,7 @@ struct ExpandedMealGroupView: View {
                 AnimatedBackgroundGradient(colours: [
                     emblem, emblem, medium, medium,
                     emblem, emblem, medium, medium,
-                    mixed, mixed, .white, heavy,
+                    mixed, mixed, .backgroundColour, heavy,
                     mixed, mixed, heavy, heavy
                 ], clipToShape: false)
             )
@@ -99,10 +99,10 @@ struct ExpandedMealGroupView: View {
                 LazyVStack(alignment: .leading, spacing: 12) {
                     ForEach(group.meals, id: \.id) { meal in
                         FoodItemView(foodItem: meal,
-                                     subtextColor: Color(.darkGray),
-                                     backgroundColor: .white)
+                                     subtextColor: .secondaryText,
+                                     backgroundColor: .backgroundColour)
                         .clipShape(RoundedRectangle(cornerRadius: 12))
-                        .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
+                        .shadow(color: .primaryText.opacity(0.05), radius: 4, x: 0, y: 2)
                     }
                 }
                 .padding()
@@ -114,9 +114,9 @@ struct ExpandedMealGroupView: View {
                                 medMixedColour: medium,
                                 heavyMixedColour: heavy)
         }
-        .background(.white)
+        .background(.backgroundColour)
         .clipShape(RoundedRectangle(cornerRadius: 20))
-        .shadow(color: .black.opacity(0.15), radius: 12, x: 0, y: 6)
+        .shadow(color: .primaryText.opacity(0.15), radius: 12, x: 0, y: 6)
         .padding(.horizontal)
     }
 }
@@ -134,7 +134,7 @@ struct MealGroupBottomEdge: View {
                 .background(AnimatedBackgroundGradient(colours: [
                     emblemColour, emblemColour, medMixedColour, medMixedColour,
                     emblemColour, emblemColour, medMixedColour, medMixedColour,
-                    mixedColour, mixedColour, .white, heavyMixedColour,
+                    mixedColour, mixedColour, .backgroundColour, heavyMixedColour,
                     mixedColour, mixedColour, heavyMixedColour, heavyMixedColour
                 ], clipToShape: false))
                 .frame(maxHeight: 10)

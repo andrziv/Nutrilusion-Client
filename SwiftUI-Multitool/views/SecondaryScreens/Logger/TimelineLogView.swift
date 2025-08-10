@@ -90,7 +90,7 @@ struct TimelineHourView: View {
                 Text(timeString + amPm)
                     .font(.footnote)
                     .fontWeight(.semibold)
-                    .foregroundColor(.gray)
+                    .foregroundStyle(.secondaryText)
                     .frame(height: 30)
                     .id("hour-\(hour)")
                 TimelineHourStatView(mealItems: filteredHourMealItems)
@@ -113,6 +113,7 @@ struct TimelineHourStatView: View {
             HStack(spacing: 8) {
                 Line()
                     .stroke(style: StrokeStyle(lineWidth: 1, dash: [5]))
+                    .fill(.secondaryText)
                     .frame(height: 1)
                     .frame(maxWidth: .infinity)
                     .layoutPriority(0)
@@ -124,7 +125,7 @@ struct TimelineHourStatView: View {
                     TotalNutrientStatView(nutrientOfInterest: "Carbohydrates", mealItems: mealItems)
                 }
                 .font(.caption)
-                .foregroundStyle(.gray)
+                .foregroundStyle(.secondaryText)
                 .padding(.horizontal, 5)
                 .background(.thinMaterial)
                 .clipShape(RoundedRectangle(cornerRadius: 15))
@@ -132,6 +133,7 @@ struct TimelineHourStatView: View {
                 
                 Line()
                     .stroke(style: StrokeStyle(lineWidth: 1, dash: [5]))
+                    .fill(.secondaryText)
                     .frame(height: 1)
                     .frame(maxWidth: .infinity)
                     .layoutPriority(0)
@@ -139,6 +141,7 @@ struct TimelineHourStatView: View {
         } else {
             Line()
                 .stroke(style: StrokeStyle(lineWidth: 1, dash: [5]))
+                .fill(.secondaryText)
                 .frame(height: 1)
         }
     }

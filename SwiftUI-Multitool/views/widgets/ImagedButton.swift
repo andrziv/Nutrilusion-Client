@@ -11,7 +11,7 @@ import SwiftUI
 struct ImagedButton: View {
     let title: String
     let icon: String
-    var fontColour: Color = .primary
+    var fontColour: Color = .primaryText
     var circleColor: Color = .blue
     var cornerRadius: CGFloat = 12
     let action: () -> Void
@@ -28,12 +28,12 @@ struct ImagedButton: View {
                 Text(title)
                     .font(.headline)
             }
-            .foregroundColor(fontColour)
+            .foregroundStyle(fontColour)
             .padding(.vertical, 8)
             .padding(.horizontal, 12)
             .background(
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                    .fill(.white.opacity(0.6))
+                    .fill(.backgroundColour.opacity(0.6))
             )
         }
     }

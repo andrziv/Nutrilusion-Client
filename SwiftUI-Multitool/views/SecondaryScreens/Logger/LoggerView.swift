@@ -112,8 +112,8 @@ struct WeekDayButtonSet: View {
                     selectedDay.day = day
                     selectedDay.date = date
                 } label: {
-                    PositionalButtonView(toptext:  String(calendarDay),
-                                         maintext: day.shortform,
+                    PositionalButtonView(topText:  String(calendarDay),
+                                         mainText: day.shortform,
                                          position: positionType(index),
                                          isSelected: selectedDayIndex - 1 == index,
                                          background: .thinMaterial)
@@ -136,11 +136,11 @@ struct TimelineLogHeader: View {
             }
             .padding(.top, 10)
             .font(.system(size: 14))
-            .foregroundStyle(.gray)
+            .foregroundStyle(.secondaryText)
             
             Line()
                 .frame(height: 1)
-                .background(.gray)
+                .background(.secondaryText)
         }
     }
 }
@@ -171,6 +171,7 @@ struct DailyNutrientProgressView: View {
                 .minimumScaleFactor(0.4)
                 .frame(maxWidth: .infinity)
                 .font(.caption2)
+                .foregroundStyle(.primaryText)
             ProgressView(value: progress)
         }
     }
@@ -206,7 +207,7 @@ struct LogCurrentTimeButton: View {
     var body: some View {
         Label("@ " + timeString, systemImage: "plus.circle.fill")
             .padding(12)
-            .foregroundColor(.black)
+            .foregroundStyle(.primaryText)
             .frame(maxHeight: 50)
             .background(.thinMaterial,
                         in: RoundedRectangle(cornerRadius: 12))

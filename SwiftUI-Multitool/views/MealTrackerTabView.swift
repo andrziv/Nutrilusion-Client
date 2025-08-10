@@ -99,7 +99,8 @@ extension MealTrackerTabView {
     func CustomTabItem(imageName: String, title: String, isActive: Bool) -> some View{
         HStack {
             Label(title, systemImage: imageName)
-                .foregroundColor(isActive ? .black : .gray)
+                .fontWeight(isActive ? .semibold : .regular)
+                .foregroundStyle(.primaryText)
                 .font(.system(size: 14))
         }
         .padding(10)

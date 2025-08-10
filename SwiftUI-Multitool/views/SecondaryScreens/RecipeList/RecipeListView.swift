@@ -67,7 +67,7 @@ struct FloatingActionButtonToolbar: View {
             
             // Submenu expanding from FAB
             ReLiSubMenu(screenMode: $recipeListScreenMode, showingCustomMenu: $isShowingSubMenu)
-                .foregroundStyle(.black)
+                .foregroundStyle(.primaryText)
                 .padding(.trailing, 20)
                 .padding(.bottom, 20)
                 .scaleEffect(isShowingSubMenu ? 1 : 0.05, anchor: .bottomTrailing)
@@ -82,7 +82,7 @@ struct FloatingActionButtonToolbar: View {
                 Image(systemName: "plus")
                     .rotationEffect(.degrees(isShowingSubMenu ? 45 : 0))
                     .font(.system(size: 18, weight: .bold))
-                    .foregroundColor(.primary)
+                    .foregroundStyle(.primaryText)
                     .padding(16)
                     .background(
                         ZStack {
@@ -90,7 +90,7 @@ struct FloatingActionButtonToolbar: View {
                                 .fill(
                                     LinearGradient(
                                         gradient: Gradient(colors: [
-                                            .white.opacity(0.8),
+                                            .backgroundColour.opacity(0.8),
                                             .blue.opacity(0.8)
                                         ]),
                                         startPoint: .topLeading,
@@ -100,7 +100,7 @@ struct FloatingActionButtonToolbar: View {
                             
                             // glass-like blur (SwiftUI normal blur no bueno)
                             Circle()
-                                .fill(.white.opacity(0.1))
+                                .fill(.backgroundColour.opacity(0.1))
                                 .background(.thinMaterial,
                                             in: Circle()
                                 )
@@ -110,7 +110,7 @@ struct FloatingActionButtonToolbar: View {
                         Circle()
                             .stroke(.blue.opacity(0.4), lineWidth: 0.5)
                     )
-                    .shadow(color: .black.opacity(0.15), radius: 10, x: 0, y: 5)
+                    .shadow(color: .primaryText.opacity(0.15), radius: 10, x: 0, y: 5)
                     .scaleEffect(isShowingSubMenu ? 0.8 : 1.0)
             }
             .padding(.trailing, isShowingSubMenu ? 10 : 20)
@@ -145,7 +145,7 @@ struct ReLiSubMenu: View {
             // Glassy background with blur + gradient
             RoundedRectangle(cornerRadius: 20, style: .continuous)
                 .fill(.ultraThinMaterial)
-                .shadow(color: .black.opacity(0.15), radius: 10, x: 0, y: 5)
+                .shadow(color: .primaryText.opacity(0.15), radius: 10, x: 0, y: 5)
         )
     }
 }
