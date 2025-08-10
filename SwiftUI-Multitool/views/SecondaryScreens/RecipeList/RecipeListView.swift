@@ -24,8 +24,9 @@ struct RecipeListView: View {
     
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
-            LazyVScroll(items: mealGroups) { mealGroup in
+            LazyVScroll(items: mealGroups, spacing: 0) { mealGroup in
                 MealGroupView(group: mealGroup, isExpanded: true)
+                    .padding(.top)
             }
             
             FloatingActionButtonToolbar(isShowingSubMenu: $showAddSubMenu, recipeListScreenMode: $mode)
@@ -42,6 +43,7 @@ struct RecipeListView: View {
                     .transition(.move(edge: .bottom))
             }
         }
+        .background(.ultraThinMaterial)
     }
 }
 

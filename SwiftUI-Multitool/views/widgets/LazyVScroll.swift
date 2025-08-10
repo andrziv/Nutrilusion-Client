@@ -9,8 +9,8 @@ import SwiftUI
 
 struct LazyVScroll<Item: Identifiable, Content: View>: View {
     let items: [Item]
-    let content: (Item) -> Content
     var spacing: CGFloat = 10
+    let content: (Item) -> Content
     
     var body: some View {
         ScrollView {

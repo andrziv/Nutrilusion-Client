@@ -36,7 +36,5 @@ struct ImagedButton: View {
                     .fill(.white.opacity(0.6))
             )
         }
-        .buttonStyle(PlainButtonStyle())
-        .hoverEffect(.highlight)
     }
 }
