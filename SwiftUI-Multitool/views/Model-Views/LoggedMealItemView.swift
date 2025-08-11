@@ -42,18 +42,17 @@ struct LoggedMealItemView: View {
                 let shownNutrients = min(3, loggedItem.meal.nutritionList.count)
                 VStack(alignment: .leading) {
                     HStack(spacing: 15) {
-                        MealCalorieStatView(mealItem: loggedItem)
+                        MealCalorieStatView(mealItem: loggedItem, primaryTextColor: Color(red: 0.85, green: 0.85, blue: 0.85))
                             .labelStyle(CustomLabel(spacing: 7))
                         ForEach(0..<shownNutrients, id: \.self) { index in
-                            MealNutrientItemView(nutrientOfInterest: loggedItem.meal.nutritionList[index], mealItem: loggedItem)
+                            MealNutrientItemView(nutrientOfInterest: loggedItem.meal.nutritionList[index], mealItem: loggedItem, primaryTextColor: Color(red: 0.85, green: 0.85, blue: 0.85))
                                 .labelStyle(CustomLabel(spacing: 7))
                         }
                     }
                     
-                    MealServingSizeView(mealItem: loggedItem)
+                    MealServingSizeView(mealItem: loggedItem, primaryTextColor: Color(red: 0.85, green: 0.85, blue: 0.85))
                         .labelStyle(CustomLabel(spacing: 5))
                 }
-                .foregroundStyle(.white)
                 .font(.footnote)
             }
         }
