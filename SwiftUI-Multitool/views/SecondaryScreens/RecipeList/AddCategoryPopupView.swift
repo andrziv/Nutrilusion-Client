@@ -38,7 +38,7 @@ struct AddCategoryPopupView: View {
                 
                 ImagedButton(title: "Create Category", icon: "plus", circleColor: .clear, cornerRadius: 10) {
                     // TODO: Change this to use CoreData later...
-                    mealGroups.append(MealGroup(name: searchString, meals: [], colour: colourPicked.toHex()!))
+                    mealGroups.append(MealGroup(id: UUID(uuidString: "10000000-0000-0000-0000-000000000000")!, name: searchString, meals: [], colour: colourPicked.toHex()!))
                     screenMode = .normal
                 }
             }
@@ -55,7 +55,7 @@ struct MealGroupPreviewView: View {
     
     var body: some View {
         ZStack(alignment: .top) {
-            MealGroupView(group: MealGroup(name: searchString, meals: [MockData.sampleFoodItem], colour: colourPicked.toHex()!))
+            MealGroupView(group: MealGroup(id: UUID(), name: searchString, meals: [MockData.sampleFoodItem], colour: colourPicked.toHex()!))
                 .id(searchString + (colourPicked.toHex() ?? ""))
                 .padding(.vertical)
             

@@ -98,9 +98,7 @@ struct ExpandedMealGroupView: View {
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 12) {
                     ForEach(group.meals, id: \.id) { meal in
-                        FoodItemView(foodItem: meal,
-                                     subtextColor: .secondaryText,
-                                     backgroundColor: .backgroundColour)
+                        FoodItemView(foodItem: meal)
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                         .shadow(color: .primaryText.opacity(0.05), radius: 4, x: 0, y: 2)
                     }

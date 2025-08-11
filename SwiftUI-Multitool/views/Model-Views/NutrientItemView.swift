@@ -16,13 +16,24 @@ struct NutrientItemView: View {
     var nutrientOfInterest: NutrientItem
     var foodItem: FoodItem
     var viewType : StatViewType = .img
+    var primaryTextColor: Color = .primaryText
+    var secondaryTextColor: Color = .secondaryText
     
     var body: some View {
         switch viewType {
         case .img:
             Label(RoundingDouble(nutrientOfInterest.amount), systemImage: NutrientImageMapping.allCases[nutrientOfInterest.name] ?? "questionmark.diamond.fill")
+                .foregroundStyle(primaryTextColor)
         case .txt:
-            Text("\(nutrientOfInterest.name): \(RoundingDouble(nutrientOfInterest.amount))\(nutrientOfInterest.unit)")
+            HStack {
+                Text("\(nutrientOfInterest.name)")
+                    .foregroundStyle(primaryTextColor)
+                
+                Spacer()
+                
+                Text("\(RoundingDouble(nutrientOfInterest.amount)) \(nutrientOfInterest.unit)")
+                    .foregroundStyle(secondaryTextColor)
+            }
         }
     }
 }
@@ -31,13 +42,24 @@ struct MealNutrientItemView: View {
     var nutrientOfInterest: NutrientItem
     var mealItem: LoggedMealItem
     var viewType : StatViewType = .img
+    var primaryTextColor: Color = .primaryText
+    var secondaryTextColor: Color = .secondaryText
     
     var body: some View {
         switch viewType {
         case .img:
             Label(RoundingDouble(mealItem.servingMultiple * nutrientOfInterest.amount), systemImage: NutrientImageMapping.allCases[nutrientOfInterest.name] ?? "questionmark.diamond.fill")
+                .foregroundStyle(primaryTextColor)
         case .txt:
-            Text("\(nutrientOfInterest.name): \(RoundingDouble(mealItem.servingMultiple * nutrientOfInterest.amount))\(nutrientOfInterest.unit)")
+            HStack {
+                Text("\(nutrientOfInterest.name)")
+                    .foregroundStyle(primaryTextColor)
+                
+                Spacer()
+                
+                Text("\(RoundingDouble(mealItem.servingMultiple * nutrientOfInterest.amount)) \(nutrientOfInterest.unit)")
+                    .foregroundStyle(secondaryTextColor)
+            }
         }
     }
 }
@@ -45,13 +67,24 @@ struct MealNutrientItemView: View {
 struct CalorieStatView: View {
     var foodItem: FoodItem
     var viewType : StatViewType = .img
+    var primaryTextColor: Color = .primaryText
+    var secondaryTextColor: Color = .secondaryText
     
     var body: some View {
         switch viewType {
         case .img:
             Label(RoundingDouble(Double(foodItem.calories)), systemImage: NutrientImageMapping.allCases["Calories"] ?? "questionmark.diamond.fill")
+                .foregroundStyle(primaryTextColor)
         case .txt:
-            Text("Calories: \(RoundingDouble(Double(foodItem.calories)))")
+            HStack {
+                Text("Calories")
+                    .foregroundStyle(primaryTextColor)
+                
+                Spacer()
+                
+                Text("\(RoundingDouble(Double(foodItem.calories))) kcal")
+                    .foregroundStyle(secondaryTextColor)
+            }
         }
     }
 }
@@ -59,13 +92,24 @@ struct CalorieStatView: View {
 struct MealCalorieStatView: View {
     var mealItem: LoggedMealItem
     var viewType : StatViewType = .img
+    var primaryTextColor: Color = .primaryText
+    var secondaryTextColor: Color = .secondaryText
     
     var body: some View {
         switch viewType {
         case .img:
             Label(RoundingDouble(mealItem.servingMultiple * Double(mealItem.meal.calories)), systemImage: NutrientImageMapping.allCases["Calories"] ?? "questionmark.diamond.fill")
+                .foregroundStyle(primaryTextColor)
         case .txt:
-            Text("Calories: \(RoundingDouble(mealItem.servingMultiple * Double(mealItem.meal.calories)))")
+            HStack {
+                Text("Calories")
+                    .foregroundStyle(primaryTextColor)
+                
+                Spacer()
+                
+                Text("\(RoundingDouble(mealItem.servingMultiple * Double(mealItem.meal.calories))) kcal")
+                    .foregroundStyle(secondaryTextColor)
+            }
         }
     }
 }
@@ -73,6 +117,8 @@ struct MealCalorieStatView: View {
 struct ServingSizeView: View {
     var foodItem: FoodItem
     var viewType : StatViewType = .img
+    var primaryTextColor: Color = .primaryText
+    var secondaryTextColor: Color = .secondaryText
     
     var body: some View {
         let servingTotal = foodItem.servingAmount
@@ -82,9 +128,17 @@ struct ServingSizeView: View {
             Label("\(RoundingDouble(servingTotal)) " +
                   "\(isUnitMultiple ? foodItem.servingUnitMultiple : foodItem.servingUnit)",
                   systemImage: "dot.square")
+            .foregroundStyle(primaryTextColor)
         case .txt:
-            Text("Serving Size: \(RoundingDouble(servingTotal)) " +
-                 "\(isUnitMultiple ? foodItem.servingUnitMultiple : foodItem.servingUnit)")
+            HStack {
+                Text("Serving Size")
+                    .foregroundStyle(primaryTextColor)
+                
+                Spacer()
+                
+                Text("\(RoundingDouble(servingTotal)) \(isUnitMultiple ? foodItem.servingUnitMultiple : foodItem.servingUnit)")
+                    .foregroundStyle(secondaryTextColor)
+            }
         }
     }
 }
@@ -92,6 +146,8 @@ struct ServingSizeView: View {
 struct MealServingSizeView: View {
     var mealItem: LoggedMealItem
     var viewType : StatViewType = .img
+    var primaryTextColor: Color = .primaryText
+    var secondaryTextColor: Color = .secondaryText
     
     var body: some View {
         let servingTotal = mealItem.servingMultiple * mealItem.meal.servingAmount
@@ -101,9 +157,17 @@ struct MealServingSizeView: View {
             Label("\(RoundingDouble(servingTotal)) " +
                   "\(isUnitMultiple ? mealItem.meal.servingUnitMultiple : mealItem.meal.servingUnit)",
                   systemImage: "dot.square")
+            .foregroundStyle(primaryTextColor)
         case .txt:
-            Text("Serving Size: \(RoundingDouble(servingTotal)) " +
-                 "\(isUnitMultiple ? mealItem.meal.servingUnitMultiple : mealItem.meal.servingUnit)")
+            HStack {
+                Text("Serving Size")
+                    .foregroundStyle(primaryTextColor)
+                
+                Spacer()
+                
+                Text("\(RoundingDouble(servingTotal)) \(isUnitMultiple ? mealItem.meal.servingUnitMultiple : mealItem.meal.servingUnit)")
+                    .foregroundStyle(secondaryTextColor)
+            }
         }
     }
 }

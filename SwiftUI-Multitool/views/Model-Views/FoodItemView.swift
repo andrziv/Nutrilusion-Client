@@ -15,197 +15,194 @@ struct FoodItemView: View {
     var backgroundColor: Color = .backgroundColour
     
     var body: some View {
-        ZStack {
-            if isExpanded {
-                ExpandedFoodItemView(foodItem: foodItem,
-                                     textColor: textColor,
-                                     subtextColor: subtextColor,
-                                     backgroundColor: backgroundColor,
-                                     isExpanded: $isExpanded)
-                .transition(.opacity)
-            } else {
-                MinimizedFoodItemView(foodItem: foodItem,
-                                      textColor: textColor,
-                                      subtextColor: subtextColor,
-                                      backgroundColor: backgroundColor,
-                                      isExpanded: $isExpanded)
-                .transition(.opacity)
+        VStack(alignment: .leading, spacing: 8) {
+            FoodItemHeader(foodItem: foodItem, isExpanded: isExpanded)
+            
+            if !isExpanded {
+                Line()
+                    .frame(height: 1)
+                    .background(.secondaryText)
             }
+            
+            FoodItemBody(foodItem: foodItem, isExpanded: $isExpanded)
         }
-        .animation(.spring(), value: isExpanded)
+        .padding()
+        .background(Color(.secondarySystemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .shadow(color: Color.primary.opacity(0.05), radius: 4, x: 0, y: 2)
+        .animation(.easeInOut(duration: 0.25), value: isExpanded)
     }
 }
 
-
-struct MinimizedFoodItemView: View {
+struct FoodItemHeader: View {
     let foodItem: FoodItem
-    var textColor: Color
-    var subtextColor: Color
-    var backgroundColor: Color
-    @Binding var isExpanded: Bool
+    var isExpanded: Bool = false
+    var textColour: Color = .primaryText
+    var subtextColour: Color = .secondaryText
     
-    private func amPm(hour: Int) -> String {
-        hour < 12 ? "AM" : "PM"
+    var body: some View {
+        HStack {
+            Text(foodItem.name)
+                .font(.headline)
+                .fontWeight(.bold)
+                .foregroundStyle(textColour)
+            
+            if !isExpanded {
+                Spacer()
+                
+                ServingSizeView(foodItem: foodItem, primaryTextColor: subtextColour)
+                    .labelStyle(CustomLabel(spacing: 5))
+                    .font(.footnote)
+            }
+        }
     }
+}
+
+struct FoodItemBody: View {
+    let foodItem: FoodItem
+    @Binding var isExpanded: Bool
+    var textColour: Color = .primaryText
+    var subtextColour: Color = .secondaryText
+    
+    var body: some View {
+        SwappingVHStack(vSpacing: 8, hSpacing: 10, hAlignment: .top, vAlignment: .leading, useHStack: !isExpanded) {
+            if isExpanded {
+                ServingSizeView(foodItem: foodItem,
+                                viewType: isExpanded ? .txt : .img)
+                .labelStyle(CustomLabel(spacing: 5))
+                .font(.footnote)
+                .fontWeight(isExpanded ? .bold : .regular)
+            }
+            
+            if !foodItem.nutritionList.isEmpty {
+                FoodItemNutrientShowcase(foodItem: foodItem,
+                                         isExpanded: isExpanded)
+                
+                if !isExpanded {
+                    Spacer()
+                    
+                    MinimizedFoodItemControlRow(isExpanded: $isExpanded)
+                }
+            }
+            
+            if isExpanded && !foodItem.ingredientList.isEmpty {
+                Text("Ingredients")
+                    .font(.subheadline)
+                    .bold()
+                    .padding(.top, 6)
+                
+                ForEach(foodItem.ingredientList) { ingredient in
+                    Text(ingredient.name)
+                        .font(.footnote)
+                        .foregroundColor(.secondary)
+                }
+            }
+            
+            if isExpanded {
+                ExpandedFoodItemControlRow(isExpanded: $isExpanded)
+            }
+        }
+        .transition(.asymmetric(
+            insertion: .move(edge: .top).combined(with: .opacity),
+            removal: .opacity
+        ))
+        .padding(.top, 8)
+    }
+}
+
+struct FoodItemNutrientShowcase: View {
+    let foodItem: FoodItem
+    var isExpanded: Bool
+    
+    var body: some View {
+        let shownNutrients = min(isExpanded ? foodItem.nutritionList.count : 3, foodItem.nutritionList.count)
+        if isExpanded {
+            Text("Nutritional Information")
+                .foregroundStyle(.secondaryText)
+                .fontWeight(.heavy)
+                .font(.subheadline)
+                .padding(.vertical, 8)
+        }
+        
+        CalorieStatView(foodItem: foodItem,
+                        viewType: isExpanded ? .txt : .img,
+                        primaryTextColor: isExpanded ? .primaryText : .secondaryText)
+        .labelStyle(CustomLabel(spacing: 7))
+        .font(.footnote)
+        .fontWeight(isExpanded ? .bold : .regular)
+        
+        ForEach(0..<shownNutrients, id: \.self) { index in
+            NutrientItemView(nutrientOfInterest: foodItem.nutritionList[index],
+                             foodItem: foodItem,
+                             viewType: isExpanded ? .txt : .img,
+                             primaryTextColor: isExpanded ? .primaryText : .secondaryText)
+            .fontWeight(isExpanded ? .semibold : .regular)
+            
+            if isExpanded {
+                ForEach(foodItem.nutritionList[index].childNutrients) { childNutrient in
+                    HStack {
+                        Image(systemName: "arrow.turn.down.right")
+                        NutrientItemView(nutrientOfInterest: childNutrient, foodItem: foodItem, viewType: .txt)
+                            .fontWeight(.light)
+                    }
+                }
+            }
+        }
+        .font(.footnote)
+        .labelStyle(CustomLabel(spacing: 7))
+    }
+}
+
+struct MinimizedFoodItemControlRow: View {
+    @Binding var isExpanded: Bool
     
     var body: some View {
         Button {
-            withAnimation() {
-                isExpanded = true
-            }
+            isExpanded = true
         } label: {
-            VStack(alignment: .center, spacing: 10) {
-                VStack(alignment: .leading, spacing: 8) {
-                    VStack {
-                        HStack {
-                            Text(foodItem.name)
-                                .font(.headline)
-                                .fontWeight(.bold)
-                                .foregroundStyle(textColor)
-                            
-                            Spacer()
-                            
-                            ServingSizeView(foodItem: foodItem)
-                                .labelStyle(CustomLabel(spacing: 5))
-                                .foregroundStyle(subtextColor)
-                                .font(.footnote)
-                        }
-                        Line()
-                            .frame(height: 1)
-                            .background(.secondaryText)
-                    }
-                    
-                    HStack {
-                        let shownNutrients = min(3, foodItem.nutritionList.count)
-                        HStack(spacing: 15) {
-                            CalorieStatView(foodItem: foodItem)
-                                .labelStyle(CustomLabel(spacing: 7))
-                            ForEach(0..<shownNutrients, id: \.self) { index in
-                                NutrientItemView(nutrientOfInterest: foodItem.nutritionList[index], foodItem: foodItem)
-                                    .labelStyle(CustomLabel(spacing: 7))
-                            }
-                        }
-                        .foregroundStyle(subtextColor)
-                        .font(.footnote)
-                        
-                        Spacer()
-                        
-                        Image(systemName: "chevron.down")
-                            .foregroundStyle(textColor)
-                            .font(.callout)
-                            .padding(.horizontal)
-                            .padding(.vertical, 4)
-                            .overlay(content: {
-                                RoundedRectangle(cornerRadius: 100)
-                                    .fill(.secondaryText)
-                                    .opacity(0.2)
-                            })
-                    }
-                }
-            }
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(backgroundColor)
-            .overlay( /// apply a rounded border
-                RoundedRectangle(cornerRadius: 10)
-                    .stroke(.secondaryText, lineWidth: 0.5)
-            )
-            .cornerRadius(10)
+            Image(systemName: "chevron.down")
+                .foregroundStyle(.primaryText)
+                .font(.callout)
+                .padding(.horizontal)
+                .padding(.vertical, 4)
+                .overlay(content: {
+                    RoundedRectangle(cornerRadius: 100)
+                        .fill(.secondaryText)
+                        .opacity(0.2)
+                })
         }
     }
 }
 
-struct ExpandedFoodItemView: View {
-    
-    let foodItem: FoodItem
-    var textColor: Color
-    var subtextColor: Color
-    var backgroundColor: Color
+struct ExpandedFoodItemControlRow: View {
     @Binding var isExpanded: Bool
     
-    private func amPm(hour: Int) -> String {
-        hour < 12 ? "AM" : "PM"
-    }
-    
     var body: some View {
-        VStack(alignment: .center, spacing: 10) {
-            VStack(alignment: .leading, spacing: 8) {
-                HStack {
-                    Text(foodItem.name)
-                        .font(.headline)
-                        .fontWeight(.bold)
-                        .foregroundStyle(textColor)
-                }
-                
-                VStack(alignment: .leading, spacing: 15) {
-                    ServingSizeView(foodItem: foodItem, viewType: .txt)
-                        .labelStyle(CustomLabel(spacing: 5))
-                    
-                    Text("Nutritional Information")
-                        .fontWeight(.heavy)
-                        .font(.subheadline)
-                    
-                    ScrollView {
-                        VStack(alignment: .leading, spacing: 10) {
-                            CalorieStatView(foodItem: foodItem, viewType: .txt)
-                                .fontWeight(.bold)
-                            ForEach(foodItem.nutritionList) { nutrient in
-                                NutrientItemView(nutrientOfInterest: nutrient, foodItem: foodItem, viewType: .txt)
-                                    .fontWeight(.semibold)
-                                ForEach(nutrient.childNutrients) { childNutrient in
-                                    HStack {
-                                        Image(systemName: "arrow.turn.down.right")
-                                        NutrientItemView(nutrientOfInterest: childNutrient, foodItem: foodItem, viewType: .txt)
-                                            .fontWeight(.light)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    .frame(maxHeight: 300)
-                }
-                .foregroundStyle(subtextColor)
-                .font(.footnote)
+        ZStack(alignment: .trailing) {
+            Button {
+                isExpanded = false
+            } label: {
+                CloseButtonView()
+                    .foregroundStyle(.primaryText)
+                    .font(.callout)
+                    .frame(maxWidth: .infinity)
             }
             
-            ZStack(alignment: .trailing) {
-                Button {
-                    withAnimation {
-                        isExpanded = false
-                    }
-                } label: {
-                    CloseButtonView()
-                        .foregroundStyle(textColor)
-                        .font(.callout)
-                        .frame(maxWidth: .infinity)
-                }
-                
-                Button {
-                    // TODO: Fill out later when recipe editing becomes available
-                } label: {
-                    Image(systemName: "pencil")
-                        .foregroundStyle(textColor)
-                        .font(.callout)
-                        .padding(.horizontal)
-                        .padding(.vertical, 4)
-                        .overlay(content: {
-                            RoundedRectangle(cornerRadius: 100)
-                                .fill(.secondaryText)
-                                .opacity(0.2)
-                        })
-                }
+            Button {
+                // TODO: Fill out later when recipe editing becomes available
+            } label: {
+                Image(systemName: "pencil")
+                    .foregroundStyle(.primaryText)
+                    .font(.callout)
+                    .padding(.horizontal)
+                    .padding(.vertical, 4)
+                    .overlay(content: {
+                        RoundedRectangle(cornerRadius: 100)
+                            .fill(.secondaryText)
+                            .opacity(0.2)
+                    })
             }
         }
-        .frame(maxWidth: .infinity)
-        .padding(.horizontal)
-        .padding(.top)
-        .padding(.bottom, 10)
-        .background(backgroundColor)
-        .overlay( /// apply a rounded border
-            RoundedRectangle(cornerRadius: 10)
-                .stroke(.secondaryText, lineWidth: 0.5)
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 }
 

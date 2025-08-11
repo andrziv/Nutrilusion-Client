@@ -8,7 +8,7 @@
 import Foundation
 
 struct MealGroup: Identifiable {
-    let id: UUID = UUID()
+    let id: UUID
     var name: String
     var meals: [FoodItem]
     var colour: String
@@ -16,6 +16,7 @@ struct MealGroup: Identifiable {
 
 extension MockData {
     static let sampleMealGroup: MealGroup = .init(
+        id: UUID(uuidString: "00000000-0000-0000-0000-000000000001")!,
         name: "Breakfast",
         meals: [
             sampleFoodItem,
@@ -28,15 +29,17 @@ extension MockData {
     static var mealGroupList: [MealGroup] = [
         sampleMealGroup,
         .init(
+            id: UUID(uuidString: "00000000-0000-0000-0000-000000000002")!,
             name: "Lunch",
             meals: [
                 foodItemList[1],
-                foodItemList[8],
-                foodItemList[9]
+                foodItemList[3],
+                foodItemList[8]
             ],
             colour: "#ffeb3b"
         ),
         .init(
+            id: UUID(uuidString: "00000000-0000-0000-0000-000000000003")!,
             name: "Dinner",
             meals: [
                 foodItemList[6],
@@ -44,12 +47,14 @@ extension MockData {
             ],
             colour: "#ff5252"
         ),
-        .init(name: "Off-the-Shelf",
-              meals: [
+        .init(
+            id: UUID(uuidString: "00000000-0000-0000-0000-000000000004")!,
+            name: "Off-the-Shelf",
+            meals: [
                 foodItemList[1],
                 foodItemList[2],
                 foodItemList[7]
-              ],
-              colour: "#a319ff")
+            ],
+            colour: "#a319ff")
     ]
 }
