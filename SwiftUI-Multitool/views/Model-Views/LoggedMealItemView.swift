@@ -7,9 +7,9 @@
 
 import SwiftUI
 
-struct LoggedMealItemView: View {
-    
+struct LoggedMealItemView<Content: View>: View {
     let loggedItem: LoggedMealItem
+    let backgroundView: Content
     
     private func amPm(hour: Int) -> String {
         hour < 12 ? "AM" : "PM"
@@ -17,8 +17,10 @@ struct LoggedMealItemView: View {
     
     var body: some View {
         let emblem = loggedItem.emblemColour
-        let mixed = emblem.mix(with: .black, by: 0.3)
-        VStack(alignment: .center, spacing: 10) {
+        
+        ZStack {
+            backgroundView
+            
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
                     Text(loggedItem.meal.name)
@@ -55,18 +57,13 @@ struct LoggedMealItemView: View {
                 }
                 .font(.footnote)
             }
+            .padding()
         }
-        .padding()
-        .background(AnimatedBackgroundGradient(colours: [
-            mixed, mixed, mixed, emblem,
-            mixed, mixed, mixed, emblem,
-            mixed, mixed, mixed, emblem,
-            mixed, mixed, mixed, emblem
-        ], radius: 0, cornerRadius: 10))
+        .background(emblem)
         .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 }
 
 #Preview {
-    LoggedMealItemView(loggedItem: MockData.loggedMeals[0])
+    LoggedMealItemView(loggedItem: MockData.loggedMeals[0], backgroundView: EmptyView())
 }

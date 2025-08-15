@@ -17,10 +17,8 @@ enum RecipeListViewMode {
 // TODO: refactor and get rid of all the magic numbers used for testing
 struct RecipeListView: View {
     @State var mealGroups: [MealGroup] = MockData.mealGroupList
-    @State private var searchText: String = ""
     @State private var showAddSubMenu: Bool = false
     @State private var mode: RecipeListViewMode = .normal
-    @Namespace private var plusMenuNamespace
     
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
@@ -74,49 +72,11 @@ struct FloatingActionButtonToolbar: View {
                 .opacity(isShowingSubMenu ? 1 : 0)
                 .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isShowingSubMenu)
             
-            Button {
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                    isShowingSubMenu.toggle()
-                }
-            } label: {
-                Image(systemName: "plus")
-                    .rotationEffect(.degrees(isShowingSubMenu ? 45 : 0))
-                    .font(.system(size: 18, weight: .bold))
-                    .foregroundStyle(.primaryText)
-                    .padding(16)
-                    .background(
-                        ZStack {
-                            Circle()
-                                .fill(
-                                    LinearGradient(
-                                        gradient: Gradient(colors: [
-                                            .backgroundColour.opacity(0.8),
-                                            .blue.opacity(0.8)
-                                        ]),
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    )
-                                )
-                            
-                            // glass-like blur (SwiftUI normal blur no bueno)
-                            Circle()
-                                .fill(.backgroundColour.opacity(0.1))
-                                .background(.thinMaterial,
-                                            in: Circle()
-                                )
-                        }
-                    )
-                    .overlay(
-                        Circle()
-                            .stroke(.blue.opacity(0.4), lineWidth: 0.5)
-                    )
-                    .shadow(color: .primaryText.opacity(0.15), radius: 10, x: 0, y: 5)
-                    .scaleEffect(isShowingSubMenu ? 0.8 : 1.0)
-            }
-            .padding(.trailing, isShowingSubMenu ? 10 : 20)
-            .padding(.bottom, isShowingSubMenu ? 10 : 20)
-            .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isShowingSubMenu)
-            .zIndex(2)
+            ReLiButton(isShowingSubMenu: $isShowingSubMenu)
+                .padding(.trailing, isShowingSubMenu ? 10 : 20)
+                .padding(.bottom, isShowingSubMenu ? 10 : 20)
+                .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isShowingSubMenu)
+                .zIndex(2)
         }
     }
 }
@@ -150,7 +110,51 @@ struct ReLiSubMenu: View {
     }
 }
 
-
+struct ReLiButton: View {
+    @Binding var isShowingSubMenu: Bool
+    
+    var body: some View {
+        Button {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                isShowingSubMenu.toggle()
+            }
+        } label: {
+            Image(systemName: "plus")
+                .rotationEffect(.degrees(isShowingSubMenu ? 45 : 0))
+                .font(.system(size: 18, weight: .bold))
+                .foregroundStyle(.primaryText)
+                .padding(16)
+                .background(
+                    ZStack {
+                        Circle()
+                            .fill(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        .backgroundColour.opacity(0.8),
+                                        .blue.opacity(0.8)
+                                    ]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                        
+                        // glass-like blur (SwiftUI normal blur no bueno)
+                        Circle()
+                            .fill(.backgroundColour.opacity(0.1))
+                            .background(.thinMaterial,
+                                        in: Circle()
+                            )
+                    }
+                )
+                .overlay(
+                    Circle()
+                        .stroke(.blue.opacity(0.4), lineWidth: 0.5)
+                )
+                .shadow(color: .primaryText.opacity(0.03), radius: 10, x: 0, y: 5)
+                .scaleEffect(isShowingSubMenu ? 0.8 : 1.0)
+        }
+    }
+}
 
 #Preview {
     RecipeListView()

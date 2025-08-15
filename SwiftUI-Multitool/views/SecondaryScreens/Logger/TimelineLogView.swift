@@ -19,6 +19,15 @@ struct TimelineLogView: View {
     private let maxScale: CGFloat = 2.0
     private let defaultHourSpacing: CGFloat = 40
     
+    private static let whiteness = Color.black.opacity(0.3)
+    
+    private let animBackground = AnimatedBackgroundGradient(colours: [
+        whiteness, whiteness, whiteness, .clear,
+        whiteness, whiteness, whiteness, .clear,
+        whiteness, whiteness, whiteness, .clear,
+        whiteness, whiteness, whiteness, .clear
+    ], radius: 0, cornerRadius: 10)
+    
     private var hourSpacing: CGFloat {
         defaultHourSpacing * timeSlotScale
     }
@@ -30,7 +39,8 @@ struct TimelineLogView: View {
                     ZStack(alignment: .topLeading) {
                         TimelineDayView(loggedMealItems: loggedMealItems,
                                         selectedDate: selectedDate,
-                                        hourSpacing: hourSpacing)
+                                        hourSpacing: hourSpacing,
+                                        backgroundView: animBackground)
                         .padding([.leading, .trailing], 16)
                     }
                 }
@@ -51,26 +61,29 @@ struct TimelineLogView: View {
     }
 }
 
-struct TimelineDayView: View {
+struct TimelineDayView<Content: View>: View {
     var loggedMealItems: [LoggedMealItem]
     let selectedDate: Date
     let hourSpacing: CGFloat
+    let backgroundView: Content
     
     var body: some View {
         VStack(alignment: .trailing, spacing: hourSpacing) {
             ForEach(0..<25) { hour in
-                TimelineHourView(hour: hour, loggedMealItems: loggedMealItems)
+                TimelineHourView(hour: hour,
+                                 loggedMealItems: loggedMealItems,
+                                 backgroundView: backgroundView)
             }
         }
         .padding(.bottom, 40)
     }
 }
 
-struct TimelineHourView: View {
+struct TimelineHourView<Content: View>: View {
     let hour: Int
     var formattedHour: String = "%d:00"
     var loggedMealItems: [LoggedMealItem]
-    
+    let backgroundView: Content
     
     private var timeString: String {
         String(format: formattedHour, hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour))
@@ -97,7 +110,7 @@ struct TimelineHourView: View {
             }
             VStack(spacing: 10) {
                 ForEach(filteredHourMealItems, id: \.id) { meal in
-                    LoggedMealItemView(loggedItem: meal)
+                    LoggedMealItemView(loggedItem: meal, backgroundView: backgroundView)
                 }
             }
         }

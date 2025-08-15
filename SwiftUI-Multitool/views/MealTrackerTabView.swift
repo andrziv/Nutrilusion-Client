@@ -40,7 +40,7 @@ struct MealTrackerTabView: View {
     
     var body: some View {
         ZStack(alignment: .bottom) {
-            BackgroundView()
+          //  BackgroundView()
             
             VStack() {
                 // kludge around TabView because getting around the fixed-window of the main screens is too complicated.
