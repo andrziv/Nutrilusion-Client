@@ -29,7 +29,6 @@ struct FoodItemView: View {
         .padding()
         .background(.regularMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 12))
-        .shadow(color: Color.primary.opacity(0.05), radius: 4, x: 0, y: 2)
         .animation(.easeInOut(duration: 0.25), value: isExpanded)
     }
 }

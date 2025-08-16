@@ -12,9 +12,10 @@ struct AnimatedBackgroundGradient: View {
     var radius: CGFloat = 15
     var cornerRadius: CGFloat = 15
     var clipToShape: Bool = true
+    @Binding var isActive: Bool
     
     var body: some View {
-        TimelineView(.animation) { context in
+        TimelineView(.animation(minimumInterval: 0.1, paused: isActive)) { context in
             let time = context.date.timeIntervalSince1970
             let offsetX = Float(sin(time)) * 0.1
             let offsetY = Float(cos(time)) * 0.1

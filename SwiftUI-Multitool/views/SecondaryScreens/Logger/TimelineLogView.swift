@@ -10,6 +10,7 @@ import SwiftUI
 struct TimelineLogView: View {
     let selectedDate: Date
     @Binding var loggedMealItems: [LoggedMealItem]
+    @Binding var isHidden: Bool
     
     @State private var initialScrollPerformed = false
     @State private var timeSlotScale: CGFloat = 1.0
@@ -19,20 +20,20 @@ struct TimelineLogView: View {
     private let maxScale: CGFloat = 2.0
     private let defaultHourSpacing: CGFloat = 40
     
-    private static let whiteness = Color.black.opacity(0.3)
-    
-    private let animBackground = AnimatedBackgroundGradient(colours: [
-        whiteness, whiteness, whiteness, .clear,
-        whiteness, whiteness, whiteness, .clear,
-        whiteness, whiteness, whiteness, .clear,
-        whiteness, whiteness, whiteness, .clear
-    ], radius: 0, cornerRadius: 10)
+    private let whiteness = Color.black.opacity(0.3)
     
     private var hourSpacing: CGFloat {
         defaultHourSpacing * timeSlotScale
     }
     
     var body: some View {
+        let animBackground = AnimatedBackgroundGradient(colours: [
+            whiteness, whiteness, whiteness, .clear,
+            whiteness, whiteness, whiteness, .clear,
+            whiteness, whiteness, whiteness, .clear,
+            whiteness, whiteness, whiteness, .clear
+        ], radius: 0, cornerRadius: 10, isActive: $isHidden)
+        
         VStack {
             ScrollViewReader { scrollProxy in
                 ScrollView(.vertical, showsIndicators: false) {
@@ -174,5 +175,5 @@ struct TotalNutrientStatView: View {
 }
 
 #Preview{
-    TimelineLogView(selectedDate: Date(), loggedMealItems: .constant(MockData.loggedMeals))
+    TimelineLogView(selectedDate: Date(), loggedMealItems: .constant(MockData.loggedMeals), isHidden: .constant(false))
 }

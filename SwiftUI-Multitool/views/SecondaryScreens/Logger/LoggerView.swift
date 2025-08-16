@@ -56,7 +56,7 @@ struct LoggerView: View {
                     VStack {
                         TimelineLogHeader(selectedDay: selectedDay)
                             .padding([.trailing, .leading], 15)
-                        TimelineLogView(selectedDate: selectedDay.date, loggedMealItems: .constant(filteredSortedMeals))
+                        TimelineLogView(selectedDate: selectedDay.date, loggedMealItems: .constant(filteredSortedMeals), isHidden: $isShowingRecipesMenu)
                     }
                     .background(.thinMaterial)
                     .clipShape(RoundedRectangle(cornerSize: .init(width: 20, height: 20)))
