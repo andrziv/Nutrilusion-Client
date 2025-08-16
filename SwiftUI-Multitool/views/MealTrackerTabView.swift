@@ -7,12 +7,12 @@
 
 import SwiftUI
 
-enum TabbedItems: Int, CaseIterable{
+fileprivate enum TabbedItems: Int, CaseIterable {
     case logger = 0
     case tracker
     case settings
     
-    var title: String{
+    var title: String {
         switch self {
         case .logger:
             return "Food Log"
@@ -23,7 +23,7 @@ enum TabbedItems: Int, CaseIterable{
         }
     }
     
-    var iconName: String{
+    var iconName: String {
         switch self {
         case .logger:
             return "clock"

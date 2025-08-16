@@ -7,12 +7,12 @@
 
 import SwiftUI
 
-struct SelectedDay {
+fileprivate struct SelectedDay {
     var day: WeekDayType
     var date: Date
 }
 
-struct WeekDayType: Hashable {
+fileprivate struct WeekDayType: Hashable {
     let id: String = UUID().uuidString
     let name: String
     let shortform: String
@@ -23,7 +23,7 @@ struct WeekDayType: Hashable {
     }
 }
 
-extension WeekDayType {
+fileprivate extension WeekDayType {
     static let monday = WeekDayType("Monday", "Mon")
     static let tuesday = WeekDayType("Tuesday", "Tue")
     static let wednesday = WeekDayType("Wednesday", "Wed")
@@ -84,7 +84,7 @@ struct LoggerView: View {
 }
 
 struct WeekDayButtonSet: View {
-    @Binding var selectedDay: SelectedDay
+    @Binding fileprivate var selectedDay: SelectedDay
     
     private func positionType(_ index: Int) -> Position {
         if index == 0 {
@@ -126,7 +126,7 @@ struct WeekDayButtonSet: View {
 }
 
 struct TimelineLogHeader: View {
-    let selectedDay: SelectedDay
+    fileprivate let selectedDay: SelectedDay
     
     var body: some View {
         VStack(alignment: .leading) {
