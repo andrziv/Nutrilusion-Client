@@ -20,8 +20,9 @@ struct FoodItemView: View {
             
             if !isExpanded {
                 Line()
-                    .frame(height: 1)
+                    .frame(height: 0.5)
                     .background(.secondaryText)
+                    .opacity(0.5)
             }
             
             FoodItemBody(foodItem: foodItem, isExpanded: $isExpanded)
