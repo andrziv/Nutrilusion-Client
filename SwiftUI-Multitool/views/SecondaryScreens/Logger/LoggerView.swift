@@ -49,13 +49,14 @@ struct LoggerView: View {
         
         VStack {
             VStack {
-                VStack() {
+                VStack {
                     WeekDayButtonSet(selectedDay: $selectedDay)
                         .frame(maxWidth: .infinity)
 
-                    VStack {
+                    VStack(spacing: 0) {
                         TimelineLogHeader(selectedDay: selectedDay)
                             .padding([.trailing, .leading], 15)
+                        
                         TimelineLogView(selectedDate: selectedDay.date, loggedMealItems: .constant(filteredSortedMeals), isHidden: $isShowingRecipesMenu)
                     }
                     .background(.thinMaterial)
@@ -129,16 +130,13 @@ struct TimelineLogHeader: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            HStack {
-                Image(systemName: "list.clipboard")
-                Text("Logged Food for " + selectedDay.date.formatted(dateMonthDayYearFormat()))
-            }
-            .padding(.top, 10)
-            .font(.system(size: 14))
-            .foregroundStyle(.secondaryText)
+            Label("Logged Food for " + selectedDay.date.formatted(dateMonthDayYearFormat()), systemImage: "list.clipboard")
+                .padding(.top, 10)
+                .font(.system(size: 14))
+                .foregroundStyle(.secondaryText)
             
             Line()
-                .frame(height: 1)
+                .frame(height: 0.5)
                 .background(.secondaryText)
         }
     }
