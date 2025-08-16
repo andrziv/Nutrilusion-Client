@@ -94,6 +94,9 @@
 			);
 			mainGroup = 6107AB5F2E208FEA0084B6E2;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				61ACF55C2E513ADF00921917 /* XCRemoteSwiftPackageReference "gitignore" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 6107AB692E208FEA0084B6E2 /* Products */;
 			projectDirPath = "";
@@ -326,6 +329,17 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		61ACF55C2E513ADF00921917 /* XCRemoteSwiftPackageReference "gitignore" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/github/gitignore";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
 	};
 	rootObject = 6107AB602E208FEA0084B6E2 /* Project object */;
 }
