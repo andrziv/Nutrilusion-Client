@@ -133,23 +133,35 @@ struct FoodItemNutrientShowcase: View {
         
         ForEach(0..<shownNutrients, id: \.self) { index in
             NutrientItemView(nutrientOfInterest: foodItem.nutritionList[index],
-                             foodItem: foodItem,
                              viewType: isExpanded ? .txt : .img,
                              primaryTextColor: isExpanded ? .primaryText : .secondaryText)
             .fontWeight(isExpanded ? .semibold : .regular)
             
             if isExpanded {
-                ForEach(foodItem.nutritionList[index].childNutrients) { childNutrient in
-                    HStack {
-                        Image(systemName: "arrow.turn.down.right")
-                        NutrientItemView(nutrientOfInterest: childNutrient, foodItem: foodItem, viewType: .txt)
-                            .fontWeight(.light)
-                    }
-                }
+                ChildNutrientRecursionView(nutrient: foodItem.nutritionList[index])
             }
         }
         .font(.footnote)
         .labelStyle(CustomLabel(spacing: 7))
+    }
+}
+
+struct ChildNutrientRecursionView: View {
+    let nutrient: NutrientItem
+    private(set) var isOrigin: Bool = true
+    
+    var body: some View {
+        ForEach(nutrient.childNutrients) { childNutrient in
+            VStack(spacing: 8) {
+                HStack {
+                    Image(systemName: "arrow.turn.down.right")
+                    NutrientItemView(nutrientOfInterest: childNutrient, viewType: .txt)
+                        .fontWeight(.light)
+                }
+                ChildNutrientRecursionView(nutrient: childNutrient, isOrigin: false)
+            }
+            .padding(.leading, isOrigin ? 0 : 25)
+        }
     }
 }
 

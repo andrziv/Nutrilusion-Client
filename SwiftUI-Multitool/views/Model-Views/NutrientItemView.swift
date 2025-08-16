@@ -14,7 +14,6 @@ enum StatViewType {
 
 struct NutrientItemView: View {
     var nutrientOfInterest: NutrientItem
-    var foodItem: FoodItem
     var viewType : StatViewType = .img
     var primaryTextColor: Color = .primaryText
     var secondaryTextColor: Color = .secondaryText

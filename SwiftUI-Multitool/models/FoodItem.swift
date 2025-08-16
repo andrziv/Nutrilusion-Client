@@ -36,10 +36,40 @@ struct MockData {
         name: "Peanut Butter Sandwich",
         calories: 350,
         nutritionList: [
-            NutrientItem(name: "Protein", amount: 12.0, unit: "g"),
-            NutrientItem(name: "Fat", amount: 18.0, unit: "g",
-                         childNutrients: [NutrientItem(name: "Trans Fat", amount: 0.0, unit: "g"),
-                                          NutrientItem(name: "Saturated Fat", amount: 1.0, unit: "g")]),
+            NutrientItem(name: "Protein",
+                         amount: 12.0,
+                         unit: "g"),
+            NutrientItem(name: "Fat",
+                         amount: 14.0,
+                         unit: "g",
+                         childNutrients: [
+                            NutrientItem(name: "Trans Fat",
+                                         amount: 0.0,
+                                         unit: "g"),
+                            NutrientItem(name: "Saturated Fat",
+                                         amount: 1.0,
+                                         unit: "g"),
+                            NutrientItem(name: "Unsaturated Fat",
+                                         amount: 13.0,
+                                         unit: "g",
+                                         childNutrients: [
+                                            NutrientItem(name: "Monounsaturated",
+                                                         amount: 2.0,
+                                                         unit: "g"),
+                                            NutrientItem(name: "Polyunsaturated",
+                                                         amount: 11.0,
+                                                         unit: "g",
+                                                         childNutrients: [
+                                                            NutrientItem(name: "Omega-3",
+                                                                         amount: 5.0,
+                                                                         unit: "g"),
+                                                            NutrientItem(name: "Omega-6", amount: 6.0, unit: "g")
+                                                         ]
+                                                        )
+                                         ]
+                                        )
+                         ]
+                        ),
             NutrientItem(name: "Carbohydrates", amount: 30.0, unit: "g",
                          childNutrients: [NutrientItem(name: "Dietary Fiber", amount: 0.0, unit: "g"),
                                           NutrientItem(name: "Sugar", amount: 1.0, unit: "g")])
