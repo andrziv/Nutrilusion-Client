@@ -75,7 +75,7 @@ struct LoggerView: View {
                 }
             }
         }
-        .padding()
+        .padding(.horizontal)
         .sheet(isPresented: $isShowingRecipesMenu) {
             RecipeListView()
         }
@@ -83,7 +83,6 @@ struct LoggerView: View {
 }
 
 struct WeekDayButtonSet: View {
-    
     @Binding var selectedDay: SelectedDay
     
     private func positionType(_ index: Int) -> Position {

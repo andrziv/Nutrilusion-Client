@@ -12,7 +12,7 @@ struct MealGroupView: View {
     @State var isExpanded: Bool = false
     
     var body: some View {
-        let (emblem, mixed, medium, heavy) = Color.emblemPalette(from: group.colour)
+        let emblem = Color(hex: group.colour)
         
         VStack(spacing: 0) {
             MealGroupHeader(group: group, isExpanded: $isExpanded, emblem: emblem)
@@ -20,7 +20,7 @@ struct MealGroupView: View {
                 .background(Rectangle().fill(emblem).blur(radius: 50))
                 
             
-            MealGroupBody(group: group, isExpanded: isExpanded, emblem: emblem, mixed: mixed, medium: medium, heavy: heavy)
+            MealGroupBody(group: group, isExpanded: isExpanded, emblem: emblem)
                 .transition(.asymmetric(
                     insertion: .move(edge: .top).combined(with: .opacity),
                     removal: .opacity
@@ -83,25 +83,18 @@ struct MealGroupBody: View {
     let group: MealGroup
     let isExpanded: Bool
     let emblem: Color
-    let mixed: Color
-    let medium: Color
-    let heavy: Color
     
     var body: some View {
         Group {
             if isExpanded {
                 LazyVScroll(items: group.meals, spacing: 12) { meal in
                     FoodItemView(foodItem: meal)
-                        .padding(.horizontal)
                 }
-                .padding(.bottom)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
+                .padding([.horizontal, .bottom])
                 .frame(maxHeight: 600)
                 
-                MealGroupBottomEdge(emblemColour: emblem,
-                                    mixedColour: mixed,
-                                    medMixedColour: medium,
-                                    heavyMixedColour: heavy)
+                MealGroupBottomEdge(emblemColour: emblem)
             }
         }
     }
@@ -109,29 +102,11 @@ struct MealGroupBody: View {
 
 struct MealGroupBottomEdge: View {
     let emblemColour: Color
-    let mixedColour: Color
-    let medMixedColour: Color
-    let heavyMixedColour: Color
     
     var body: some View {
-        VStack(spacing: 0) {
-
-            Line()
-                .frame(height: 1)
-                .background(emblemColour)
-        }
-    }
-}
-
-private extension Color {
-    static func emblemPalette(from hex: String) -> (emblem: Color, mixed: Color, medium: Color, heavy: Color) {
-        let emblem = Color(hex: hex)
-        return (
-            emblem,
-            emblem.mix(with: Color(.systemGray6), by: 0.3),
-            emblem.mix(with: Color(.systemGray6), by: 0.45),
-            emblem.mix(with: Color(.systemGray6), by: 0.6)
-        )
+        Line()
+            .frame(height: 1)
+            .background(emblemColour)
     }
 }
 

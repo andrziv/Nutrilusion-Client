@@ -40,7 +40,7 @@ struct MealTrackerTabView: View {
     
     var body: some View {
         ZStack(alignment: .bottom) {
-          //  BackgroundView()
+            //  BackgroundView()
             
             VStack() {
                 // kludge around TabView because getting around the fixed-window of the main screens is too complicated.
@@ -51,7 +51,7 @@ struct MealTrackerTabView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 
                 // Floating tab bar
-                HStack(spacing: 30) {
+                HStack(spacing: 0) {
                     ForEach(TabbedItems.allCases, id: \.self) { item in
                         Button {
                             withAnimation(.snappy) {
@@ -64,8 +64,13 @@ struct MealTrackerTabView: View {
                                 isActive: selectedTab == item
                             )
                         }
+                        
+                        if item != TabbedItems.allCases.last! {
+                            Spacer()
+                        }
                     }
                 }
+                .padding(.horizontal, 7)
                 .frame(maxWidth: .infinity, maxHeight: 50)
                 .background(.thinMaterial)
                 .clipShape(RoundedRectangle(cornerRadius: 20))
@@ -97,15 +102,13 @@ struct BackgroundView: View {
 
 extension MealTrackerTabView {
     func CustomTabItem(imageName: String, title: String, isActive: Bool) -> some View{
-        HStack {
-            Label(title, systemImage: imageName)
-                .fontWeight(isActive ? .semibold : .regular)
-                .foregroundStyle(.primaryText)
-                .font(.system(size: 14))
-        }
-        .padding(10)
-        .background(isActive ? .blue.opacity(0.4) : .clear)
-        .clipShape(RoundedRectangle(cornerRadius: 15))
+        Label(title, systemImage: imageName)
+            .fontWeight(isActive ? .semibold : .regular)
+            .foregroundStyle(.primaryText)
+            .font(.system(size: 14))
+            .padding(10)
+            .background(isActive ? .blue.opacity(0.4) : .clear)
+            .clipShape(RoundedRectangle(cornerRadius: 15))
     }
 }
 
