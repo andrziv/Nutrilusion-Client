@@ -56,7 +56,7 @@
               "name": "Unsaturated Fat",
               "children": [
                 {
-                  "name": "Monounsaturated Fatty Acids",
+                  "name": "Monounsaturated",
                   "children": [
                     {
                       "name": "Oleic acid"
@@ -64,10 +64,10 @@
                   ]
                 },
                 {
-                  "name": "Polyunsaturated Fatty Acids",
+                  "name": "Polyunsaturated",
                   "children": [
                     {
-                      "name": "Omega-3 fatty acids",
+                      "name": "Omega-3",
                       "children": [
                         {
                           "name": "Alpha-linolenic acid"
@@ -81,7 +81,7 @@
                       ]
                     },
                     {
-                      "name": "Omega-6 fatty acids",
+                      "name": "Omega-6",
                       "children": [
                         {
                           "name": "Linoleic acid"
