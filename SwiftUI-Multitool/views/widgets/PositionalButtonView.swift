@@ -16,6 +16,8 @@ struct Position {
 }
 
 extension Position {
+    static let topmid = Position(AnyShape(UnevenRoundedRectangle(cornerRadii: .init(topLeading: 20, topTrailing: 20))))
+    static let botmid = Position(AnyShape(UnevenRoundedRectangle(cornerRadii: .init(bottomLeading: 20, bottomTrailing: 20))))
     static let left = Position(AnyShape(UnevenRoundedRectangle(cornerRadii: .init(topLeading: 20, bottomLeading: 20))))
     static let mid = Position(AnyShape(Rectangle()))
     static let right = Position(AnyShape(UnevenRoundedRectangle(cornerRadii: .init(bottomTrailing: 20, topTrailing: 20))))
@@ -74,7 +76,19 @@ struct PositionalButtonView<S: ShapeStyle>: View {
     }
 }
 
-
 #Preview {
-    PositionalButtonView(mainText: "mon", position: .left, background: .backgroundColour, foreground: .primaryText)
+    VStack(spacing: 30) {
+        VStack(spacing: 2) {
+            PositionalButtonView(mainText: "topmid", position: .topmid, background: .regularMaterial, foreground: .primaryText)
+            PositionalButtonView(mainText: "mid", position: .mid, background: .regularMaterial, foreground: .primaryText)
+            PositionalButtonView(mainText: "botmid", position: .botmid, isSelected: true, background: .regularMaterial, foreground: .primaryText)
+        }
+        
+        HStack(spacing: 2) {
+            PositionalButtonView(mainText: "left", position: .left, background: .regularMaterial, foreground: .primaryText)
+            PositionalButtonView(mainText: "mid", position: .mid, isSelected: true, background: .regularMaterial, foreground: .primaryText)
+            PositionalButtonView(mainText: "right", position: .right, background: .regularMaterial, foreground: .primaryText)
+        }
+    }
+    .padding()
 }
