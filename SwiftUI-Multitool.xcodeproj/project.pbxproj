@@ -6,8 +6,13 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		61ACF55F2E513B9900921917 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 61ACF55D2E513B8E00921917 /* .gitignore */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		6107AB682E208FEA0084B6E2 /* SwiftUI-Multitool.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SwiftUI-Multitool.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		61ACF55D2E513B8E00921917 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -34,6 +39,7 @@
 			children = (
 				6107AB6A2E208FEA0084B6E2 /* SwiftUI-Multitool */,
 				6107AB692E208FEA0084B6E2 /* Products */,
+				61ACF55D2E513B8E00921917 /* .gitignore */,
 			);
 			sourceTree = "<group>";
 		};
@@ -112,6 +118,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				61ACF55F2E513B9900921917 /* .gitignore in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
