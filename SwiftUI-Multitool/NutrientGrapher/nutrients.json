@@ -1,0 +1,384 @@
+{
+  "name": "Nutrients",
+  "children": [
+    {
+      "name": "Macronutrients",
+      "children": [
+        {
+          "name": "Carbohydrates",
+          "children": [
+            {
+              "name": "Sugars",
+              "children": [
+                {
+                  "name": "Glucose"
+                },
+                {
+                  "name": "Fructose"
+                },
+                {
+                  "name": "Galactose"
+                },
+                {
+                  "name": "Sucrose"
+                },
+                {
+                  "name": "Lactose"
+                },
+                {
+                  "name": "Maltose"
+                }
+              ]
+            },
+            {
+              "name": "Starch"
+            },
+            {
+              "name": "Fiber",
+              "children": [
+                {
+                  "name": "Soluble fiber"
+                },
+                {
+                  "name": "Insoluble fiber"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Fats",
+          "children": [
+            {
+              "name": "Saturated Fat"
+            },
+            {
+              "name": "Unsaturated Fat",
+              "children": [
+                {
+                  "name": "Monounsaturated Fatty Acids",
+                  "children": [
+                    {
+                      "name": "Oleic acid"
+                    }
+                  ]
+                },
+                {
+                  "name": "Polyunsaturated Fatty Acids",
+                  "children": [
+                    {
+                      "name": "Omega-3 fatty acids",
+                      "children": [
+                        {
+                          "name": "Alpha-linolenic acid"
+                        },
+                        {
+                          "name": "Eicosapentaenoic acid"
+                        },
+                        {
+                          "name": "Docosahexaenoic acid"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Omega-6 fatty acids",
+                      "children": [
+                        {
+                          "name": "Linoleic acid"
+                        },
+                        {
+                          "name": "Arachidonic acid"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Trans Fat"
+            }
+          ]
+        },
+        {
+          "name": "Proteins",
+          "children": [
+            {
+              "name": "Essential Amino Acids",
+              "children": [
+                {
+                  "name": "Histidine"
+                },
+                {
+                  "name": "Isoleucine"
+                },
+                {
+                  "name": "Leucine"
+                },
+                {
+                  "name": "Lysine"
+                },
+                {
+                  "name": "Methionine"
+                },
+                {
+                  "name": "Phenylalanine"
+                },
+                {
+                  "name": "Threonine"
+                },
+                {
+                  "name": "Tryptophan"
+                },
+                {
+                  "name": "Valine"
+                }
+              ]
+            },
+            {
+              "name": "Non-essential Amino Acids",
+              "children": [
+                {
+                  "name": "Alanine"
+                },
+                {
+                  "name": "Asparagine"
+                },
+                {
+                  "name": "Aspartic acid"
+                },
+                {
+                  "name": "Glutamic acid"
+                },
+                {
+                  "name": "Serine"
+                }
+              ]
+            },
+            {
+              "name": "Conditionally Essential Amino Acids",
+              "children": [
+                {
+                  "name": "Arginine"
+                },
+                {
+                  "name": "Cysteine"
+                },
+                {
+                  "name": "Glutamine"
+                },
+                {
+                  "name": "Glycine"
+                },
+                {
+                  "name": "Proline"
+                },
+                {
+                  "name": "Tyrosine"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Water"
+        }
+      ]
+    },
+    {
+      "name": "Micronutrients",
+      "children": [
+        {
+          "name": "Vitamins",
+          "children": [
+            {
+              "name": "Fat-Soluble",
+              "children": [
+                {
+                  "name": "Vitamin A"
+                },
+                {
+                  "name": "Vitamin D"
+                },
+                {
+                  "name": "Vitamin E"
+                },
+                {
+                  "name": "Vitamin K"
+                }
+              ]
+            },
+            {
+              "name": "Water-Soluble",
+              "children": [
+                {
+                  "name": "Vitamin B1"
+                },
+                {
+                  "name": "Vitamin B2"
+                },
+                {
+                  "name": "Vitamin B3"
+                },
+                {
+                  "name": "Vitamin B5"
+                },
+                {
+                  "name": "Vitamin B6"
+                },
+                {
+                  "name": "Vitamin B7"
+                },
+                {
+                  "name": "Vitamin B9"
+                },
+                {
+                  "name": "Vitamin B12"
+                },
+                {
+                  "name": "Vitamin C"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Minerals",
+          "children": [
+            {
+              "name": "Major Minerals (Macrominerals)",
+              "children": [
+                {
+                  "name": "Calcium"
+                },
+                {
+                  "name": "Phosphorus"
+                },
+                {
+                  "name": "Potassium"
+                },
+                {
+                  "name": "Sodium"
+                },
+                {
+                  "name": "Magnesium"
+                },
+                {
+                  "name": "Chloride"
+                },
+                {
+                  "name": "Sulfur"
+                }
+              ]
+            },
+            {
+              "name": "Trace Minerals (Microminerals)",
+              "children": [
+                {
+                  "name": "Iron"
+                },
+                {
+                  "name": "Zinc"
+                },
+                {
+                  "name": "Copper"
+                },
+                {
+                  "name": "Manganese"
+                },
+                {
+                  "name": "Iodine"
+                },
+                {
+                  "name": "Selenium"
+                },
+                {
+                  "name": "Fluoride"
+                },
+                {
+                  "name": "Chromium"
+                },
+                {
+                  "name": "Molybdenum"
+                }
+              ]
+            },
+            {
+              "name": "Ultra-trace Minerals",
+              "children": [
+                {
+                  "name": "Boron"
+                },
+                {
+                  "name": "Nickel"
+                },
+                {
+                  "name": "Silicon"
+                },
+                {
+                  "name": "Vanadium"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Other Bioactive Compounds",
+      "children": [
+        {
+          "name": "Phytonutrients",
+          "children": [
+            {
+              "name": "Polyphenols",
+              "children": [
+                {
+                  "name": "Flavonoids"
+                },
+                {
+                  "name": "Phenolic acids"
+                },
+                {
+                  "name": "Lignans"
+                }
+              ]
+            },
+            {
+              "name": "Carotenoids",
+              "children": [
+                {
+                  "name": "Beta-carotene"
+                },
+                {
+                  "name": "Lycopene"
+                },
+                {
+                  "name": "Lutein"
+                },
+                {
+                  "name": "Zeaxanthin"
+                }
+              ]
+            },
+            {
+              "name": "Glucosinolates"
+            }
+          ]
+        },
+        {
+          "name": "Choline"
+        },
+        {
+          "name": "Carnitine"
+        },
+        {
+          "name": "Creatine"
+        },
+        {
+          "name": "Coenzyme Q10"
+        }
+      ]
+    }
+  ]
+}
