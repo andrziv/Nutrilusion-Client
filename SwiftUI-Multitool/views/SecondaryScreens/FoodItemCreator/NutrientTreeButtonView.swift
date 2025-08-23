@@ -67,7 +67,7 @@ struct NutrientTreeButtonView: View {
         ScrollViewReader { scrollProxy in
             VStack {
                 ScrollView {
-                    NutrientTreeButtonChildView(nutrientName: "Nutrients", nutrientTree: nutrientTree, disabledList: createDisabledList(), isShowing: $isShowing)
+                    NutrientTreeButtonChildView(foodItem: $foodItem, nutrientName: "Nutrients", nutrientTree: nutrientTree, disabledList: createDisabledList(), isShowing: $isShowing)
                 }
                 
                 BasicTextField(textBinding: $searchString, placeholder: "Search for nutrient")
@@ -82,6 +82,7 @@ struct NutrientTreeButtonView: View {
 }
 
 struct NutrientTreeButtonChildView: View {
+    @Binding var foodItem: FoodItem
     var nutrientName: String
     var nutrientTree: NutrientTree = .shared
     var disabledList: [String]
@@ -89,7 +90,9 @@ struct NutrientTreeButtonChildView: View {
     private(set) var depth: Int = 0
     @State private var isExpanded: BlockState
     
-    init(nutrientName: String, nutrientTree: NutrientTree = .shared, disabledList: [String] = [], isShowing: Binding<Bool>, depth: Int = 0) {
+    init(foodItem: Binding<FoodItem>, nutrientName: String, nutrientTree: NutrientTree = .shared, disabledList: [String] = [], isShowing: Binding<Bool>, depth: Int = 0) {
+        self._foodItem = foodItem
+        
         self.nutrientName = nutrientName
         self.nutrientTree = nutrientTree
         
@@ -125,7 +128,8 @@ struct NutrientTreeButtonChildView: View {
                     let backgroundColour = depthColor(depth)
                     if getDisableReason() == .none {
                         Button {
-                            
+                            foodItem.nutritionList.append(NutrientItem(name: nutrientName, amount: 0, unit: "g"))
+                            isShowing = false
                         } label: {
                             Label("Add", systemImage: "plus")
                                 .font(.caption)
@@ -141,6 +145,7 @@ struct NutrientTreeButtonChildView: View {
                     if isExpanded == .expanded {
                         ForEach(nutrientTree.getChildren(of: nutrientName), id: \.self) { child in
                             NutrientTreeButtonChildView(
+                                foodItem: $foodItem,
                                 nutrientName: child,
                                 nutrientTree: nutrientTree,
                                 disabledList: disabledList,
@@ -161,7 +166,7 @@ struct NutrientTreeButtonChildView: View {
 fileprivate struct NutrientTreeBlockEntryView<Content: View>: View {
     let text: String
     let backgroundColour: Color
-    @Binding var isExpanded: BlockState // nil if no children
+    @Binding var isExpanded: BlockState
     var disableReason: DisableReason
     let content: Content
     
@@ -182,9 +187,7 @@ fileprivate struct NutrientTreeBlockEntryView<Content: View>: View {
                     isExpanded = .minimized
                 } else if isExpanded == .minimized {
                     isExpanded = .expanded
-                } else if isExpanded == .noChildren {
-                    
-                }
+                } 
             } label: {
                 NutrientTreeBlockEntryHeaderView(text: text, backgroundColour: backgroundColour, isExpanded: isExpanded, disableReason: disableReason)
             }
