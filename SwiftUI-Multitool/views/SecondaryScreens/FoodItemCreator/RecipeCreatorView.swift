@@ -98,6 +98,7 @@ private struct ContentView: View {
 
 struct ManualCreatorModeView: View {
     @Binding var foodItem: FoodItem
+    @State private var showNutritionList: Bool = false
     
     var body: some View {
         VStack {
@@ -126,7 +127,7 @@ struct ManualCreatorModeView: View {
             .labelStyle(CustomLabel(spacing: 7))
             
             Button {
-                
+                showNutritionList = true
             } label: {
                 Image(systemName: "plus")
                     .foregroundStyle(.secondaryText)
@@ -140,6 +141,9 @@ struct ManualCreatorModeView: View {
                             .foregroundStyle(.primaryText.mix(with: .backgroundColour, by: 0.5))
                     }
             }
+        }
+        .fullScreenCover(isPresented: $showNutritionList) {
+            NutrientAdderPopup(isActive: $showNutritionList, foodItem: $foodItem)
         }
     }
 }

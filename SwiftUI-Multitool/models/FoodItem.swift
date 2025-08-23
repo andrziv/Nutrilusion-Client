@@ -28,6 +28,15 @@ struct FoodItem: Identifiable {
         }
         return nil
     }
+    
+    func getAllNutrients() -> [NutrientItem] {
+        var allNutrients: [NutrientItem] = []
+        for nutrient in nutritionList {
+            allNutrients.append(nutrient)
+            allNutrients.append(contentsOf: nutrient.flattenChildren())
+        }
+        return allNutrients
+    }
 }
 
 struct MockData {

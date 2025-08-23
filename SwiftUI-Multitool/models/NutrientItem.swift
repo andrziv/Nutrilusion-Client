@@ -20,6 +20,22 @@ struct NutrientItem: Identifiable {
                 return nutrient
             }
         }
+        
+        for nutrient in childNutrients {
+            if let found = nutrient.getChildNutrientValue(nutrientType) {
+                return found
+            }
+        }
+        
         return nil
+    }
+    
+    func flattenChildren() -> [NutrientItem] {
+        var result: [NutrientItem] = []
+        for child in childNutrients {
+            result.append(child)
+            result.append(contentsOf: child.flattenChildren())
+        }
+        return result
     }
 }
