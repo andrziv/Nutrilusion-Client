@@ -46,6 +46,12 @@ fileprivate enum DisableReason {
     }
 }
 
+fileprivate enum BlockState {
+    case noChildren
+    case expanded
+    case minimized
+}
+
 struct NutrientTreeButtonView: View {
     var nutrientTree: NutrientTree = .shared
     @Binding var foodItem: FoodItem
@@ -81,7 +87,18 @@ struct NutrientTreeButtonChildView: View {
     var disabledList: [String]
     @Binding var isShowing: Bool
     private(set) var depth: Int = 0
-    @State private var isExpanded: Bool = true
+    @State private var isExpanded: BlockState
+    
+    init(nutrientName: String, nutrientTree: NutrientTree = .shared, disabledList: [String] = [], isShowing: Binding<Bool>, depth: Int = 0) {
+        self.nutrientName = nutrientName
+        self.nutrientTree = nutrientTree
+        
+        self.disabledList = disabledList
+        self._isShowing = isShowing
+        
+        self.depth = depth
+        self.isExpanded = !nutrientTree.getChildren(of: nutrientName).isEmpty ? .expanded : .noChildren
+    }
     
     private func depthColor(_ depth: Int) -> Color {
         let hue = Double((depth * 40) % 360) / 360.0
@@ -103,7 +120,7 @@ struct NutrientTreeButtonChildView: View {
             NutrientTreeBlockEntryView(
                 text: nutrientName,
                 backgroundColour: depthColor(depth),
-                isExpanded: !nutrientTree.getChildren(of: nutrientName).isEmpty ? isExpanded : nil,
+                isExpanded: $isExpanded,
                 disableReason: getDisableReason()) {
                     let backgroundColour = depthColor(depth)
                     if getDisableReason() == .none {
@@ -121,7 +138,7 @@ struct NutrientTreeButtonChildView: View {
                         }
                     }
                     
-                    if isExpanded {
+                    if isExpanded == .expanded {
                         ForEach(nutrientTree.getChildren(of: nutrientName), id: \.self) { child in
                             NutrientTreeButtonChildView(
                                 nutrientName: child,
@@ -131,7 +148,7 @@ struct NutrientTreeButtonChildView: View {
                                 depth: depth + 1
                             )
                             
-                            .transition(.opacity.combined(with: .move(edge: .trailing)))
+                            .transition(.opacity.combined(with: .blurReplace))
                         }
                         .padding(.horizontal, 5)
                     }
@@ -144,15 +161,15 @@ struct NutrientTreeButtonChildView: View {
 fileprivate struct NutrientTreeBlockEntryView<Content: View>: View {
     let text: String
     let backgroundColour: Color
-    var isExpanded: Bool? // nil if no children
+    @Binding var isExpanded: BlockState // nil if no children
     var disableReason: DisableReason
     let content: Content
     
-    init(text: String, backgroundColour: Color, isExpanded: Bool?, disableReason: DisableReason = .none, @ViewBuilder content: () -> Content) {
+    init(text: String, backgroundColour: Color, isExpanded: Binding<BlockState>, disableReason: DisableReason = .none, @ViewBuilder content: () -> Content) {
         self.text = text
         self.backgroundColour = backgroundColour
         
-        self.isExpanded = isExpanded
+        self._isExpanded = isExpanded
         self.disableReason = disableReason
         
         self.content = content()
@@ -160,38 +177,48 @@ fileprivate struct NutrientTreeBlockEntryView<Content: View>: View {
     
     var body: some View {
         VStack {
-            NutrientTreeBlockEntryHeaderView(text: text, backgroundColour: backgroundColour, isExpanded: isExpanded, disableReason: disableReason)
+            Button {
+                if isExpanded == .expanded {
+                    isExpanded = .minimized
+                } else if isExpanded == .minimized {
+                    isExpanded = .expanded
+                } else if isExpanded == .noChildren {
+                    
+                }
+            } label: {
+                NutrientTreeBlockEntryHeaderView(text: text, backgroundColour: backgroundColour, isExpanded: isExpanded, disableReason: disableReason)
+            }
             
             content
         }
-        .padding(.bottom, isExpanded == nil ? 15 : 5)
+        .padding(.bottom, isExpanded == .noChildren ? 15 : 5)
         .overlay{
             RoundedRectangle(cornerRadius: 10)
                 .stroke(style: StrokeStyle(lineWidth: 6))
                 .foregroundStyle(backgroundColour.mix(with: .backgroundColour, by: 0.5))
         }
         .clipShape(RoundedRectangle(cornerRadius: 10))
-        .animation(.interpolatingSpring(mass: 1, stiffness: 188, damping: 23), value: isExpanded)
+        .animation(.snappy, value: isExpanded)
     }
 }
 
 fileprivate struct NutrientTreeBlockEntryHeaderView: View {
     let text: String
     let backgroundColour: Color
-    let isExpanded: Bool? // nil if no children
+    let isExpanded: BlockState
     let disableReason: DisableReason
     
     var body: some View {
         VStack {
             HStack {
-                if let expanded = isExpanded {
-                    Image(systemName: expanded ? "chevron.down" : "chevron.right")
+                if isExpanded != .noChildren {
+                    Image(systemName: isExpanded == .expanded ? "chevron.down" : "chevron.right")
                         .font(.caption)
                         .foregroundColor(.primaryText)
                 }
                 
                 Text(text)
-                    .fontWeight(isExpanded == nil ? .regular : .semibold)
+                    .fontWeight(isExpanded == .noChildren ? .regular : .semibold)
                     .foregroundStyle(.primaryText)
                 
                 Spacer()
