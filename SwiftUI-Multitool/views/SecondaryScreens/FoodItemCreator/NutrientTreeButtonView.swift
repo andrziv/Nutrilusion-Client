@@ -138,7 +138,6 @@ struct NutrientTreeButtonChildView: View {
                 }
                 .id("nutrient-\(nutrientName)")
         }
-        .padding(.vertical, CGFloat(depth) + 1)
     }
 }
 
@@ -161,7 +160,42 @@ fileprivate struct NutrientTreeBlockEntryView<Content: View>: View {
     
     var body: some View {
         VStack {
-            NutrientTreeBlockEntryHeaderView(text: text, backgroundColour: backgroundColour, isExpanded: isExpanded)
+            NutrientTreeBlockEntryHeaderView(text: text, backgroundColour: backgroundColour, isExpanded: isExpanded, disableReason: disableReason)
+            
+            content
+        }
+        .padding(.bottom, isExpanded == nil ? 15 : 5)
+        .overlay{
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(style: StrokeStyle(lineWidth: 6))
+                .foregroundStyle(backgroundColour.mix(with: .backgroundColour, by: 0.5))
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .animation(.interpolatingSpring(mass: 1, stiffness: 188, damping: 23), value: isExpanded)
+    }
+}
+
+fileprivate struct NutrientTreeBlockEntryHeaderView: View {
+    let text: String
+    let backgroundColour: Color
+    let isExpanded: Bool? // nil if no children
+    let disableReason: DisableReason
+    
+    var body: some View {
+        VStack {
+            HStack {
+                if let expanded = isExpanded {
+                    Image(systemName: expanded ? "chevron.down" : "chevron.right")
+                        .font(.caption)
+                        .foregroundColor(.primaryText)
+                }
+                
+                Text(text)
+                    .fontWeight(isExpanded == nil ? .regular : .semibold)
+                    .foregroundStyle(.primaryText)
+                
+                Spacer()
+            }
             
             HStack {
                 AddabilityReasonView(isActive: disableReason == .isBroadCategory, disableReason: .isBroadCategory, backgroundColour: backgroundColour)
@@ -170,18 +204,10 @@ fileprivate struct NutrientTreeBlockEntryView<Content: View>: View {
             }
             .scaledToFit()
             .minimumScaleFactor(0.4)
-            .padding(.horizontal)
-            
-            content
         }
-        .overlay{
-            RoundedRectangle(cornerRadius: 10)
-                .stroke(style: StrokeStyle(lineWidth: isExpanded == nil ? 0 : 6))
-                .foregroundStyle(backgroundColour.mix(with: .backgroundColour, by: 0.5))
-        }
-        
-        .clipShape(RoundedRectangle(cornerRadius: 10))
-        .animation(.interpolatingSpring(mass: 1, stiffness: 188, damping: 23), value: isExpanded)
+        .padding(.horizontal)
+        .padding(.top)
+        .background(Rectangle().fill(backgroundColour).blur(radius: 40))
     }
 }
 
@@ -205,31 +231,6 @@ fileprivate struct AddabilityReasonView: View {
         .padding(.horizontal, 4)
         .padding(.vertical, 2)
         .background(RoundedRectangle(cornerRadius: 7).fill(backgroundColour.mix(with: .backgroundColour, by: 0.2).opacity(0.5)))
-    }
-}
-
-struct NutrientTreeBlockEntryHeaderView: View {
-    let text: String
-    let backgroundColour: Color
-    let isExpanded: Bool? // nil if no children
-    
-    var body: some View {
-        HStack {
-            if let expanded = isExpanded {
-                Image(systemName: expanded ? "chevron.down" : "chevron.right")
-                    .font(.caption)
-                    .foregroundColor(.primaryText)
-            }
-            
-            Text(text)
-                .fontWeight(isExpanded == nil ? .regular : .semibold)
-                .foregroundStyle(.primaryText)
-            
-            Spacer()
-        }
-        .padding(.horizontal)
-        .padding(.top)
-        .background(Rectangle().fill(backgroundColour).blur(radius: 40))
     }
 }
 
