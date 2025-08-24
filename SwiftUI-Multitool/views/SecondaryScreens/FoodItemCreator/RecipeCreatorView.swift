@@ -37,13 +37,20 @@ fileprivate enum RecipeCreatorMode: Int, CaseIterable {
 
 struct RecipeCreatorView: View {
     @State var foodItem: FoodItem = FoodItem(name: "")
-    @State private var title: String = ""
+    @State private var titleInput: String = ""
     @State private var selectedMode: RecipeCreatorMode = .manual
     
     var body: some View {
         VStack {
             HStack {
-                BasicTextField(textBinding: $title, placeholder: "Name of the Recipe")
+                VStack {
+                    UnderlineTextField(textBinding: $titleInput, placeholder: "Name of the Recipe")
+                    
+                    HStack {
+                        UnderlineTextField(textBinding: $titleInput, placeholder: "Unit Name")
+                        UnderlineTextField(textBinding: $titleInput, placeholder: "Plural Unit")
+                    }
+                }
                 
                 VStack(spacing: 0) {
                     ForEach(RecipeCreatorMode.allCases, id: \.self) { item in
@@ -77,6 +84,18 @@ struct RecipeCreatorView: View {
             }
         }
         .basicBackground()
+    }
+}
+
+struct UnderlineTextField: View {
+    @Binding var textBinding: String
+    var placeholder: String
+    var outline: Color = .gray
+    var background: Color = .backgroundColour
+    
+    var body: some View {
+        TextField(placeholder, text: $textBinding)
+            .edgeBorder(colour: .red)
     }
 }
 
