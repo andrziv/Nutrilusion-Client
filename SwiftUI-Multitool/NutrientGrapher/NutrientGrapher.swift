@@ -11,27 +11,30 @@ import SwiftUI
 struct Nutrient: Codable, Identifiable {
     let id = UUID()
     let name: String
+    let ignoreGeneric: Bool
     let children: [Nutrient]?
     
     enum CodingKeys: String, CodingKey {
-        case name, children
+        case name
+        case ignoreGeneric
+        case children
     }
 }
 
 // MARK: - Tree Helper
-class NutrientTree: ObservableObject {
+final class NutrientTree: ObservableObject {
+    static let shared = NutrientTree()
+    
     @Published var root: Nutrient?
     private var lookup: [String: Nutrient] = [:]
     private var parentMap: [String: String] = [:]  // childName → parentName
-    
-    static let shared = NutrientTree()
     
     private init() {
         loadJSON()
         buildLookup()
     }
     
-    // Load JSON file from app bundle
+    // Load JSON file from bundle
     private func loadJSON() {
         if let url = Bundle.main.url(forResource: "nutrients", withExtension: "json") {
             do {
@@ -43,7 +46,7 @@ class NutrientTree: ObservableObject {
         }
     }
     
-    // Build lookup dictionary and parent relationships
+    // Build lookup + parent map
     private func buildLookup() {
         guard let root = root else { return }
         func traverse(_ node: Nutrient, parent: Nutrient?) {
@@ -56,25 +59,40 @@ class NutrientTree: ObservableObject {
         traverse(root, parent: nil)
     }
     
-    // Find a nutrient by name
+    // MARK: - API
+    /// Find a nutrient by name
     func findNutrient(_ name: String) -> Nutrient? {
         return lookup[name.lowercased()]
     }
     
-    // Get the chain of parents for a nutrient
-    func getParents(of name: String) -> [String] {
+    /// Get parent chain for a nutrient
+    func getParents(of name: String, ignoringGenerics: Bool = false) -> [String] {
         var chain: [String] = []
         var current = name.lowercased()
+        
         while let parent = parentMap[current] {
-            chain.append(parent)
-            current = parent.lowercased()
+            if let parentNutrient = lookup[parent.lowercased()] {
+                if !ignoringGenerics || !parentNutrient.ignoreGeneric {
+                    chain.append(parentNutrient.name)
+                }
+                current = parent.lowercased()
+            } else {
+                break
+            }
         }
         return chain.reversed()
     }
     
-    // Get the children of a nutrient
-    func getChildren(of name: String) -> [String] {
-        return lookup[name.lowercased()]?.children?.map { $0.name } ?? []
+    /// Get children of a nutrient
+    func getChildren(of name: String, ignoringGenerics: Bool = false) -> [String] {
+        guard let node = lookup[name.lowercased()] else { return [] }
+        let kids = node.children ?? []
+        
+        if ignoringGenerics {
+            return kids.filter{ !$0.ignoreGeneric }.map{ $0.name }
+        } else {
+            return kids.map{ $0.name }
+        }
     }
 }
 

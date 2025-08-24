@@ -1,46 +1,60 @@
 {
   "name": "Nutrients",
+  "ignoreGeneric": true,
   "children": [
     {
       "name": "Macronutrients",
+      "ignoreGeneric": true,
       "children": [
         {
           "name": "Carbohydrates",
+          "ignoreGeneric": false,
           "children": [
             {
               "name": "Sugars",
+              "ignoreGeneric": false,
               "children": [
                 {
-                  "name": "Glucose"
+                  "name": "Glucose",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Fructose"
+                  "name": "Fructose",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Galactose"
+                  "name": "Galactose",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Sucrose"
+                  "name": "Sucrose",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Lactose"
+                  "name": "Lactose",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Maltose"
+                  "name": "Maltose",
+                  "ignoreGeneric": false
                 }
               ]
             },
             {
-              "name": "Starch"
+              "name": "Starch",
+              "ignoreGeneric": false
             },
             {
               "name": "Fiber",
+              "ignoreGeneric": false,
               "children": [
                 {
-                  "name": "Soluble fiber"
+                  "name": "Soluble fiber",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Insoluble fiber"
+                  "name": "Insoluble fiber",
+                  "ignoreGeneric": false
                 }
               ]
             }
@@ -48,46 +62,59 @@
         },
         {
           "name": "Fats",
+          "ignoreGeneric": false,
           "children": [
             {
-              "name": "Saturated Fat"
+              "name": "Saturated Fat",
+              "ignoreGeneric": false
             },
             {
               "name": "Unsaturated Fat",
+              "ignoreGeneric": false,
               "children": [
                 {
                   "name": "Monounsaturated",
+                  "ignoreGeneric": false,
                   "children": [
                     {
-                      "name": "Oleic acid"
+                      "name": "Oleic acid",
+                      "ignoreGeneric": false
                     }
                   ]
                 },
                 {
                   "name": "Polyunsaturated",
+                  "ignoreGeneric": false,
                   "children": [
                     {
                       "name": "Omega-3",
+                      "ignoreGeneric": false,
                       "children": [
                         {
-                          "name": "Alpha-linolenic acid"
+                          "name": "Alpha-linolenic acid",
+                          "ignoreGeneric": false
                         },
                         {
-                          "name": "Eicosapentaenoic acid"
+                          "name": "Eicosapentaenoic acid",
+                          "ignoreGeneric": false
                         },
                         {
-                          "name": "Docosahexaenoic acid"
+                          "name": "Docosahexaenoic acid",
+                          "ignoreGeneric": false
                         }
                       ]
                     },
                     {
                       "name": "Omega-6",
+                      "ignoreGeneric": false,
                       "children": [
                         {
-                          "name": "Linoleic acid"
+                          "name": "Linoleic acid",
+                          "ignoreGeneric": false
                         },
                         {
-                          "name": "Arachidonic acid"
+                          "name": "Arachidonic acid",
+                          "ignoreGeneric": false
                         }
                       ]
                     }
@@ -96,147 +123,190 @@
               ]
             },
             {
-              "name": "Trans Fat"
+              "name": "Trans Fat",
+              "ignoreGeneric": false
             }
           ]
         },
         {
           "name": "Proteins",
+          "ignoreGeneric": false,
           "children": [
             {
               "name": "Essential Amino Acids",
+              "ignoreGeneric": false,
               "children": [
                 {
-                  "name": "Histidine"
+                  "name": "Histidine",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Isoleucine"
+                  "name": "Isoleucine",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Leucine"
+                  "name": "Leucine",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Lysine"
+                  "name": "Lysine",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Methionine"
+                  "name": "Methionine",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Phenylalanine"
+                  "name": "Phenylalanine",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Threonine"
+                  "name": "Threonine",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Tryptophan"
+                  "name": "Tryptophan",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Valine"
+                  "name": "Valine",
+                  "ignoreGeneric": false
                 }
               ]
             },
             {
               "name": "Non-essential Amino Acids",
+              "ignoreGeneric": false,
               "children": [
                 {
-                  "name": "Alanine"
+                  "name": "Alanine",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Asparagine"
+                  "name": "Asparagine",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Aspartic acid"
+                  "name": "Aspartic acid",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Glutamic acid"
+                  "name": "Glutamic acid",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Serine"
+                  "name": "Serine",
+                  "ignoreGeneric": false
                 }
               ]
             },
             {
               "name": "Conditionally Essential Amino Acids",
+              "ignoreGeneric": false,
               "children": [
                 {
-                  "name": "Arginine"
+                  "name": "Arginine",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Cysteine"
+                  "name": "Cysteine",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Glutamine"
+                  "name": "Glutamine",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Glycine"
+                  "name": "Glycine",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Proline"
+                  "name": "Proline",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Tyrosine"
+                  "name": "Tyrosine",
+                  "ignoreGeneric": false
                 }
               ]
             }
           ]
         },
         {
-          "name": "Water"
+          "name": "Water",
+          "ignoreGeneric": false
         }
       ]
     },
     {
       "name": "Micronutrients",
+      "ignoreGeneric": true,
       "children": [
         {
           "name": "Vitamins",
+          "ignoreGeneric": false,
           "children": [
             {
               "name": "Fat-Soluble",
+              "ignoreGeneric": false,
               "children": [
                 {
-                  "name": "Vitamin A"
+                  "name": "Vitamin A",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Vitamin D"
+                  "name": "Vitamin D",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Vitamin E"
+                  "name": "Vitamin E",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Vitamin K"
+                  "name": "Vitamin K",
+                  "ignoreGeneric": false
                 }
               ]
             },
             {
               "name": "Water-Soluble",
+              "ignoreGeneric": false,
               "children": [
                 {
-                  "name": "Vitamin B1"
+                  "name": "Vitamin B1",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Vitamin B2"
+                  "name": "Vitamin B2",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Vitamin B3"
+                  "name": "Vitamin B3",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Vitamin B5"
+                  "name": "Vitamin B5",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Vitamin B6"
+                  "name": "Vitamin B6",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Vitamin B7"
+                  "name": "Vitamin B7",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Vitamin B9"
+                  "name": "Vitamin B9",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Vitamin B12"
+                  "name": "Vitamin B12",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Vitamin C"
+                  "name": "Vitamin C",
+                  "ignoreGeneric": false
                 }
               ]
             }
@@ -244,79 +314,103 @@
         },
         {
           "name": "Minerals",
+          "ignoreGeneric": false,
           "children": [
             {
               "name": "Major Minerals (Macrominerals)",
+              "ignoreGeneric": false,
               "children": [
                 {
-                  "name": "Calcium"
+                  "name": "Calcium",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Phosphorus"
+                  "name": "Phosphorus",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Potassium"
+                  "name": "Potassium",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Sodium"
+                  "name": "Sodium",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Magnesium"
+                  "name": "Magnesium",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Chloride"
+                  "name": "Chloride",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Sulfur"
+                  "name": "Sulfur",
+                  "ignoreGeneric": false
                 }
               ]
             },
             {
               "name": "Trace Minerals (Microminerals)",
+              "ignoreGeneric": false,
               "children": [
                 {
-                  "name": "Iron"
+                  "name": "Iron",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Zinc"
+                  "name": "Zinc",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Copper"
+                  "name": "Copper",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Manganese"
+                  "name": "Manganese",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Iodine"
+                  "name": "Iodine",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Selenium"
+                  "name": "Selenium",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Fluoride"
+                  "name": "Fluoride",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Chromium"
+                  "name": "Chromium",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Molybdenum"
+                  "name": "Molybdenum",
+                  "ignoreGeneric": false
                 }
               ]
             },
             {
               "name": "Ultra-trace Minerals",
+              "ignoreGeneric": false,
               "children": [
                 {
-                  "name": "Boron"
+                  "name": "Boron",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Nickel"
+                  "name": "Nickel",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Silicon"
+                  "name": "Silicon",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Vanadium"
+                  "name": "Vanadium",
+                  "ignoreGeneric": false
                 }
               ]
             }
@@ -326,57 +420,73 @@
     },
     {
       "name": "Other Bioactive Compounds",
+      "ignoreGeneric": true,
       "children": [
         {
           "name": "Phytonutrients",
+          "ignoreGeneric": false,
           "children": [
             {
               "name": "Polyphenols",
+              "ignoreGeneric": false,
               "children": [
                 {
-                  "name": "Flavonoids"
+                  "name": "Flavonoids",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Phenolic acids"
+                  "name": "Phenolic acids",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Lignans"
+                  "name": "Lignans",
+                  "ignoreGeneric": false
                 }
               ]
             },
             {
               "name": "Carotenoids",
+              "ignoreGeneric": false,
               "children": [
                 {
-                  "name": "Beta-carotene"
+                  "name": "Beta-carotene",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Lycopene"
+                  "name": "Lycopene",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Lutein"
+                  "name": "Lutein",
+                  "ignoreGeneric": false
                 },
                 {
-                  "name": "Zeaxanthin"
+                  "name": "Zeaxanthin",
+                  "ignoreGeneric": false
                 }
               ]
             },
             {
-              "name": "Glucosinolates"
+              "name": "Glucosinolates",
+              "ignoreGeneric": false
             }
           ]
         },
         {
-          "name": "Choline"
+          "name": "Choline",
+          "ignoreGeneric": false
         },
         {
-          "name": "Carnitine"
+          "name": "Carnitine",
+          "ignoreGeneric": false
         },
         {
-          "name": "Creatine"
+          "name": "Creatine",
+          "ignoreGeneric": false
         },
         {
-          "name": "Coenzyme Q10"
+          "name": "Coenzyme Q10",
+          "ignoreGeneric": false
         }
       ]
     }

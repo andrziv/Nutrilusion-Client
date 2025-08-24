@@ -36,7 +36,7 @@ fileprivate enum RecipeCreatorMode: Int, CaseIterable {
 }
 
 struct RecipeCreatorView: View {
-    @State var foodItem: FoodItem = .init(id: UUID(), name: "", calories: 0)
+    @State var foodItem: FoodItem = FoodItem(name: "")
     @State private var title: String = ""
     @State private var selectedMode: RecipeCreatorMode = .manual
     
@@ -76,7 +76,7 @@ struct RecipeCreatorView: View {
                 }
             }
         }
-        .padding()
+        .basicBackground()
     }
 }
 
@@ -109,19 +109,13 @@ struct ManualCreatorModeView: View {
             .font(.callout)
             .fontWeight(.bold)
             
-            ForEach(foodItem.nutritionList) { nutrient in
-                NutrientItemView(nutrientOfInterest: nutrient,
+            ForEach(foodItem.nutritionList, id: \.id) { nutrientItem in
+                NutrientItemView(nutrientOfInterest: nutrientItem,
                                  viewType: .txt,
                                  primaryTextColor: .primaryText)
                 .fontWeight(.semibold)
                 
-                ForEach(nutrient.childNutrients) { childNutrient in
-                    HStack {
-                        Image(systemName: "arrow.turn.down.right")
-                        NutrientItemView(nutrientOfInterest: childNutrient, viewType: .txt)
-                            .fontWeight(.light)
-                    }
-                }
+                ChildNutrientRecursionView(nutrient: nutrientItem)
             }
             .font(.footnote)
             .labelStyle(CustomLabel(spacing: 7))

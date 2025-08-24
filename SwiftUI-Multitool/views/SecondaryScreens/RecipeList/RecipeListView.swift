@@ -37,7 +37,7 @@ struct RecipeListView: View {
                 AddCategoryPopupView(screenMode: $mode, mealGroups: $mealGroups)
                     .transition(.move(edge: .bottom))
             } else if mode == .addRecipe {
-                SearchPopupView(screenMode: $mode, mealGroups: mealGroups)
+                RecipeCreatorView()
                     .transition(.move(edge: .bottom))
             }
         }

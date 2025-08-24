@@ -18,7 +18,7 @@ struct NutrientAdderPopup: View {
             ImagedButton(title: "Dismiss", icon: "xmark", circleColor: .clear, cornerRadius: 10) {
                 isActive = false
             }
-            .frame(width: .infinity)
+            .frame(maxWidth: .infinity)
         }
         .basicBackground()
     }

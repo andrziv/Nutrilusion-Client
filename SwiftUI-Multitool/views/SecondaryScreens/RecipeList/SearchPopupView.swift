@@ -41,7 +41,7 @@ struct SearchPopupView: View {
             ImagedButton(title: "Dismiss", icon: "xmark", circleColor: .clear, cornerRadius: 10) {
                 screenMode = .normal
             }
-            .frame(width: .infinity)
+            .frame(maxWidth: .infinity)
         }
         .basicBackground()
     }

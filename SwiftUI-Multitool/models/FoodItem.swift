@@ -12,11 +12,24 @@ struct FoodItem: Identifiable {
     let id: UUID
     var name: String
     var calories: Int
-    var nutritionList: [NutrientItem] = []
-    var ingredientList: [FoodItem] = []
-    var servingAmount: Double = 1.0
-    var servingUnit: String = "x"
-    var servingUnitMultiple: String = "x"
+    var nutritionList: [NutrientItem]
+    var ingredientList: [FoodItem]
+    var servingAmount: Double
+    var servingUnit: String
+    var servingUnitMultiple: String
+    
+    init(id: UUID = UUID(), name: String, calories: Int = 0,
+         nutritionList: [NutrientItem] = [], ingredientList: [FoodItem] = [],
+         servingAmount: Double = 1.0, servingUnit: String = "x", servingUnitMultiple: String = "x") {
+        self.id = id
+        self.name = name
+        self.calories = calories
+        self.nutritionList = nutritionList
+        self.ingredientList = ingredientList
+        self.servingAmount = servingAmount
+        self.servingUnit = servingUnit
+        self.servingUnitMultiple = servingUnitMultiple
+    }
     
     func getNutrientValue(_ nutrientType: String) -> NutrientItem? {
         for nutrient in nutritionList {
@@ -36,6 +49,37 @@ struct FoodItem: Identifiable {
             allNutrients.append(contentsOf: nutrient.flattenChildren())
         }
         return allNutrients
+    }
+    
+    mutating func addFoodItemNutrientChain(_ nutrientToAdd: String) {
+        var nameChain: [String] = NutrientTree.shared.getParents(of: nutrientToAdd, ignoringGenerics: true)
+        
+        for nutrientName in nameChain {
+            for index in 0..<nutritionList.count {
+                if nutritionList[index].name == nutrientName {
+                    nutritionList[index].append(NutrientItem(name: nutrientToAdd))
+                    return
+                }
+            }
+        }
+        
+        nameChain.append(nutrientToAdd)
+        if let nutrientChain = generateNutrientItemChain(nameChain) {
+            nutritionList.append(nutrientChain)
+        }
+    }
+    
+    private func generateNutrientItemChain(_ nutrientToChain: [String]) -> NutrientItem? {
+        if nutrientToChain.isEmpty {
+            return nil
+        }
+        var nutrientItemParent = NutrientItem(name: nutrientToChain.first!)
+        if nutrientToChain.count > 1 {
+            if let nutrientItemChild = generateNutrientItemChain(Array(nutrientToChain.suffix(from: 1))) {
+                nutrientItemParent.childNutrients.append(nutrientItemChild)
+            }
+        }
+        return nutrientItemParent
     }
 }
 
