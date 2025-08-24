@@ -71,6 +71,7 @@ struct NutrientTreeButtonView: View {
                 }
                 
                 BasicTextField(textBinding: $searchString, placeholder: "Search for nutrient")
+                    .disableAutocorrection(true)
                     .onSubmit {
                         withAnimation {
                             scrollProxy.scrollTo("nutrient-\(searchString)", anchor: .top)

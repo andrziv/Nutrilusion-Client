@@ -38,17 +38,25 @@ fileprivate enum RecipeCreatorMode: Int, CaseIterable {
 struct RecipeCreatorView: View {
     @State var foodItem: FoodItem = FoodItem(name: "")
     @State private var titleInput: String = ""
+    @State private var unitSingularInput: String = ""
+    @State private var unitPluralInput: String = ""
     @State private var selectedMode: RecipeCreatorMode = .manual
     
     var body: some View {
         VStack {
             HStack {
                 VStack {
-                    UnderlineTextField(textBinding: $titleInput, placeholder: "Name of the Recipe")
+                    UnderlineTextField(textBinding: $titleInput, placeholder: "Name of the Recipe", borderColour: titleInput.isEmpty ? .red : .green)
+                        .disableAutocorrection(true)
                     
                     HStack {
-                        UnderlineTextField(textBinding: $titleInput, placeholder: "Unit Name")
-                        UnderlineTextField(textBinding: $titleInput, placeholder: "Plural Unit")
+                        UnderlineTextField(textBinding: $unitSingularInput, placeholder: "Unit Name", borderColour: unitSingularInput.isEmpty ? .red : .green)
+                            .disableAutocorrection(true)
+                            .textInputAutocapitalization(.never)
+                        
+                        UnderlineTextField(textBinding: $unitPluralInput, placeholder: "Plural Unit", borderColour: unitPluralInput.isEmpty ? .red : .green)
+                            .disableAutocorrection(true)
+                            .textInputAutocapitalization(.never)
                     }
                 }
                 
@@ -90,12 +98,15 @@ struct RecipeCreatorView: View {
 struct UnderlineTextField: View {
     @Binding var textBinding: String
     var placeholder: String
-    var outline: Color = .gray
-    var background: Color = .backgroundColour
+    var cornerRadius: CGFloat = 10
+    var borderColour: Color = .backgroundColour
     
     var body: some View {
         TextField(placeholder, text: $textBinding)
-            .edgeBorder(colour: .red)
+            .padding(10)
+            .background(Rectangle().fill(.clear).background(.thinMaterial))
+            .clipShape(UnevenRoundedRectangle(cornerRadii: .init(topLeading: cornerRadius, topTrailing: cornerRadius)))
+            .edgeBorder(colour: borderColour, thickness: 2)
     }
 }
 
