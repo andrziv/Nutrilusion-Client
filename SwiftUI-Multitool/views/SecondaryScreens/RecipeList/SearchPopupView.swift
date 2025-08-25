@@ -9,7 +9,7 @@
 import SwiftUI
 
 struct SearchPopupView: View {
-    @Binding var screenMode: RecipeListViewMode
+    @Binding var screenMode: RecipeListViewMode?
     var mealGroups: [MealGroup]
     
     @State private var searchString: String = ""
@@ -39,7 +39,7 @@ struct SearchPopupView: View {
             }
             
             ImagedButton(title: "Dismiss", icon: "xmark", circleColor: .clear, cornerRadius: 10) {
-                screenMode = .normal
+                screenMode = nil
             }
             .frame(maxWidth: .infinity)
         }

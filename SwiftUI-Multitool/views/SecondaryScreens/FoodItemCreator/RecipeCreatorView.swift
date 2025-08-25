@@ -36,12 +36,19 @@ fileprivate enum RecipeCreatorMode: Int, CaseIterable {
 }
 
 struct RecipeCreatorView: View {
-    // @State var foodItem: FoodItem = FoodItem(name: "")
-    @State var foodItem: FoodItem = MockData.sampleFoodItem
-    @State private var titleInput: String = ""
-    @State private var unitSingularInput: String = ""
-    @State private var unitPluralInput: String = ""
-    @State private var selectedMode: RecipeCreatorMode = .manual
+    @State var foodItem: FoodItem
+    @State private var titleInput: String
+    @State private var unitSingularInput: String
+    @State private var unitPluralInput: String
+    @State private var selectedMode: RecipeCreatorMode
+    
+    init(foodItem: FoodItem) {
+        self.foodItem = foodItem
+        self.titleInput = foodItem.name
+        self.unitSingularInput = foodItem.servingUnit
+        self.unitPluralInput = foodItem.servingUnitMultiple
+        self.selectedMode = .manual
+    }
     
     var body: some View {
         VStack {
@@ -79,15 +86,15 @@ private struct FoodItemNameUnitFieldSet: View {
     
     var body: some View {
         VStack {
-            UnderlineTextField(textBinding: $titleInput, placeholder: "Name of the Recipe", borderColour: titleInput.isEmpty ? .red : .green)
+            UnderlineTextField(textBinding: $titleInput, placeholder: "Name of the Recipe", borderColour: titleInput.isEmpty ? .red : .green, backgroundColour: Color.gray.opacity(0.1))
                 .disableAutocorrection(true)
             
             HStack {
-                UnderlineTextField(textBinding: $unitSingularInput, placeholder: "Unit Name", borderColour: unitSingularInput.isEmpty ? .red : .green)
+                UnderlineTextField(textBinding: $unitSingularInput, placeholder: "Unit Name", borderColour: unitSingularInput.isEmpty ? .red : .green, backgroundColour: Color.gray.opacity(0.1))
                     .disableAutocorrection(true)
                     .textInputAutocapitalization(.never)
                 
-                UnderlineTextField(textBinding: $unitPluralInput, placeholder: "Plural Unit", borderColour: unitPluralInput.isEmpty ? .red : .green)
+                UnderlineTextField(textBinding: $unitPluralInput, placeholder: "Plural Unit", borderColour: unitPluralInput.isEmpty ? .red : .green, backgroundColour: Color.gray.opacity(0.1))
                     .disableAutocorrection(true)
                     .textInputAutocapitalization(.never)
             }
@@ -109,7 +116,7 @@ private struct ModeSwitcherView: View {
                     PositionalButtonView(mainText: item.title,
                                          position: item.position,
                                          isSelected: selectedMode == item,
-                                         background: .regularMaterial)
+                                         background: Color.gray.opacity(0.1))
                 }
             }
         }
@@ -133,5 +140,5 @@ private struct ContentView: View {
 }
 
 #Preview {
-    RecipeCreatorView()
+    RecipeCreatorView(foodItem: MockData.sampleFoodItem)
 }

@@ -14,43 +14,45 @@ struct ManualCreatorModeView: View {
     
     var body: some View {
         VStack {
-            CalorieStatView(foodItem: foodItem,
-                            viewType: .txt,
-                            primaryTextColor: .primaryText)
-            .labelStyle(CustomLabel(spacing: 7))
-            .font(.callout)
-            .fontWeight(.bold)
+            EditorialCalorieBlockEntry(foodItem: $foodItem)
+                .font(.callout)
+                .fontWeight(.heavy)
             
-            ForEach(foodItem.nutritionList, id: \.id) { nutrientItem in
-                NutrientItemView(nutrientOfInterest: nutrientItem,
-                                 viewType: .txt,
-                                 primaryTextColor: .primaryText)
-                .fontWeight(.semibold)
-                
-                ChildNutrientRecursionView(nutrient: nutrientItem)
-            }
-            .font(.footnote)
-            .labelStyle(CustomLabel(spacing: 7))
+            NutrientTreeEditorialView(foodItem: $foodItem)
             
             Button {
                 showNutritionList = true
             } label: {
-                Image(systemName: "plus")
-                    .foregroundStyle(.secondaryText)
-                    .frame(maxWidth: .infinity)
-                    .padding(.horizontal)
-                    .padding(.vertical, 5)
-                    .background(RoundedRectangle(cornerRadius: 20).fill(.backgroundColour.mix(with: .primaryText, by: 0.1)))
-                    .overlay{
-                        RoundedRectangle(cornerRadius: 20)
-                            .stroke(style: StrokeStyle(lineWidth: 1, dash: [8, 10]))
-                            .foregroundStyle(.primaryText.mix(with: .backgroundColour, by: 0.5))
-                    }
+                ShowNutrientsButtonView()
             }
         }
         .fullScreenCover(isPresented: $showNutritionList) {
             NutrientAdderPopup(isActive: $showNutritionList, foodItem: $foodItem)
         }
+    }
+}
+
+struct ShowNutrientsButtonView: View {
+    var body: some View {
+        Image(systemName: "plus")
+            .foregroundStyle(.secondaryText)
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal)
+            .padding(.vertical, 8)
+            .background(RoundedRectangle(cornerRadius: 20).fill(.secondaryText.mix(with: .backgroundColour, by: 0.65)))
+            .overlay{
+                RoundedRectangle(cornerRadius: 20)
+                    .stroke(style: StrokeStyle(lineWidth: 1, dash: [8]))
+                    .foregroundStyle(.primaryText.mix(with: .backgroundColour, by: 0.5))
+            }
+    }
+}
+
+private struct EditorialCalorieBlockEntry: View {
+    @Binding var foodItem: FoodItem
+    
+    var body: some View {
+        EditorialBlockEntryInt(title: "Calories", value: $foodItem.calories, unit: "kcal")
     }
 }
 

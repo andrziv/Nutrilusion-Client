@@ -7,18 +7,25 @@
 
 import SwiftUI
 
-enum RecipeListViewMode {
-    case normal
+enum RecipeListViewMode: Identifiable {
     case search
     case addCategory
     case addRecipe
+    
+    var id: Int {
+        switch self {
+        case .search: return 1
+        case .addCategory: return 2
+        case .addRecipe: return 3
+        }
+    }
 }
 
 // TODO: refactor and get rid of all the magic numbers used for testing
 struct RecipeListView: View {
     @State var mealGroups: [MealGroup] = MockData.mealGroupList
     @State private var showAddSubMenu: Bool = false
-    @State private var mode: RecipeListViewMode = .normal
+    @State private var mode: RecipeListViewMode? = nil
     
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
@@ -28,7 +35,8 @@ struct RecipeListView: View {
             }
             
             FloatingActionButtonToolbar(isShowingSubMenu: $showAddSubMenu, recipeListScreenMode: $mode)
-            
+        }
+        .fullScreenCover(item: $mode) { mode in
             // Popups from submenu
             if mode == .search {
                 SearchPopupView(screenMode: $mode, mealGroups: mealGroups)
@@ -37,7 +45,7 @@ struct RecipeListView: View {
                 AddCategoryPopupView(screenMode: $mode, mealGroups: $mealGroups)
                     .transition(.move(edge: .bottom))
             } else if mode == .addRecipe {
-                RecipeCreatorView()
+                RecipeCreatorView(foodItem: FoodItem(name: ""))
                     .transition(.move(edge: .bottom))
             }
         }
@@ -48,7 +56,7 @@ struct RecipeListView: View {
 // "FAB" Menu
 struct FloatingActionButtonToolbar: View {
     @Binding var isShowingSubMenu: Bool
-    @Binding var recipeListScreenMode: RecipeListViewMode
+    @Binding var recipeListScreenMode: RecipeListViewMode?
     
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
@@ -82,7 +90,7 @@ struct FloatingActionButtonToolbar: View {
 }
 
 struct ReLiSubMenu: View {
-    @Binding var screenMode: RecipeListViewMode
+    @Binding var screenMode: RecipeListViewMode?
     @Binding var showingCustomMenu: Bool
     
     var body: some View {

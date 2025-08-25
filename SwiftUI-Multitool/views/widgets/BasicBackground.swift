@@ -7,10 +7,10 @@
 
 import SwiftUI
 
-struct BasicBackground: ViewModifier {
+struct BasicBackground<S: ShapeStyle>: ViewModifier {
     var cornerRadius: CGFloat
     var shadowRadius: CGFloat
-    var background: Material
+    var background: S
     var edges: Edge.Set
     
     func body(content: Content) -> some View {
@@ -24,7 +24,7 @@ struct BasicBackground: ViewModifier {
 }
 
 extension View {
-    func basicBackground(cornerRadius: CGFloat = 10, shadowRadius: CGFloat = 5, background: Material = .ultraThinMaterial, edges: Edge.Set = .bottom) -> some View {
+    func basicBackground(cornerRadius: CGFloat = 10, shadowRadius: CGFloat = 5, background: some ShapeStyle = .ultraThinMaterial, edges: Edge.Set = .bottom) -> some View {
         self.modifier(
             BasicBackground(
                 cornerRadius: cornerRadius,
