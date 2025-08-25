@@ -86,6 +86,35 @@ struct NutrientItem: Identifiable {
         return result
     }
     
+    /// Delete a nutrient by name from this node’s children (recursively).
+    /// - Parameters:
+    ///   - targetName: The nutrient to remove.
+    ///   - adjustAmounts: Whether to subtract the removed amount from parent totals.
+    /// - Returns: `true` if deletion occurred, `false` otherwise.
+    mutating func delete(_ targetName: String, adjustAmounts: Bool = true) -> Bool {
+        if let index = childNutrients.firstIndex(where: { $0.name == targetName }) {
+            let removed = childNutrients.remove(at: index)
+            
+            if adjustAmounts {
+                // remove grams from self
+                // TODO: consider additive solution (sum the other components instead of subtracting the removed components)
+                let removedGrams = removed.unit.toGrams(removed.amount)
+                let currentGrams = unit.toGrams(amount)
+                let newTotal = max(0, currentGrams - removedGrams)
+                amount = unit.fromGrams(newTotal)
+            }
+            return true
+        }
+        
+        for i in childNutrients.indices {
+            if childNutrients[i].delete(targetName, adjustAmounts: adjustAmounts) {
+                return true
+            }
+        }
+        
+        return false
+    }
+    
     /// Append a nutrient item.
     /// - Parameters:
     ///   - child: The nutrient item to add.
@@ -123,8 +152,8 @@ struct NutrientItem: Identifiable {
             
             let rest = Array(path.dropFirst())
             if let next = rest.first {
-                if let idx = childNutrients.firstIndex(where: { $0.name == next }) {
-                    childNutrients[idx].insertAlongPath(path: rest, child: child)
+                if let index = childNutrients.firstIndex(where: { $0.name == next }) {
+                    childNutrients[index].insertAlongPath(path: rest, child: child)
                 } else {
                     var newNode = NutrientItem(name: next, amount: 0, unit: child.unit)
                     newNode.insertAlongPath(path: rest, child: child)

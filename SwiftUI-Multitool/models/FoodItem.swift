@@ -35,10 +35,15 @@ struct FoodItem: Identifiable {
         for nutrient in nutritionList {
             if nutrient.name == nutrientType {
                 return nutrient
-            } else if let childNutrient = nutrient.getChildNutrientValue(nutrientType) {
+            }
+        }
+        
+        for nutrient in nutritionList {
+            if let childNutrient = nutrient.getChildNutrientValue(nutrientType) {
                 return childNutrient
             }
         }
+        
         return nil
     }
     
@@ -49,6 +54,27 @@ struct FoodItem: Identifiable {
             allNutrients.append(contentsOf: nutrient.flattenChildren())
         }
         return allNutrients
+    }
+    
+    /// Delete a nutrient by name from this node’s children (recursively).
+    /// - Parameters:
+    ///   - targetName: The nutrient to remove.
+    /// - Returns: `true` if deletion occurred, `false` otherwise.
+    mutating func delete(_ targetName: String) -> Bool {
+        for i in nutritionList.indices {
+            if nutritionList[i].name == targetName {
+                nutritionList.remove(at: i)
+                return true
+            }
+        }
+        
+        for i in nutritionList.indices {
+            if nutritionList[i].delete(targetName, adjustAmounts: true) {
+                return true
+            }
+        }
+        
+        return false
     }
     
     mutating func addFoodItemNutrientChain(_ nutrientToAdd: String) {
