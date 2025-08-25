@@ -7,14 +7,53 @@
 
 import Foundation
 
+enum NutrientUnit: String, Codable, CustomStringConvertible {
+    case grams, milligrams, micrograms
+    
+    public var description: String {
+        switch self {
+        case .grams:  return "g"
+        case .milligrams: return "mg"
+        case .micrograms: return "µg"
+        }
+    }
+    
+    func toGrams(_ value: Double) -> Double {
+        switch self {
+        case .grams:  return value
+        case .milligrams: return value / 1000.0
+        case .micrograms: return value / 1_000_000.0
+        }
+    }
+    
+    func fromGrams(_ grams: Double) -> Double {
+        switch self {
+        case .grams:  return grams
+        case .milligrams: return grams * 1000.0
+        case .micrograms: return grams * 1_000_000.0
+        }
+    }
+    
+    // Pick best unit given a gram value
+    static func bestUnit(for grams: Double) -> NutrientUnit {
+        if grams < 0.001 {
+            return .micrograms
+        } else if grams < 1.0 {
+            return .milligrams
+        } else {
+            return .grams
+        }
+    }
+}
+
 struct NutrientItem: Identifiable {
     var id: UUID
     var name: String
     var amount: Double
-    var unit: String
+    var unit: NutrientUnit
     var childNutrients: [NutrientItem]
     
-    init(id: UUID = UUID(), name: String, amount: Double = 0, unit: String = "g", childNutrients: [NutrientItem] = []) {
+    init(id: UUID = UUID(), name: String, amount: Double = 0, unit: NutrientUnit = .grams, childNutrients: [NutrientItem] = []) {
         self.id = id
         self.name = name
         self.amount = amount
@@ -72,12 +111,20 @@ struct NutrientItem: Identifiable {
         guard let first = path.first else { return }
         
         if first == name {
-            amount += child.amount
+            // tally new totals given the added nutrient
+            let childGrams = child.unit.toGrams(child.amount)
+            let selfGrams = unit.toGrams(amount)
+            let totalGrams = selfGrams + childGrams
+            
+            // change unit if needed to make sure that the numbers aren't too small or large
+            let bestUnit = NutrientUnit.bestUnit(for: totalGrams)
+            unit = bestUnit
+            amount = unit.fromGrams(totalGrams)
             
             let rest = Array(path.dropFirst())
             if let next = rest.first {
-                if let index = childNutrients.firstIndex(where: { $0.name == next }) {
-                    childNutrients[index].insertAlongPath(path: rest, child: child)
+                if let idx = childNutrients.firstIndex(where: { $0.name == next }) {
+                    childNutrients[idx].insertAlongPath(path: rest, child: child)
                 } else {
                     var newNode = NutrientItem(name: next, amount: 0, unit: child.unit)
                     newNode.insertAlongPath(path: rest, child: child)
