@@ -84,6 +84,7 @@ private struct EditorialNutrientBlockEntry: View {
         }
     }
 }
+
 #Preview {
     NutrientTreeEditorialView(foodItem: .constant(MockData.sampleFoodItem))
 }
