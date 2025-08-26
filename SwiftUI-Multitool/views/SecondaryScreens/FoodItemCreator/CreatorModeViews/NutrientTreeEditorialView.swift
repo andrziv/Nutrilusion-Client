@@ -14,7 +14,7 @@ struct NutrientTreeEditorialView: View {
     
     var body: some View {
         ScrollView {
-            ForEach($foodItem.nutritionList, id: \.id) { $nutrientItem in
+            ForEach($foodItem.nutritionList) { $nutrientItem in
                 EditorialNutrientBlockEntry(nutrient: $nutrientItem, foodItem: $foodItem)
                     .fontWeight(.semibold)
                 
@@ -49,7 +49,9 @@ struct EditorialNutrientRecursionView: View {
 private struct EditorialNutrientBlockEntry: View {
     @Binding var nutrient: NutrientItem
     @Binding var foodItem: FoodItem
-    @State private var draftAmount: Double = 0
+    
+    @FocusState private var isFocused: Bool
+    @State private var draftAmount: Double
     
     init(nutrient: Binding<NutrientItem>, foodItem: Binding<FoodItem>) {
         self._nutrient = nutrient
@@ -67,20 +69,21 @@ private struct EditorialNutrientBlockEntry: View {
         SwipeableRow {
             foodItem.deleteNutrient(nutrient.name)
         } content: {
-            EditorialBlockEntry(title: nutrient.name, value: $draftAmount, unit: String(describing: nutrient.unit))
-                .onSubmit(commit) // TODO: simplify? kind-of a kludge but ObservableObject seems to be the only solution (expensive...?)
-                .onChange(of: nutrient.amount) { old, new in
-                    if new != draftAmount {
-                        draftAmount = new
-                    }
+            EditorialBlockEntry(title: nutrient.name, value: $draftAmount, unit: String(describing: nutrient.unit)
+            )
+            .focused($isFocused)
+            .onSubmit { commit() }
+            .onChange(of: isFocused) { old, focused in
+                if !focused { commit() }
+            }
+            .onChange(of: nutrient.amount) { old, newValue in
+                if newValue != draftAmount {
+                    draftAmount = newValue
                 }
-                .onDisappear {
-                    commit()
-                }
+            }
         }
     }
 }
-
 #Preview {
     NutrientTreeEditorialView(foodItem: .constant(MockData.sampleFoodItem))
 }
