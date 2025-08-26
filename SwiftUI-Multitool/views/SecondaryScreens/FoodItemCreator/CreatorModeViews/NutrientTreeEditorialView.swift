@@ -9,7 +9,6 @@
 import SwiftUI
 
 
-
 struct NutrientTreeEditorialView: View {
     @Binding var foodItem: FoodItem
     
@@ -50,12 +49,34 @@ struct EditorialNutrientRecursionView: View {
 private struct EditorialNutrientBlockEntry: View {
     @Binding var nutrient: NutrientItem
     @Binding var foodItem: FoodItem
+    @State private var draftAmount: Double = 0
+    
+    init(nutrient: Binding<NutrientItem>, foodItem: Binding<FoodItem>) {
+        self._nutrient = nutrient
+        self._foodItem = foodItem
+        self._draftAmount = State(initialValue: nutrient.wrappedValue.amount)
+    }
+    
+    private func commit() {
+        if draftAmount != nutrient.amount {
+            foodItem.modifyNutrient(nutrient.name, newValue: draftAmount)
+        }
+    }
     
     var body: some View {
         SwipeableRow {
-            foodItem.delete(nutrient.name)
+            foodItem.deleteNutrient(nutrient.name)
         } content: {
-            EditorialBlockEntry(title: nutrient.name, value: $nutrient.amount, unit: String(describing: nutrient.unit))
+            EditorialBlockEntry(title: nutrient.name, value: $draftAmount, unit: String(describing: nutrient.unit))
+                .onSubmit(commit) // TODO: simplify? kind-of a kludge but ObservableObject seems to be the only solution (expensive...?)
+                .onChange(of: nutrient.amount) { old, new in
+                    if new != draftAmount {
+                        draftAmount = new
+                    }
+                }
+                .onDisappear {
+                    commit()
+                }
         }
     }
 }

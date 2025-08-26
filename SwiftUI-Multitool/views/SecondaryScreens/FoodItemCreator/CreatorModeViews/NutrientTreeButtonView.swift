@@ -129,7 +129,7 @@ struct NutrientTreeButtonChildView: View {
                     let backgroundColour = depthColor(depth)
                     if getDisableReason() == .none {
                         Button {
-                            foodItem.addFoodItemNutrientChain(nutrientName)
+                            foodItem.createNutrientChain(nutrientName)
                             isShowing = false
                         } label: {
                             Label("Add", systemImage: "plus")
