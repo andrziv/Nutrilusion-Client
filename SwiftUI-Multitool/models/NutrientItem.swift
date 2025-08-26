@@ -91,14 +91,14 @@ struct NutrientItem: Identifiable {
     ///   - targetName: The nutrient to remove.
     ///   - adjustAmounts: Whether to subtract the removed amount from parent totals.
     /// - Returns: `true` if deletion occurred, `false` otherwise.
-    mutating func delete(_ targetName: String, adjustAmounts: Bool = true) -> Bool {
+    @discardableResult mutating func delete(_ targetName: String, adjustAmounts: Bool = true) -> Bool {
         if let index = childNutrients.firstIndex(where: { $0.name == targetName }) {
             let removed = childNutrients.remove(at: index)
             
             if adjustAmounts {
                 // remove grams from self
                 // TODO: consider additive solution (sum the other components instead of subtracting the removed components)
-                let removedGrams = removed.unit.toGrams(removed.amount)
+                let removedGrams = removed.totalInGrams()
                 let currentGrams = unit.toGrams(amount)
                 let newTotal = max(0, currentGrams - removedGrams)
                 amount = unit.fromGrams(newTotal)
@@ -108,6 +108,9 @@ struct NutrientItem: Identifiable {
         
         for i in childNutrients.indices {
             if childNutrients[i].delete(targetName, adjustAmounts: adjustAmounts) {
+                let sumGrams = childNutrients.map { $0.totalInGrams() }.reduce(0, +)
+                
+                amount = unit.fromGrams(sumGrams)
                 return true
             }
         }
@@ -133,6 +136,13 @@ struct NutrientItem: Identifiable {
         let parents = NutrientTree.shared.getParents(of: child.name, ignoringGenerics: true)
         
         insertAlongPath(path: parents + [child.name], child: child)
+    }
+    
+    private func totalInGrams() -> Double {
+        let selfGrams = unit.toGrams(amount)
+        if childNutrients.isEmpty { return selfGrams }
+        let childrenGrams = childNutrients.map { $0.totalInGrams() }.reduce(0, +)
+        return childrenGrams
     }
     
     /// Helper: walks down a path of names, auto-creating if needed, and aggregates amounts.

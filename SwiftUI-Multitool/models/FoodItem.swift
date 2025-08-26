@@ -60,7 +60,7 @@ struct FoodItem: Identifiable {
     /// - Parameters:
     ///   - targetName: The nutrient to remove.
     /// - Returns: `true` if deletion occurred, `false` otherwise.
-    mutating func delete(_ targetName: String) -> Bool {
+    @discardableResult mutating func delete(_ targetName: String) -> Bool {
         for i in nutritionList.indices {
             if nutritionList[i].name == targetName {
                 nutritionList.remove(at: i)
