@@ -86,43 +86,11 @@ struct NutrientItem: Identifiable {
         return result
     }
     
-    /// Delete a nutrient by name from this node’s children (recursively).
-    /// - Parameters:
-    ///   - targetName: The nutrient to remove.
-    ///   - adjustAmounts: Whether to subtract the removed amount from parent totals.
-    /// - Returns: `true` if deletion occurred, `false` otherwise.
-    @discardableResult mutating func delete(_ targetName: String, adjustAmounts: Bool = true) -> Bool {
-        if let index = childNutrients.firstIndex(where: { $0.name == targetName }) {
-            let removed = childNutrients.remove(at: index)
-            
-            if adjustAmounts {
-                // remove grams from self
-                // TODO: consider additive solution (sum the other components instead of subtracting the removed components)
-                let removedGrams = removed.totalInGrams()
-                let currentGrams = unit.toGrams(amount)
-                let newTotal = max(0, currentGrams - removedGrams)
-                amount = unit.fromGrams(newTotal)
-            }
-            return true
-        }
-        
-        for i in childNutrients.indices {
-            if childNutrients[i].delete(targetName, adjustAmounts: adjustAmounts) {
-                let sumGrams = childNutrients.map { $0.totalInGrams() }.reduce(0, +)
-                
-                amount = unit.fromGrams(sumGrams)
-                return true
-            }
-        }
-        
-        return false
-    }
-    
     /// Append a nutrient item.
     /// - Parameters:
     ///   - child: The nutrient item to add.
     ///   - directInsert: If true, bypasses the NutrientTree and just appends directly.
-    mutating func append(_ child: NutrientItem, directInsert: Bool = false) {
+    mutating func appendChildNutrient(_ child: NutrientItem, directInsert: Bool = false) {
         if directInsert {
             childNutrients.append(child)
             return
@@ -138,11 +106,64 @@ struct NutrientItem: Identifiable {
         insertAlongPath(path: parents + [child.name], child: child)
     }
     
-    private func totalInGrams() -> Double {
-        let selfGrams = unit.toGrams(amount)
-        if childNutrients.isEmpty { return selfGrams }
-        let childrenGrams = childNutrients.map { $0.totalInGrams() }.reduce(0, +)
-        return childrenGrams
+    /// Modify a nutrient and propagate changes upward.
+    /// Returns true if modification was applied.
+    @discardableResult 
+    mutating func modify(_ targetName: String, newValue: Double? = nil, newUnit: NutrientUnit? = nil) -> Bool {
+        return modifyInternal(targetName, newValue: newValue, newUnit: newUnit) != nil
+    }
+    
+    /// Recursive helper: returns delta in grams if modification occurred
+    private mutating func modifyInternal(_ targetName: String, newValue: Double?, newUnit: NutrientUnit?) -> Double? {
+        // Case 1: this node matches
+        if name == targetName {
+            let oldGrams = unit.toGrams(amount)
+            applyModification(newValue: newValue, newUnit: newUnit)
+            let newGrams = unit.toGrams(amount)
+            return newGrams - oldGrams
+        }
+        
+        // Case 2: search children
+        for i in childNutrients.indices {
+            if let delta = childNutrients[i].modifyInternal(targetName, newValue: newValue, newUnit: newUnit) {
+                applyDelta(delta) // apply change to self
+                return delta
+            }
+        }
+        
+        return nil
+    }
+    
+    /// Delete a nutrient by name from this node’s children (recursively).
+    /// - Parameters:
+    ///   - targetName: The nutrient to remove.
+    ///   - adjustAmounts: Whether to subtract the removed amount from parent totals.
+    /// - Returns: `true` if deletion occurred, `false` otherwise.
+    @discardableResult
+    mutating func deleteChildNutrient(_ targetName: String, adjustAmounts: Bool = true) -> Bool {
+        if let index = childNutrients.firstIndex(where: { $0.name == targetName }) {
+            let removed = childNutrients.remove(at: index)
+            
+            if adjustAmounts {
+                // remove grams from self
+                // TODO: consider additive solution (sum the other components instead of subtracting the removed components)
+                let removedGrams = removed.totalInGrams()
+                let currentGrams = unit.toGrams(amount)
+                let newTotal = max(0, currentGrams - removedGrams)
+                amount = unit.fromGrams(newTotal)
+            }
+            return true
+        }
+        
+        for i in childNutrients.indices {
+            if childNutrients[i].deleteChildNutrient(targetName, adjustAmounts: adjustAmounts) {
+                let sumGrams = childNutrients.map { $0.totalInGrams() }.reduce(0, +)
+                amount = unit.fromGrams(sumGrams)
+                return true
+            }
+        }
+        
+        return false
     }
     
     /// Helper: walks down a path of names, auto-creating if needed, and aggregates amounts.
@@ -171,5 +192,32 @@ struct NutrientItem: Identifiable {
                 }
             }
         }
+    }
+    
+    /// Apply local update logic
+    private mutating func applyModification(newValue: Double?, newUnit: NutrientUnit?) {
+        if let newUnit = newUnit, let newValue = newValue {
+            amount = newValue
+            unit = newUnit
+        } else if let newValue = newValue {
+            amount = newValue
+        } else if let newUnit = newUnit {
+            let grams = unit.toGrams(amount)
+            amount = newUnit.fromGrams(grams)
+            unit = newUnit
+        }
+    }
+    
+    /// Apply a delta (grams) to this node’s amount
+    private mutating func applyDelta(_ deltaGrams: Double) {
+        let newGrams = max(0, unit.toGrams(amount) + deltaGrams)
+        amount = unit.fromGrams(newGrams)
+    }
+    
+    private func totalInGrams() -> Double {
+        let selfGrams = unit.toGrams(amount)
+        if childNutrients.isEmpty { return selfGrams }
+        let childrenGrams = childNutrients.map { $0.totalInGrams() }.reduce(0, +)
+        return childrenGrams
     }
 }

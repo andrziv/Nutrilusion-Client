@@ -56,34 +56,16 @@ struct FoodItem: Identifiable {
         return allNutrients
     }
     
-    /// Delete a nutrient by name from this node’s children (recursively).
+    /// Create a nutrient by name using proper nutrient hierarchical structure.
     /// - Parameters:
-    ///   - targetName: The nutrient to remove.
-    /// - Returns: `true` if deletion occurred, `false` otherwise.
-    @discardableResult mutating func delete(_ targetName: String) -> Bool {
-        for i in nutritionList.indices {
-            if nutritionList[i].name == targetName {
-                nutritionList.remove(at: i)
-                return true
-            }
-        }
-        
-        for i in nutritionList.indices {
-            if nutritionList[i].delete(targetName, adjustAmounts: true) {
-                return true
-            }
-        }
-        
-        return false
-    }
-    
-    mutating func addFoodItemNutrientChain(_ nutrientToAdd: String) {
+    ///   - nutrientToAdd: The nutrient to create.
+    mutating func createNutrientChain(_ nutrientToAdd: String) {
         var nameChain: [String] = NutrientTree.shared.getParents(of: nutrientToAdd, ignoringGenerics: true)
         
         for nutrientName in nameChain {
             for index in 0..<nutritionList.count {
                 if nutritionList[index].name == nutrientName {
-                    nutritionList[index].append(NutrientItem(name: nutrientToAdd))
+                    nutritionList[index].appendChildNutrient(NutrientItem(name: nutrientToAdd))
                     return
                 }
             }
@@ -95,16 +77,57 @@ struct FoodItem: Identifiable {
         }
     }
     
+    @discardableResult
+    mutating func modifyNutrient(_ targetName: String, newValue: Double? = nil, newUnit: NutrientUnit? = nil) -> Bool {
+        for i in nutritionList.indices {
+            if nutritionList[i].name == targetName {
+                nutritionList[i].modify(targetName, newValue: newValue, newUnit: newUnit)
+                return true
+            }
+        }
+        
+        for i in nutritionList.indices {
+            if nutritionList[i].modify(targetName, newValue: newValue, newUnit: newUnit) {
+                return true
+            }
+        }
+        
+        return false
+    }
+    
+    /// Delete a nutrient by name from this node’s children (recursively).
+    /// - Parameters:
+    ///   - targetName: The nutrient to remove.
+    /// - Returns: `true` if deletion occurred, `false` otherwise.
+    @discardableResult mutating func deleteNutrient(_ targetName: String) -> Bool {
+        for i in nutritionList.indices {
+            if nutritionList[i].name == targetName {
+                nutritionList.remove(at: i)
+                return true
+            }
+        }
+        
+        for i in nutritionList.indices {
+            if nutritionList[i].deleteChildNutrient(targetName, adjustAmounts: true) {
+                return true
+            }
+        }
+        
+        return false
+    }
+    
     private func generateNutrientItemChain(_ nutrientToChain: [String]) -> NutrientItem? {
         if nutrientToChain.isEmpty {
             return nil
         }
+        
         var nutrientItemParent = NutrientItem(name: nutrientToChain.first!)
         if nutrientToChain.count > 1 {
             if let nutrientItemChild = generateNutrientItemChain(Array(nutrientToChain.suffix(from: 1))) {
                 nutrientItemParent.childNutrients.append(nutrientItemChild)
             }
         }
+        
         return nutrientItemParent
     }
 }
