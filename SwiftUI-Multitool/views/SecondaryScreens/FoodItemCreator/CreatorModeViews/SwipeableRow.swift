@@ -1,3 +1,11 @@
+//
+//  SwipeableRow.swift
+//  SwiftUI-Multitool
+//
+//  Created by Andrej Zivkovic on 2025-08-25.
+//
+
+
 import SwiftUI
 
 struct SwipeableRow<Content: View>: View {
@@ -23,7 +31,9 @@ struct SwipeableRow<Content: View>: View {
             content()
                 .offset(x: -offset)
                 .gesture(
-                    DragGesture()
+                    // future ref: minDistance was used to tweak sweet spot between
+                    //   scrollview vertical drag and row deletion horizontal drag
+                    DragGesture(minimumDistance: 18, coordinateSpace: .local)
                         .onChanged { value in
                             if value.translation.width < 0 { // left swipe
                                 offset = min(-value.translation.width, maxSwipeDistance)

@@ -8,16 +8,18 @@
 
 import SwiftUI
 
+
+
 struct NutrientTreeEditorialView: View {
     @Binding var foodItem: FoodItem
     
     var body: some View {
         ScrollView {
             ForEach($foodItem.nutritionList, id: \.id) { $nutrientItem in
-                EditorialNutrientBlockEntry(nutrient: $nutrientItem)
+                EditorialNutrientBlockEntry(nutrient: $nutrientItem, foodItem: $foodItem)
                     .fontWeight(.semibold)
                 
-                EditorialNutrientRecursionView(nutrient: $nutrientItem)
+                EditorialNutrientRecursionView(nutrient: $nutrientItem, foodItem: $foodItem)
             }
         }
         .font(.footnote)
@@ -27,6 +29,7 @@ struct NutrientTreeEditorialView: View {
 
 struct EditorialNutrientRecursionView: View {
     @Binding var nutrient: NutrientItem
+    @Binding var foodItem: FoodItem
     private(set) var isOrigin: Bool = true
     
     var body: some View {
@@ -34,10 +37,10 @@ struct EditorialNutrientRecursionView: View {
             VStack(spacing: 8) {
                 HStack {
                     Image(systemName: "arrow.turn.down.right")
-                    EditorialNutrientBlockEntry(nutrient: $childNutrient)
+                    EditorialNutrientBlockEntry(nutrient: $childNutrient, foodItem: $foodItem)
                         .fontWeight(.light)
                 }
-                EditorialNutrientRecursionView(nutrient: $childNutrient, isOrigin: false)
+                EditorialNutrientRecursionView(nutrient: $childNutrient, foodItem: $foodItem, isOrigin: false)
             }
             .padding(.leading, isOrigin ? 0 : 25)
         }
@@ -46,9 +49,14 @@ struct EditorialNutrientRecursionView: View {
 
 private struct EditorialNutrientBlockEntry: View {
     @Binding var nutrient: NutrientItem
+    @Binding var foodItem: FoodItem
     
     var body: some View {
-        EditorialBlockEntry(title: nutrient.name, value: $nutrient.amount, unit: nutrient.unit)
+        SwipeableRow {
+            foodItem.delete(nutrient.name)
+        } content: {
+            EditorialBlockEntry(title: nutrient.name, value: $nutrient.amount, unit: String(describing: nutrient.unit))
+        }
     }
 }
 
