@@ -112,7 +112,7 @@ struct NutrientTreeButtonChildView: View {
     private func getDisableReason() -> DisableReason {
         if disabledList.contains(nutrientName) {
             return .alreadyAdded
-        } else if depth < 2 {
+        } else if nutrientTree.findNutrient(nutrientName)!.ignoreGeneric {
             return .isBroadCategory
         } else {
             return .none
