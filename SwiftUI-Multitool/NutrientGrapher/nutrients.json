@@ -70,7 +70,7 @@
             },
             {
               "name": "Unsaturated Fat",
-              "ignoreGeneric": false,
+              "ignoreGeneric": true,
               "children": [
                 {
                   "name": "Monounsaturated",
