@@ -104,23 +104,23 @@ struct NutrientItem: Identifiable, Equatable {
     /// Returns true if modification was applied.
     @discardableResult
     mutating func modify(_ targetName: String, newValue: Double? = nil, newUnit: NutrientUnit? = nil) -> Bool {
-        return modifyInternal(targetName, newValue: newValue, newUnit: newUnit) != nil
+        return modifyInternal(targetName, newValue: newValue, newUnit: newUnit, optimizeUnitPropagation: true) != nil
     }
     
     /// Recursive helper: returns delta in grams if modification occurred
-    private mutating func modifyInternal(_ targetName: String, newValue: Double?, newUnit: NutrientUnit?) -> Double? {
+    private mutating func modifyInternal(_ targetName: String, newValue: Double?, newUnit: NutrientUnit?, optimizeUnitPropagation: Bool = false) -> Double? {
         // Case 1: this node matches
         if name == targetName {
             let oldGrams = unit.convertTo(amount)
-            applyModification(newValue: newValue, newUnit: newUnit)
+            applyModification(newValue: newValue, newUnit: newUnit, optimizeUnit: false)
             let newGrams = unit.convertTo(amount)
             return newGrams - oldGrams
         }
         
         // Case 2: search children
         for i in childNutrients.indices {
-            if let delta = childNutrients[i].modifyInternal(targetName, newValue: newValue, newUnit: newUnit) {
-                applyDelta(delta) // apply change to self
+            if let delta = childNutrients[i].modifyInternal(targetName, newValue: newValue, newUnit: newUnit, optimizeUnitPropagation: optimizeUnitPropagation) {
+                applyDelta(delta, optimizeUnit: optimizeUnitPropagation) // apply change to self
                 return delta
             }
         }
@@ -134,7 +134,7 @@ struct NutrientItem: Identifiable, Equatable {
     ///   - adjustAmounts: Whether to subtract the removed amount from parent totals.
     /// - Returns: `true` if deletion occurred, `false` otherwise.
     @discardableResult
-    mutating func deleteChildNutrient(_ targetName: String, adjustAmounts: Bool = true) -> Bool {
+    mutating func deleteChildNutrient(_ targetName: String, adjustAmounts: Bool = true, optimizeUnit: Bool = false) -> Bool {
         if let index = childNutrients.firstIndex(where: { $0.name == targetName }) {
             let removed = childNutrients.remove(at: index)
             
@@ -144,7 +144,7 @@ struct NutrientItem: Identifiable, Equatable {
                 let removedGrams = removed.totalInGrams()
                 let currentGrams = unit.convertTo(amount)
                 let newTotal = max(0, currentGrams - removedGrams)
-                applyModification(newValue: newTotal)
+                applyModification(newValue: newTotal, optimizeUnit: optimizeUnit)
             }
             return true
         }
@@ -152,7 +152,7 @@ struct NutrientItem: Identifiable, Equatable {
         for i in childNutrients.indices {
             if childNutrients[i].deleteChildNutrient(targetName, adjustAmounts: adjustAmounts) {
                 let sumGrams = childNutrients.map { $0.totalInGrams() }.reduce(0, +)
-                applyModification(newValue: unit.convertFrom(sumGrams))
+                applyModification(newValue: unit.convertFrom(sumGrams), optimizeUnit: optimizeUnit)
                 return true
             }
         }
@@ -186,30 +186,36 @@ struct NutrientItem: Identifiable, Equatable {
         }
     }
     
-    private mutating func optimizeUnitFor(_ newGramValue: Double) {
-        let bestUnit = NutrientUnit.bestUnit(for: newGramValue)
-        unit = bestUnit
-        amount = unit.convertFrom(newGramValue)
-    }
-    
     /// Apply local update logic
-    private mutating func applyModification(newValue: Double? = nil, newUnit: NutrientUnit? = nil) {
+    private mutating func applyModification(newValue: Double? = nil, newUnit: NutrientUnit? = nil, unitConversion: Bool = false, optimizeUnit: Bool = false) {
         if let newUnit = newUnit, let newValue = newValue {
             amount = newValue
             unit = newUnit
         } else if let newValue = newValue {
             amount = newValue
         } else if let newUnit = newUnit {
-            let grams = unit.convertTo(amount)
-            amount = newUnit.convertFrom(grams)
+            if unitConversion {
+                let grams = unit.convertTo(amount)
+                amount = newUnit.convertFrom(grams)
+            }
             unit = newUnit
+        }
+        
+        if optimizeUnit {
+            optimizeUnitFor(unit.convertTo(amount, to: .grams))
         }
     }
     
+    private mutating func optimizeUnitFor(_ newGramValue: Double) {
+        let bestUnit = NutrientUnit.bestUnit(for: newGramValue)
+        unit = bestUnit
+        amount = unit.convertFrom(newGramValue)
+    }
+    
     /// Apply a delta (grams) to this node’s amount
-    private mutating func applyDelta(_ deltaGrams: Double) {
+    private mutating func applyDelta(_ deltaGrams: Double, optimizeUnit: Bool = false) {
         let newGrams = max(0, unit.convertTo(amount) + deltaGrams)
-        applyModification(newValue: unit.convertFrom(newGrams))
+        applyModification(newValue: unit.convertFrom(newGrams), optimizeUnit: optimizeUnit)
     }
     
     private func totalInGrams() -> Double {

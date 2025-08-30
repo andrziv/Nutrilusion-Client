@@ -108,7 +108,7 @@ struct FoodItem: Identifiable {
         }
         
         for i in nutritionList.indices {
-            if nutritionList[i].deleteChildNutrient(targetName, adjustAmounts: true) {
+            if nutritionList[i].deleteChildNutrient(targetName, adjustAmounts: true, optimizeUnit: true) {
                 return true
             }
         }

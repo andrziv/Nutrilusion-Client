@@ -11,7 +11,8 @@ import SwiftUI
 struct EditorialNutrientEntry: View {
     let title: String
     @Binding var value: Double
-    @Binding var unit: NutrientUnit
+    var unit: NutrientUnit
+    let unitMenuAction: (NutrientUnit) -> Void
     
     var body: some View {
         HStack(spacing: 14) {
@@ -28,7 +29,7 @@ struct EditorialNutrientEntry: View {
                     .multilineTextAlignment(.center)
                     .frame(width: 64)
                 
-                NutrientUnitPicker(selectedUnit: $unit)
+                NutrientUnitPicker(selectedUnit: unit, action: unitMenuAction)
                     .foregroundStyle(.primaryText)
                     .multilineTextAlignment(.center)
             }
@@ -42,13 +43,14 @@ struct EditorialNutrientEntry: View {
 }
 
 struct NutrientUnitPicker: View {
-    @Binding var selectedUnit: NutrientUnit
+    var selectedUnit: NutrientUnit
+    let action: (NutrientUnit) -> Void
     
     var body: some View {
         Menu {
             ForEach(NutrientUnit.allCases) { unit in
-                Button {
-                    selectedUnit = unit
+                Button() {
+                    action(unit)
                 } label: {
                     Text("\(unit)")
                     if unit == selectedUnit {

@@ -53,13 +53,11 @@ private struct EditorialNutrientBlockEntry: View {
     
     @FocusState private var isFocused: Bool
     @State private var draftAmount: Double
-    @State private var draftUnit: NutrientUnit
     
     init(nutrient: Binding<NutrientItem>, foodItem: Binding<FoodItem>) {
         self._nutrient = nutrient
         self._foodItem = foodItem
         self._draftAmount = State(initialValue: nutrient.wrappedValue.amount)
-        self._draftUnit = State(initialValue: nutrient.wrappedValue.unit)
     }
     
     private func commit() {
@@ -72,20 +70,19 @@ private struct EditorialNutrientBlockEntry: View {
         SwipeableRow {
             foodItem.deleteNutrient(nutrient.name)
         } content: {
-            EditorialNutrientEntry(title: nutrient.name, value: $draftAmount, unit: $draftUnit)
+            EditorialNutrientEntry(title: nutrient.name, value: $draftAmount, unit: nutrient.unit) { newUnit in
+                if newUnit != nutrient.unit {
+                    foodItem.modifyNutrient(nutrient.name, newUnit: newUnit)
+                }
+            }
             .focused($isFocused)
             .onSubmit { commit() }
-            .onChange(of: isFocused) { old, focused in
+            .onChange(of: isFocused) { _, focused in
                 if !focused { commit() }
             }
             .onChange(of: nutrient.amount) { old, newValue in
                 if newValue != draftAmount {
                     draftAmount = newValue
-                }
-            }
-            .onChange(of: draftUnit) { old, newValue in
-                if old != newValue {
-                    foodItem.modifyNutrient(nutrient.name, newUnit: newValue)
                 }
             }
         }
