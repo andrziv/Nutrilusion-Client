@@ -7,23 +7,70 @@
 
 import SwiftUI
 
-
-struct BasicTextField: View {
-    @Binding var textBinding: String
-    var placeholder: String
-    var outline: Color = .gray
-    var background: Color = .backgroundColour
+struct BasicTextField<Value>: View {
+    private var outline: Color
+    private var outlineWidth: CGFloat
+    private var background: Color
+    private var horizontalPadding: CGFloat
+    private var verticalPadding: CGFloat
+    
+    private let _body: AnyView
+    
+    init(
+        _ placeholder: String,
+        text: Binding<String>,
+        outline: Color = .gray,
+        outlineWidth: CGFloat = 0.5,
+        background: Color = .backgroundColour,
+        horizontalPadding: CGFloat = 15.5,
+        verticalPadding: CGFloat = 15.5
+    ) where Value == String {
+        self.outline = outline
+        self.outlineWidth = outlineWidth
+        self.background = background
+        self.horizontalPadding = horizontalPadding
+        self.verticalPadding = verticalPadding
+        
+        self._body = AnyView(
+            TextField(placeholder, text: text)
+        )
+    }
+    
+    init<F>(
+        _ placeholder: String,
+        value: Binding<Value>,
+        format: F,
+        outline: Color = .gray,
+        outlineWidth: CGFloat = 0.5,
+        background: Color = .backgroundColour,
+        horizontalPadding: CGFloat = 15.5,
+        verticalPadding: CGFloat = 15.5
+    ) where F: ParseableFormatStyle, F.FormatInput == Value, F.FormatOutput == String {
+        self.outline = outline
+        self.outlineWidth = outlineWidth
+        self.background = background
+        self.horizontalPadding = horizontalPadding
+        self.verticalPadding = verticalPadding
+        
+        self._body = AnyView(
+            TextField(placeholder, value: value, format: format)
+        )
+    }
     
     var body: some View {
-        TextField(placeholder, text: $textBinding)
+        _body
             .font(.headline)
-            .padding()
-            .background(RoundedRectangle(cornerRadius: 10)
-                .stroke(outline, lineWidth: 0.5)
-                .fill(background))
+            .padding(.vertical, verticalPadding)
+            .padding(.horizontal, horizontalPadding)
+            .background(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(outline, lineWidth: outlineWidth)
+                    .fill(background)
+            )
     }
 }
 
+
 #Preview {
-    BasicTextField(textBinding: .constant("Hello"), placeholder: "Placeholder Text...")
+    BasicTextField("Placeholder Text...", text: .constant("Hello"))
 }

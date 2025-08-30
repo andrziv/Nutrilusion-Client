@@ -19,7 +19,7 @@ struct ManualCreatorModeView: View {
                 .fontWeight(.heavy)
             
             NutrientTreeEditorialView(foodItem: $foodItem)
-            
+
             Button {
                 showNutritionList = true
             } label: {
@@ -52,7 +52,7 @@ private struct EditorialCalorieBlockEntry: View {
     @Binding var foodItem: FoodItem
     
     var body: some View {
-        EditorialBlockEntryInt(title: "Calories", value: $foodItem.calories, unit: "kcal")
+        EditorialCalorieEntry(title: "Calories", value: $foodItem.calories, unit: "kcal")
     }
 }
 

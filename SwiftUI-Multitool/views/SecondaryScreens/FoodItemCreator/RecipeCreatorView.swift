@@ -37,13 +37,17 @@ fileprivate enum RecipeCreatorMode: Int, CaseIterable {
 
 struct RecipeCreatorView: View {
     @State var foodItem: FoodItem
+    let onExitAction: () -> Void
+    
     @State private var titleInput: String
     @State private var unitSingularInput: String
     @State private var unitPluralInput: String
     @State private var selectedMode: RecipeCreatorMode
     
-    init(foodItem: FoodItem) {
+    init(foodItem: FoodItem, onExitAction: @escaping () -> Void) {
         self.foodItem = foodItem
+        self.onExitAction = onExitAction
+        
         self.titleInput = foodItem.name
         self.unitSingularInput = foodItem.servingUnit
         self.unitPluralInput = foodItem.servingUnitMultiple
@@ -63,12 +67,10 @@ struct RecipeCreatorView: View {
             
             ContentView(foodItem: $foodItem, mode: selectedMode)
                 .padding(10)
-                .background(RoundedRectangle(cornerRadius: 10).fill(Color.gray.opacity(0.1)))
+                .background(RoundedRectangle(cornerRadius: 10).fill(.white))
             
             HStack {
-                ImagedButton(title: "Exit", icon: "xmark", circleColor: .clear, cornerRadius: 10) {
-                    
-                }
+                ImagedButton(title: "Exit", icon: "xmark", circleColor: .clear, cornerRadius: 10, action: onExitAction)
                 
                 ImagedButton(title: "Save & Exit", icon: "tray.and.arrow.down.fill", circleColor: .clear, cornerRadius: 10) {
                     
@@ -140,5 +142,7 @@ private struct ContentView: View {
 }
 
 #Preview {
-    RecipeCreatorView(foodItem: MockData.sampleFoodItem)
+    RecipeCreatorView(foodItem: MockData.sampleFoodItem) {
+        
+    }
 }

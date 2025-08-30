@@ -70,7 +70,7 @@ struct NutrientTreeButtonView: View {
                     NutrientTreeButtonChildView(foodItem: $foodItem, nutrientName: "Nutrients", nutrientTree: nutrientTree, disabledList: createDisabledList(), isShowing: $isShowing)
                 }
                 
-                BasicTextField(textBinding: $searchString, placeholder: "Search for nutrient")
+                BasicTextField("Search for nutrient", text: $searchString)
                     .disableAutocorrection(true)
                     .onSubmit {
                         withAnimation {

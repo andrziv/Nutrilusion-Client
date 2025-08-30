@@ -4,7 +4,7 @@
 //
 //  Created by Andrej Zivkovic on 2025-08-23.
 //
-
+// TODO: come back to this later and see if you can do it in a better way
 
 import SwiftUI
 
@@ -20,6 +20,7 @@ struct NutrientTreeEditorialView: View {
                 
                 EditorialNutrientRecursionView(nutrient: $nutrientItem, foodItem: $foodItem)
             }
+            .padding(.top, 0.5) // just to make it so that the value textfield outline isn't clipping the top
         }
         .font(.footnote)
         .labelStyle(CustomLabel(spacing: 7))
@@ -52,11 +53,13 @@ private struct EditorialNutrientBlockEntry: View {
     
     @FocusState private var isFocused: Bool
     @State private var draftAmount: Double
+    @State private var draftUnit: NutrientUnit
     
     init(nutrient: Binding<NutrientItem>, foodItem: Binding<FoodItem>) {
         self._nutrient = nutrient
         self._foodItem = foodItem
         self._draftAmount = State(initialValue: nutrient.wrappedValue.amount)
+        self._draftUnit = State(initialValue: nutrient.wrappedValue.unit)
     }
     
     private func commit() {
@@ -69,8 +72,7 @@ private struct EditorialNutrientBlockEntry: View {
         SwipeableRow {
             foodItem.deleteNutrient(nutrient.name)
         } content: {
-            EditorialBlockEntry(title: nutrient.name, value: $draftAmount, unit: String(describing: nutrient.unit)
-            )
+            EditorialNutrientEntry(title: nutrient.name, value: $draftAmount, unit: $draftUnit)
             .focused($isFocused)
             .onSubmit { commit() }
             .onChange(of: isFocused) { old, focused in
@@ -79,6 +81,11 @@ private struct EditorialNutrientBlockEntry: View {
             .onChange(of: nutrient.amount) { old, newValue in
                 if newValue != draftAmount {
                     draftAmount = newValue
+                }
+            }
+            .onChange(of: draftUnit) { old, newValue in
+                if old != newValue {
+                    foodItem.modifyNutrient(nutrient.name, newUnit: newValue)
                 }
             }
         }

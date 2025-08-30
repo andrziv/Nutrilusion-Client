@@ -7,7 +7,9 @@
 
 import Foundation
 
-enum NutrientUnit: String, Codable, CustomStringConvertible {
+enum NutrientUnit: String, Codable, CustomStringConvertible, CaseIterable, Identifiable {
+    var id: String { rawValue }
+    
     case grams, milligrams, micrograms
     
     public var description: String {

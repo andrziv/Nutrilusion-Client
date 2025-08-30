@@ -17,7 +17,7 @@ struct SearchPopupView: View {
     
     var body: some View {
         VStack {
-            BasicTextField(textBinding: $searchString, placeholder: "Search for Recipe Names... eg: Lasagna")
+            BasicTextField("Search for Recipe Names... eg: Lasagna", text: $searchString)
                 .focused($searchFocus)
                 .onAppear {
                     withAnimation {

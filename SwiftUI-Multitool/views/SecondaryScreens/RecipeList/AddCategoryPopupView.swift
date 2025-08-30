@@ -24,7 +24,7 @@ struct AddCategoryPopupView: View {
             Spacer()
             
             HStack {
-                BasicTextField(textBinding: $searchString, placeholder: "Group name... eg: Breakfast", outline: colourPicked)
+                BasicTextField("Group name... eg: Breakfast", text: $searchString, outline: colourPicked)
                 
                 SquareColourPickerView(selection: $colourPicked)
             }
