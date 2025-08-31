@@ -24,6 +24,7 @@ struct EditorialNutrientEntry: View {
             
             HStack(spacing: 6) {
                 BasicTextField("##", value: $value, format: .number,
+                               background: .secondaryBackground,
                                horizontalPadding: 8,
                                verticalPadding: 6)
                     .multilineTextAlignment(.center)
@@ -37,7 +38,7 @@ struct EditorialNutrientEntry: View {
         .padding(.horizontal, 8)
         .background(
             RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .fill(.backgroundColour)
+                .fill(.secondaryBackground)
         )
     }
 }
@@ -91,6 +92,7 @@ struct EditorialCalorieEntry: View {
             
             HStack(spacing: 6) {
                 BasicTextField("##", value: $value, format: .number,
+                               background: .secondaryBackground,
                                horizontalPadding: 8,
                                verticalPadding: 6)
                     .multilineTextAlignment(.center)
@@ -110,7 +112,7 @@ struct EditorialCalorieEntry: View {
         .padding(.horizontal, 8)
         .background(
             RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .fill(.backgroundColour)
+                .fill(.secondaryBackground)
         )
     }
 }

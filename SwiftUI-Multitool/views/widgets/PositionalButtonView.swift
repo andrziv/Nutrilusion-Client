@@ -7,20 +7,52 @@
 
 import SwiftUI
 
+fileprivate enum PositionKind {
+    case topmid, botmid, left, mid, right
+}
+
 struct Position {
-    let shape: AnyShape
+    fileprivate let kind: PositionKind
+    let cornerRadius: CGFloat
     
-    private init(_ shape: AnyShape) {
-        self.shape = shape
+    var shape: AnyShape {
+        switch kind {
+        case .topmid:
+            return AnyShape(
+                UnevenRoundedRectangle(
+                    cornerRadii: .init(topLeading: cornerRadius, topTrailing: cornerRadius)
+                )
+            )
+        case .botmid:
+            return AnyShape(
+                UnevenRoundedRectangle(
+                    cornerRadii: .init(bottomLeading: cornerRadius, bottomTrailing: cornerRadius)
+                )
+            )
+        case .left:
+            return AnyShape(
+                UnevenRoundedRectangle(
+                    cornerRadii: .init(topLeading: cornerRadius, bottomLeading: cornerRadius)
+                )
+            )
+        case .right:
+            return AnyShape(
+                UnevenRoundedRectangle(
+                    cornerRadii: .init(bottomTrailing: cornerRadius, topTrailing: cornerRadius)
+                )
+            )
+        case .mid:
+            return AnyShape(Rectangle())
+        }
     }
 }
 
 extension Position {
-    static let topmid = Position(AnyShape(UnevenRoundedRectangle(cornerRadii: .init(topLeading: 20, topTrailing: 20))))
-    static let botmid = Position(AnyShape(UnevenRoundedRectangle(cornerRadii: .init(bottomLeading: 20, bottomTrailing: 20))))
-    static let left = Position(AnyShape(UnevenRoundedRectangle(cornerRadii: .init(topLeading: 20, bottomLeading: 20))))
-    static let mid = Position(AnyShape(Rectangle()))
-    static let right = Position(AnyShape(UnevenRoundedRectangle(cornerRadii: .init(bottomTrailing: 20, topTrailing: 20))))
+    static let topmid = Position(kind: .topmid, cornerRadius: 20)
+    static let botmid = Position(kind: .botmid, cornerRadius: 20)
+    static let left   = Position(kind: .left,   cornerRadius: 20)
+    static let right  = Position(kind: .right,  cornerRadius: 20)
+    static let mid    = Position(kind: .mid,    cornerRadius: 0)
 }
 
 struct PositionalButtonView<S: ShapeStyle>: View {
@@ -30,6 +62,7 @@ struct PositionalButtonView<S: ShapeStyle>: View {
     var isSelected: Bool = false
 
     // Configurable styles
+    var cornerRadius: CGFloat = 20
     var background: S
     var foreground: Color = .primaryText
     var selectedForeground: Color = .primaryText
@@ -52,6 +85,7 @@ struct PositionalButtonView<S: ShapeStyle>: View {
     var verticalPaddingSelected: CGFloat = 8
 
     var body: some View {
+        let customPosition = Position(kind: position.kind, cornerRadius: cornerRadius)
         VStack {
             if !topText.isEmpty {
                 Text(topText)
@@ -70,7 +104,7 @@ struct PositionalButtonView<S: ShapeStyle>: View {
         .padding(.vertical, isSelected ? verticalPaddingSelected : verticalPadding)
         .frame(maxWidth: .infinity)
         .background(isSelected ? selectedBackground : AnyShapeStyle(background))
-        .clipShape(position.shape)
+        .clipShape(customPosition.shape)
         .shadow(color: isSelected ? .primaryText.opacity(0.15) : .clear, radius: isSelected ? 4 : 0)
         .animation(.easeInOut(duration: 0.2), value: isSelected)
     }

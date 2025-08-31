@@ -39,9 +39,9 @@ struct ShowNutrientsButtonView: View {
             .frame(maxWidth: .infinity)
             .padding(.horizontal)
             .padding(.vertical, 8)
-            .background(RoundedRectangle(cornerRadius: 20).fill(.secondaryText.mix(with: .backgroundColour, by: 0.65)))
+            .background(.clear)
             .overlay{
-                RoundedRectangle(cornerRadius: 20)
+                RoundedRectangle(cornerRadius: 15)
                     .stroke(style: StrokeStyle(lineWidth: 1, dash: [8]))
                     .foregroundStyle(.primaryText.mix(with: .backgroundColour, by: 0.5))
             }

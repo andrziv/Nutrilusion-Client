@@ -67,7 +67,7 @@ struct RecipeCreatorView: View {
             
             ContentView(foodItem: $foodItem, mode: selectedMode)
                 .padding(10)
-                .background(RoundedRectangle(cornerRadius: 10).fill(.white))
+                .background(RoundedRectangle(cornerRadius: 10).fill(.secondaryBackground))
             
             HStack {
                 ImagedButton(title: "Exit", icon: "xmark", circleColor: .clear, cornerRadius: 10, action: onExitAction)
@@ -118,7 +118,10 @@ private struct ModeSwitcherView: View {
                     PositionalButtonView(mainText: item.title,
                                          position: item.position,
                                          isSelected: selectedMode == item,
-                                         background: Color.gray.opacity(0.1))
+                                         cornerRadius: 10,
+                                         background: .secondaryBackground,
+                                         mainFontWeight: .medium,
+                                         mainFontWeightSelected: .bold)
                 }
             }
         }
