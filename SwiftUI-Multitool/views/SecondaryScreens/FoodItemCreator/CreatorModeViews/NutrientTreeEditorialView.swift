@@ -80,9 +80,9 @@ private struct EditorialNutrientBlockEntry: View {
             .onChange(of: isFocused) { _, focused in
                 if !focused { commit() }
             }
-            .onChange(of: nutrient.amount) { old, newValue in
-                if newValue != draftAmount {
-                    draftAmount = newValue
+            .onChange(of: nutrient) { old, newValue in
+                if newValue.amount != draftAmount || old.unit != newValue.unit {
+                    draftAmount = newValue.amount
                 }
             }
         }

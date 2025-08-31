@@ -112,7 +112,7 @@ struct NutrientItem: Identifiable, Equatable {
         // Case 1: this node matches
         if name == targetName {
             let oldGrams = unit.convertTo(amount)
-            applyModification(newValue: newValue, newUnit: newUnit, optimizeUnit: false)
+            applyModification(newValue: newValue, newUnit: newUnit, optimizeUnit: (unit == newUnit) || (newUnit == nil)) // only optimize unit if the unit itself isn't being changed
             let newGrams = unit.convertTo(amount)
             return newGrams - oldGrams
         }
@@ -143,14 +143,14 @@ struct NutrientItem: Identifiable, Equatable {
                 // TODO: consider additive solution (sum the other components instead of subtracting the removed components)
                 let removedGrams = removed.totalInGrams()
                 let currentGrams = unit.convertTo(amount)
-                let newTotal = max(0, currentGrams - removedGrams)
+                let newTotal = max(0, roundProper(currentGrams - removedGrams))
                 applyModification(newValue: newTotal, optimizeUnit: optimizeUnit)
             }
             return true
         }
         
         for i in childNutrients.indices {
-            if childNutrients[i].deleteChildNutrient(targetName, adjustAmounts: adjustAmounts) {
+            if childNutrients[i].deleteChildNutrient(targetName, adjustAmounts: adjustAmounts, optimizeUnit: optimizeUnit) {
                 let sumGrams = childNutrients.map { $0.totalInGrams() }.reduce(0, +)
                 applyModification(newValue: unit.convertFrom(sumGrams), optimizeUnit: optimizeUnit)
                 return true
@@ -214,7 +214,7 @@ struct NutrientItem: Identifiable, Equatable {
     
     /// Apply a delta (grams) to this node’s amount
     private mutating func applyDelta(_ deltaGrams: Double, optimizeUnit: Bool = false) {
-        let newGrams = max(0, unit.convertTo(amount) + deltaGrams)
+        let newGrams = max(0, roundProper(unit.convertTo(amount) + deltaGrams))
         applyModification(newValue: unit.convertFrom(newGrams), optimizeUnit: optimizeUnit)
     }
     
@@ -223,5 +223,9 @@ struct NutrientItem: Identifiable, Equatable {
         if childNutrients.isEmpty { return selfGrams }
         let childrenGrams = childNutrients.map { $0.totalInGrams() }.reduce(0, +)
         return childrenGrams
+    }
+    
+    private func roundProper(_ value: Double) -> Double {
+        return round(value, exp: 6)
     }
 }
