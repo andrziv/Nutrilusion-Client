@@ -36,73 +36,139 @@ fileprivate enum RecipeCreatorMode: Int, CaseIterable {
 }
 
 struct RecipeCreatorView: View {
-    @State var foodItem: FoodItem
+    let foodItem: FoodItem
+    let mealGroups: [MealGroup]
     let onExitAction: () -> Void
+    let onSaveAction: (MealGroup, FoodItem) -> Void
     
-    @State private var titleInput: String
-    @State private var unitSingularInput: String
-    @State private var unitPluralInput: String
+    @State private var draftFoodItem: FoodItem
+    @State private var selectedMealGroup: MealGroup
     @State private var selectedMode: RecipeCreatorMode
     
-    init(foodItem: FoodItem, onExitAction: @escaping () -> Void) {
+    init(foodItem: FoodItem, mealGroups: [MealGroup], onExitAction: @escaping () -> Void, onSaveAction: @escaping (MealGroup, FoodItem) -> Void) {
         self.foodItem = foodItem
+        self.mealGroups = mealGroups
         self.onExitAction = onExitAction
+        self.onSaveAction = onSaveAction
         
-        self.titleInput = foodItem.name
-        self.unitSingularInput = foodItem.servingUnit
-        self.unitPluralInput = foodItem.servingUnitMultiple
+        self.draftFoodItem = foodItem
+        self.selectedMealGroup = mealGroups.first { group in
+            group.meals.contains { $0.id == foodItem.id }
+        } ?? mealGroups[0]
         self.selectedMode = .manual
     }
     
     var body: some View {
         VStack {
             HStack {
-                FoodItemNameUnitFieldSet(titleInput: $titleInput,
-                                         unitSingularInput: $unitSingularInput,
-                                         unitPluralInput: $unitPluralInput)
+                FoodItemBasicInfoEditors(titleInput: $draftFoodItem.name,
+                                         unitSingularInput: $draftFoodItem.servingUnit,
+                                         unitPluralInput: $draftFoodItem.servingUnitMultiple,
+                                         selectedGroup: $selectedMealGroup,
+                                         availableMealGroups: mealGroups)
+                .padding(5)
+                .background(Rectangle().fill(Color(hex: selectedMealGroup.colour)).blur(radius: 200))
+                .clipShape(
+                    RoundedRectangle(cornerRadius: 10)
+                )
                 
                 ModeSwitcherView(selectedMode: $selectedMode)
                     .frame(maxWidth: 80)
             }
             
-            ContentView(foodItem: $foodItem, mode: selectedMode)
+            ContentView(foodItem: $draftFoodItem, mode: selectedMode)
                 .padding(10)
                 .background(RoundedRectangle(cornerRadius: 10).fill(.secondaryBackground))
             
             HStack {
-                ImagedButton(title: "Exit", icon: "xmark", circleColor: .clear, cornerRadius: 10, action: onExitAction)
+                ImagedButton(title: "Exit", icon: "xmark", circleColour: .clear, cornerRadius: 10, action: onExitAction)
                 
-                ImagedButton(title: "Save & Exit", icon: "tray.and.arrow.down.fill", circleColor: .clear, cornerRadius: 10) {
-                    
-                }
+                ImagedButton(title: "Save & Exit", icon: "tray.and.arrow.down.fill", circleColour: .clear, cornerRadius: 10, action: onSaveAction, item: (selectedMealGroup, draftFoodItem))
             }
         }
         .basicBackground()
     }
 }
 
-private struct FoodItemNameUnitFieldSet: View {
+private struct FoodItemBasicInfoEditors: View {
     @Binding var titleInput: String
     @Binding var unitSingularInput: String
     @Binding var unitPluralInput: String
+    @Binding var selectedGroup: MealGroup
+    var availableMealGroups: [MealGroup]
     
     var body: some View {
-        VStack {
-            UnderlineTextField(textBinding: $titleInput, placeholder: "Name of the Recipe", borderColour: titleInput.isEmpty ? .red : .green, backgroundColour: Color.gray.opacity(0.1))
-                .disableAutocorrection(true)
+        VStack(spacing: 5) {
+            let emptyInputColour: Color = .red.mix(with: .secondaryBackground, by: 0.8)
             
-            HStack {
-                UnderlineTextField(textBinding: $unitSingularInput, placeholder: "Unit Name", borderColour: unitSingularInput.isEmpty ? .red : .green, backgroundColour: Color.gray.opacity(0.1))
-                    .disableAutocorrection(true)
-                    .textInputAutocapitalization(.never)
+            BasicTextField("Name of the Recipe", text: $titleInput,
+                           cornerRadius: 7, outlineWidth: 0,
+                           background: unitSingularInput.isEmpty ? emptyInputColour : .secondaryBackground.opacity(0.45),
+                           horizontalPadding: 8,
+                           verticalPadding: 4)
+            .disableAutocorrection(true)
+            
+            HStack(spacing: 5) {
+                BasicTextField("Unit Name", text: $unitSingularInput,
+                               cornerRadius: 7, outlineWidth: 0,
+                               background: unitSingularInput.isEmpty ? emptyInputColour : .secondaryBackground.opacity(0.45),
+                               horizontalPadding: 8,
+                               verticalPadding: 5)
+                .disableAutocorrection(true)
+                .textInputAutocapitalization(.never)
                 
-                UnderlineTextField(textBinding: $unitPluralInput, placeholder: "Plural Unit", borderColour: unitPluralInput.isEmpty ? .red : .green, backgroundColour: Color.gray.opacity(0.1))
-                    .disableAutocorrection(true)
-                    .textInputAutocapitalization(.never)
+                BasicTextField("Plural Unit", text: $unitPluralInput,
+                               cornerRadius: 7, outlineWidth: 0,
+                               background: unitPluralInput.isEmpty ? emptyInputColour : .secondaryBackground.opacity(0.45),
+                               horizontalPadding: 8,
+                               verticalPadding: 5)
+                .disableAutocorrection(true)
+                .textInputAutocapitalization(.never)
             }
+            
+            FoodGroupPicker(mealgroups: availableMealGroups, selectedGroup: $selectedGroup)
         }
     }
 }
+
+struct FoodGroupPicker: View {
+    let mealgroups: [MealGroup]
+    @Binding var selectedGroup: MealGroup
+    
+    var body: some View {
+        Menu {
+            ForEach(mealgroups) { mealGroup in
+                Button() {
+                    selectedGroup = mealGroup
+                } label: {
+                    Text("\(mealGroup.name)")
+                    if selectedGroup.id == mealGroup.id {
+                        Image(systemName: "checkmark")
+                    }
+                }
+            }
+        } label: {
+            HStack(spacing: 4) {
+                Spacer()
+                
+                Text("\(selectedGroup.name)")
+                    .font(.callout.weight(.medium))
+                Image(systemName: "chevron.down")
+                    .font(.caption2)
+                
+                Spacer()
+            }
+            .foregroundStyle(.primaryText)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 5)
+            .background(
+                RoundedRectangle(cornerRadius: 7)
+                    .fill(.secondaryBackground.opacity(0.45))
+            )
+        }
+    }
+}
+
 
 private struct ModeSwitcherView: View {
     @Binding var selectedMode: RecipeCreatorMode
@@ -145,7 +211,9 @@ private struct ContentView: View {
 }
 
 #Preview {
-    RecipeCreatorView(foodItem: MockData.sampleFoodItem) {
+    RecipeCreatorView(foodItem: MockData.sampleFoodItem, mealGroups: MockData.mealGroupList) {
+        
+    } onSaveAction: { selectedGroup, foodItem in
         
     }
 }

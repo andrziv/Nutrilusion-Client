@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct BasicTextField<Value>: View {
+    private var cornerRadius: CGFloat
     private var outline: Color
     private var outlineWidth: CGFloat
     private var background: Color
@@ -19,12 +20,14 @@ struct BasicTextField<Value>: View {
     init(
         _ placeholder: String,
         text: Binding<String>,
+        cornerRadius: CGFloat = 10,
         outline: Color = .gray,
         outlineWidth: CGFloat = 0.5,
         background: Color = .backgroundColour,
         horizontalPadding: CGFloat = 15.5,
         verticalPadding: CGFloat = 15.5
     ) where Value == String {
+        self.cornerRadius = cornerRadius
         self.outline = outline
         self.outlineWidth = outlineWidth
         self.background = background
@@ -40,12 +43,14 @@ struct BasicTextField<Value>: View {
         _ placeholder: String,
         value: Binding<Value>,
         format: F,
+        cornerRadius: CGFloat = 10,
         outline: Color = .gray,
         outlineWidth: CGFloat = 0.5,
         background: Color = .backgroundColour,
         horizontalPadding: CGFloat = 15.5,
         verticalPadding: CGFloat = 15.5
     ) where F: ParseableFormatStyle, F.FormatInput == Value, F.FormatOutput == String {
+        self.cornerRadius = cornerRadius
         self.outline = outline
         self.outlineWidth = outlineWidth
         self.background = background
@@ -63,7 +68,7 @@ struct BasicTextField<Value>: View {
             .padding(.vertical, verticalPadding)
             .padding(.horizontal, horizontalPadding)
             .background(
-                RoundedRectangle(cornerRadius: 10)
+                RoundedRectangle(cornerRadius: cornerRadius)
                     .stroke(outline, lineWidth: outlineWidth)
                     .fill(background)
             )

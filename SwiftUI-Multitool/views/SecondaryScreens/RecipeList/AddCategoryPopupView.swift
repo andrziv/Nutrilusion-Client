@@ -32,11 +32,11 @@ struct AddCategoryPopupView: View {
             Spacer()
             
             HStack {
-                ImagedButton(title: "Dismiss", icon: "xmark", circleColor: .clear, cornerRadius: 10) {
+                ImagedButton(title: "Dismiss", icon: "xmark", circleColour: .clear, cornerRadius: 10) {
                     screenMode = nil
                 }
                 
-                ImagedButton(title: "Create Category", icon: "plus", circleColor: .clear, cornerRadius: 10) {
+                ImagedButton(title: "Create Category", icon: "plus", circleColour: .clear, cornerRadius: 10) {
                     // TODO: Change this to use CoreData later...
                     mealGroups.append(MealGroup(id: UUID(uuidString: "10000000-0000-0000-0000-000000000000")!, name: searchString, meals: [], colour: colourPicked.toHex()!))
                     screenMode = nil

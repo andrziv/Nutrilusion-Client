@@ -15,7 +15,7 @@ struct NutrientAdderPopup: View {
         VStack {
             NutrientTreeButtonView(foodItem: $foodItem, isShowing: $isActive)
             
-            ImagedButton(title: "Dismiss", icon: "xmark", circleColor: .clear, cornerRadius: 10) {
+            ImagedButton(title: "Dismiss", icon: "xmark", circleColour: .clear, cornerRadius: 10) {
                 isActive = false
             }
             .frame(maxWidth: .infinity)

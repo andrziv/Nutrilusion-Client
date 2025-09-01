@@ -38,7 +38,7 @@ struct SearchPopupView: View {
                 FoodItemView(foodItem: meal)
             }
             
-            ImagedButton(title: "Dismiss", icon: "xmark", circleColor: .clear, cornerRadius: 10) {
+            ImagedButton(title: "Dismiss", icon: "xmark", circleColour: .clear, cornerRadius: 10) {
                 screenMode = nil
             }
             .frame(maxWidth: .infinity)
