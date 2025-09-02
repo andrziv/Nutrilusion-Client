@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct FoodItemView: View {
-    @State var foodItem: FoodItem
+    var foodItem: FoodItem
     @State var isExpanded: Bool = false
     var textColor: Color = .primaryText
     var subtextColor: Color = .secondaryText

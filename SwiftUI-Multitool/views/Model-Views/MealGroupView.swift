@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct MealGroupView: View {
-    @State var group: MealGroup
+    var group: MealGroup
     @State var isExpanded: Bool = false
     
     var body: some View {

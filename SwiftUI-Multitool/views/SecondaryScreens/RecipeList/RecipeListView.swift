@@ -21,15 +21,28 @@ enum RecipeListViewMode: Identifiable {
     }
 }
 
+// TODO: temp to make the adding work. Eventually replace with real ViewModel + Persistance
+class MealGroupsModel: ObservableObject {
+    @Published var mealGroups: [MealGroup] = MockData.mealGroupList
+}
+
 // TODO: refactor and get rid of all the magic numbers used for testing
 struct RecipeListView: View {
-    @State var mealGroups: [MealGroup] = MockData.mealGroupList
+    @StateObject var model = MealGroupsModel()
     @State private var showAddSubMenu: Bool = false
     @State private var mode: RecipeListViewMode? = nil
     
+    private func appendNewItem(_ newItem: FoodItem, selectedMealGroup: MealGroup) {
+        if let index = model.mealGroups.firstIndex(where: { $0.id == selectedMealGroup.id }) {
+            var group = model.mealGroups[index]
+            group.meals.append(newItem)
+            model.mealGroups[index] = group
+        }
+    }
+    
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
-            LazyVScroll(items: mealGroups, spacing: 0) { mealGroup in
+            LazyVScroll(items: model.mealGroups, spacing: 0) { mealGroup in
                 MealGroupView(group: mealGroup, isExpanded: true)
                     .padding(.top)
             }
@@ -39,15 +52,16 @@ struct RecipeListView: View {
         .fullScreenCover(item: $mode) { mode in
             // Popups from submenu
             if mode == .search {
-                SearchPopupView(screenMode: $mode, mealGroups: mealGroups)
+                SearchPopupView(screenMode: $mode, mealGroups: model.mealGroups)
                     .transition(.move(edge: .bottom))
             } else if mode == .addCategory {
-                AddCategoryPopupView(screenMode: $mode, mealGroups: $mealGroups)
+                AddCategoryPopupView(screenMode: $mode, mealGroups: $model.mealGroups)
                     .transition(.move(edge: .bottom))
             } else if mode == .addRecipe {
-                RecipeCreatorView(foodItem: FoodItem(name: ""), mealGroups: mealGroups) {
+                RecipeCreatorView(foodItem: FoodItem(name: ""), mealGroups: model.mealGroups) {
                     self.mode = nil
                 } onSaveAction: { selectedGroup, editedFoodItem in
+                    appendNewItem(editedFoodItem, selectedMealGroup: selectedGroup)
                     self.mode = nil
                 }
                 .transition(.move(edge: .bottom))
