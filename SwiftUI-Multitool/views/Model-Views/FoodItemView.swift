@@ -9,6 +9,7 @@ import SwiftUI
 
 struct FoodItemView: View {
     var foodItem: FoodItem
+    var mealGroup: MealGroup? = nil
     @State var isExpanded: Bool = false
     var textColor: Color = .primaryText
     var subtextColor: Color = .secondaryText
@@ -16,7 +17,7 @@ struct FoodItemView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            FoodItemHeader(foodItem: foodItem, isExpanded: isExpanded)
+            FoodItemHeader(foodItem: foodItem, mealGroup: mealGroup, isExpanded: isExpanded)
             
             if !isExpanded {
                 Line()
@@ -36,16 +37,27 @@ struct FoodItemView: View {
 
 struct FoodItemHeader: View {
     let foodItem: FoodItem
+    let mealGroup: MealGroup?
     var isExpanded: Bool = false
     var textColour: Color = .primaryText
     var subtextColour: Color = .secondaryText
     
     var body: some View {
+        
         HStack {
-            Text(foodItem.name)
-                .font(.headline)
-                .fontWeight(.bold)
-                .foregroundStyle(textColour)
+            VStack(alignment: .leading) {
+                Text(foodItem.name)
+                    .font(.headline)
+                    .fontWeight(.bold)
+                    .foregroundStyle(textColour)
+                
+                if !isExpanded, let mealGroup = mealGroup {
+                    Text(mealGroup.name)
+                        .font(.footnote)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(Color(hex: mealGroup.colour))
+                }
+            }
             
             if !isExpanded {
                 Spacer()
@@ -53,6 +65,13 @@ struct FoodItemHeader: View {
                 ServingSizeView(foodItem: foodItem, primaryTextColor: subtextColour)
                     .labelStyle(CustomLabel(spacing: 5))
                     .font(.footnote)
+            } else if let mealGroup = mealGroup {
+                Spacer()
+                
+                Text(mealGroup.name)
+                    .font(.footnote)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(Color(hex: mealGroup.colour))
             }
         }
     }
@@ -219,6 +238,6 @@ struct ExpandedFoodItemControlRow: View {
 }
 
 #Preview {
-    FoodItemView(foodItem: MockData.foodItemList[0], backgroundColor: .backgroundColour)
-    FoodItemView(foodItem: MockData.foodItemList[0], isExpanded: true, backgroundColor: .backgroundColour)
+    FoodItemView(foodItem: MockData.foodItemList[0], mealGroup: MockData.sampleMealGroup, backgroundColor: .backgroundColour)
+    FoodItemView(foodItem: MockData.foodItemList[0], mealGroup: MockData.sampleMealGroup, isExpanded: true, backgroundColor: .backgroundColour)
 }

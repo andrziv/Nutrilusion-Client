@@ -55,6 +55,12 @@ extension MockData {
                 foodItemList[2],
                 foodItemList[7]
             ],
-            colour: "#a319ff")
+            colour: "#a319ff"),
+        .init(
+            id: UUID(uuidString: "00000000-0000-0000-0000-000000000005")!,
+            name: "Generated Foods",
+            meals: Array(foodItemList.dropFirst(10)), // num of manually-created meals
+            colour: "#4caf50"
+        )
     ]
 }

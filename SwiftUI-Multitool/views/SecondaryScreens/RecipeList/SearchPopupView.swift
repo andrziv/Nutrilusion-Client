@@ -12,12 +12,19 @@ struct SearchPopupView: View {
     @Binding var screenMode: RecipeListViewMode?
     var mealGroups: [MealGroup]
     
-    @State private var searchString: String = ""
+    @StateObject private var viewModel: FoodItemSearchViewModel
     @FocusState private var searchFocus: Bool
+    
+    init(screenMode: Binding<RecipeListViewMode?>, mealGroups: [MealGroup]) {
+        self._screenMode = screenMode
+        self.mealGroups = mealGroups
+        
+        self._viewModel = StateObject(wrappedValue: FoodItemSearchViewModel(mealGroups))
+    }
     
     var body: some View {
         VStack {
-            BasicTextField("Search for Recipe Names... eg: Lasagna", text: $searchString)
+            BasicTextField("Search for Recipe Names... eg: Lasagna", text: $viewModel.searchText)
                 .focused($searchFocus)
                 .onAppear {
                     withAnimation {
@@ -25,17 +32,8 @@ struct SearchPopupView: View {
                     }
                 }
             
-            let filteredMeals = mealGroups
-                .flatMap(\.meals)
-                .filter { $0.name.lowercased().contains(searchString.lowercased()) }
-                .reduce(into: [FoodItem]()) { result, meal in
-                    if !result.contains(where: { $0.id == meal.id }) {
-                        result.append(meal)
-                    }
-                }
-            
-            LazyVScroll(items: filteredMeals) { meal in
-                FoodItemView(foodItem: meal)
+            LazyVScroll(items: viewModel.filteredPairs) { meal in
+                FoodItemView(foodItem: meal.foodItem, mealGroup: meal.mealGroup)
             }
             
             ImagedButton(title: "Dismiss", icon: "xmark", circleColour: .clear, cornerRadius: 10) {
