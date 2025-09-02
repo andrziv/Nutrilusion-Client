@@ -55,7 +55,7 @@ struct RecipeCreatorView: View {
         self.selectedMealGroup = mealGroups.first { group in
             group.meals.contains { $0.id == foodItem.id }
         } ?? mealGroups[0]
-        self.selectedMode = .manual
+        self.selectedMode = .builder
     }
     
     var body: some View {
