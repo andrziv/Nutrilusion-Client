@@ -33,16 +33,64 @@ fileprivate enum BuilderRecipeCreatorMode: Int, CaseIterable {
 
 struct BuilderCreatorModeView: View {
     @Binding var foodItem: FoodItem
+    let mealGroups: [MealGroup]
     @State private var selectedMode: BuilderRecipeCreatorMode = .ingredients
+    @State private var showIngredientList: Bool = false
     
     var body: some View {
         VStack {
             BuilderModeSwitcherView(selectedMode: $selectedMode)
             
             if selectedMode == .ingredients {
-                Text("Ingredient Details")
+                IngredientEditorialView(foodItem: $foodItem, mealGroups: mealGroups, showIngredientList: $showIngredientList)
             } else if selectedMode == .details {
                 ManualCreatorModeView(foodItem: $foodItem)
+            }
+        }
+        .fullScreenCover(isPresented: $showIngredientList) {
+            SearchPopupView(mealGroups: mealGroups) {
+                self.showIngredientList = false
+            }
+        }
+    }
+}
+
+struct IngredientEditorialView: View {
+    @Binding var foodItem: FoodItem
+    let mealGroups: [MealGroup]
+    @Binding var showIngredientList: Bool
+    
+    var body: some View {
+        VStack {
+            ScrollView {
+                IngredientListEditorialView(foodItem: $foodItem, mealGroups: mealGroups)
+            }
+            
+            Button {
+                showIngredientList = true
+            } label: {
+                DashedButtonView(imageName: "plus")
+            }
+        }
+    }
+}
+
+private struct IngredientListEditorialView: View {
+    @Binding var foodItem: FoodItem
+    let mealGroups: [MealGroup]
+    
+    private func deleteIngredient(_ ingredient: FoodItem) {
+        foodItem.ingredientList.remove(at: foodItem.ingredientList.firstIndex(where: { $0.id == ingredient.id })!)
+    }
+    
+    var body: some View {
+        VStack {
+            ForEach (foodItem.ingredientList) { meal in
+                SwipeableRow {
+                    deleteIngredient(meal)
+                } content: {
+                    FoodItemView(foodItem: meal)
+                }
             }
         }
     }
@@ -73,5 +121,5 @@ private struct BuilderModeSwitcherView: View {
 }
 
 #Preview {
-    BuilderCreatorModeView(foodItem: .constant(MockData.sampleFoodItem))
+    BuilderCreatorModeView(foodItem: .constant(MockData.sampleFoodItem), mealGroups: MockData.mealGroupList)
 }

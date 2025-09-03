@@ -23,7 +23,7 @@ struct ManualCreatorModeView: View {
             Button {
                 showNutritionList = true
             } label: {
-                ShowNutrientsButtonView()
+                DashedButtonView(imageName: "plus")
             }
         }
         .fullScreenCover(isPresented: $showNutritionList) {
@@ -32,21 +32,7 @@ struct ManualCreatorModeView: View {
     }
 }
 
-struct ShowNutrientsButtonView: View {
-    var body: some View {
-        Image(systemName: "plus")
-            .foregroundStyle(.secondaryText)
-            .frame(maxWidth: .infinity)
-            .padding(.horizontal)
-            .padding(.vertical, 8)
-            .background(.clear)
-            .overlay{
-                RoundedRectangle(cornerRadius: 15)
-                    .stroke(style: StrokeStyle(lineWidth: 1, dash: [8]))
-                    .foregroundStyle(.primaryText.mix(with: .backgroundColour, by: 0.5))
-            }
-    }
-}
+
 
 private struct EditorialCalorieBlockEntry: View {
     @Binding var foodItem: FoodItem

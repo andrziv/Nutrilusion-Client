@@ -9,15 +9,15 @@
 import SwiftUI
 
 struct SearchPopupView: View {
-    @Binding var screenMode: RecipeListViewMode?
     var mealGroups: [MealGroup]
+    let action: () -> Void
     
     @StateObject private var viewModel: FoodItemSearchViewModel
     @FocusState private var searchFocus: Bool
     
-    init(screenMode: Binding<RecipeListViewMode?>, mealGroups: [MealGroup]) {
-        self._screenMode = screenMode
+    init(mealGroups: [MealGroup], action: @escaping () -> Void) {
         self.mealGroups = mealGroups
+        self.action = action
         
         self._viewModel = StateObject(wrappedValue: FoodItemSearchViewModel(mealGroups))
     }
@@ -36,15 +36,13 @@ struct SearchPopupView: View {
                 FoodItemView(foodItem: meal.foodItem, mealGroup: meal.mealGroup)
             }
             
-            ImagedButton(title: "Dismiss", icon: "xmark", circleColour: .clear, cornerRadius: 10) {
-                screenMode = nil
-            }
-            .frame(maxWidth: .infinity)
+            ImagedButton(title: "Dismiss", icon: "xmark", circleColour: .clear, cornerRadius: 10, action: action)
+                .frame(maxWidth: .infinity)
         }
         .basicBackground()
     }
 }
 
 #Preview {
-    SearchPopupView(screenMode: .constant(.addCategory), mealGroups: MockData.mealGroupList)
+    SearchPopupView(mealGroups: MockData.mealGroupList) {}
 }

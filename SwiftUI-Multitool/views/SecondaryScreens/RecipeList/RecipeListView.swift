@@ -52,8 +52,10 @@ struct RecipeListView: View {
         .fullScreenCover(item: $mode) { mode in
             // Popups from submenu
             if mode == .search {
-                SearchPopupView(screenMode: $mode, mealGroups: model.mealGroups)
-                    .transition(.move(edge: .bottom))
+                SearchPopupView(mealGroups: model.mealGroups) {
+                    self.mode = nil
+                }
+                .transition(.move(edge: .bottom))
             } else if mode == .addCategory {
                 AddCategoryPopupView(screenMode: $mode, mealGroups: $model.mealGroups)
                     .transition(.move(edge: .bottom))
