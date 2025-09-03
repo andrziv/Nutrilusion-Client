@@ -10,14 +10,16 @@ import SwiftUI
 
 struct SearchPopupView: View {
     var mealGroups: [MealGroup]
-    let action: () -> Void
+    let exitAction: () -> Void
+    let itemTapAction: (FoodItem) -> Void
     
     @StateObject private var viewModel: FoodItemSearchViewModel
     @FocusState private var searchFocus: Bool
     
-    init(mealGroups: [MealGroup], action: @escaping () -> Void) {
+    init(mealGroups: [MealGroup], exitAction: @escaping () -> Void, itemTapAction: @escaping (FoodItem) -> Void) {
         self.mealGroups = mealGroups
-        self.action = action
+        self.exitAction = exitAction
+        self.itemTapAction = itemTapAction
         
         self._viewModel = StateObject(wrappedValue: FoodItemSearchViewModel(mealGroups))
     }
@@ -33,16 +35,24 @@ struct SearchPopupView: View {
                 }
             
             LazyVScroll(items: viewModel.filteredPairs) { meal in
-                FoodItemView(foodItem: meal.foodItem, mealGroup: meal.mealGroup)
+                Button {
+                    itemTapAction(meal.foodItem)
+                } label: {
+                    FoodItemView(foodItem: meal.foodItem, mealGroup: meal.mealGroup)
+                }
             }
             
-            ImagedButton(title: "Dismiss", icon: "xmark", circleColour: .clear, cornerRadius: 10, action: action)
+            ImagedButton(title: "Dismiss", icon: "xmark", circleColour: .clear, cornerRadius: 10, action: exitAction)
                 .frame(maxWidth: .infinity)
         }
-        .basicBackground()
+        .basicBackground(background: .secondaryBackground)
     }
 }
 
 #Preview {
-    SearchPopupView(mealGroups: MockData.mealGroupList) {}
+    SearchPopupView(mealGroups: MockData.mealGroupList) {
+        
+    } itemTapAction: { foodItem in
+        
+    }
 }

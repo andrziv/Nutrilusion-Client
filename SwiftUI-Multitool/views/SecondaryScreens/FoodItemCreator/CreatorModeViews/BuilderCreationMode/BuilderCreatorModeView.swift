@@ -50,6 +50,9 @@ struct BuilderCreatorModeView: View {
         .fullScreenCover(isPresented: $showIngredientList) {
             SearchPopupView(mealGroups: mealGroups) {
                 self.showIngredientList = false
+            } itemTapAction: { newIngredient in
+                foodItem.ingredientList.append(newIngredient) // TODO: have it properly add nutrients on ingredient addition
+                self.showIngredientList = false
             }
         }
     }

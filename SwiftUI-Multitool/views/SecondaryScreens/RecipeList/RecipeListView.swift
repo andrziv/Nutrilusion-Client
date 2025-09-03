@@ -54,6 +54,9 @@ struct RecipeListView: View {
             if mode == .search {
                 SearchPopupView(mealGroups: model.mealGroups) {
                     self.mode = nil
+                } itemTapAction: { foodItem in
+                    // TODO: adding food item to logger
+                    self.mode = nil
                 }
                 .transition(.move(edge: .bottom))
             } else if mode == .addCategory {
