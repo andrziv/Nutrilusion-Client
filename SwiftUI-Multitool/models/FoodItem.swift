@@ -31,10 +31,12 @@ struct FoodItem: Identifiable {
         self.servingUnitMultiple = servingUnitMultiple
     }
     
-    /// Gets a NutrientItem with the given name from this FoodItem. Child nutrients of held nutrients are also searched for.
-    /// - Parameters:
-    ///   - nutrientType: The nutrient to get.
-    /// - Returns: `A NutrientItem with the given name` if one is held by this FoodItem, `nil` otherwise.
+    /**
+     Gets a NutrientItem with the given name from this FoodItem. Child nutrients of held nutrients are also searched for.
+     - Parameters:
+     - nutrientType: The nutrient to get.
+     - Returns: `A NutrientItem with the given name` if one is held by this FoodItem, `nil` otherwise.
+     */
     func getNutrientValue(_ nutrientType: String) -> NutrientItem? {
         for nutrient in nutritionList {
             if nutrient.name == nutrientType {
@@ -83,15 +85,17 @@ struct FoodItem: Identifiable {
         }
     }
     
-    /// Modify a nutrient by name from this node’s children. Value changes will propagate upwards if the nutrient is a child to another nutrient.
-    /// - Parameters:
-    ///   - targetName: The nutrient to remove.
-    ///   - newValue: Change the value of the nutrient with the given name. If the value is between a certain threshold, the unit will automatically change unless a newUnit value is given..
-    ///         - 0 < value in grams < 0.001: Unit is set to micrograms
-    ///         - 0.001< value in grams < 1: unit is set to milligrams
-    ///         - else: value is set to grams
-    ///   - newUnit: Change the value of the unit.
-    /// - Returns: `true` if modification occurred, `false` otherwise.
+    /**
+     Modify a nutrient by name from this node’s children. Value changes will propagate upwards if the nutrient is a child to another nutrient.
+     - Parameters:
+     - targetName: The nutrient to remove.
+         - newValue: Change the value of the nutrient with the given name. If the value is between a certain threshold, the unit will automatically change unless a newUnit value is given..
+             - 0 < value in grams < 0.001: Unit is set to micrograms
+             - 0.001< value in grams < 1: unit is set to milligrams
+             - else: value is set to grams
+         - newUnit: Change the value of the unit.
+     - Returns: `true` if modification occurred, `false` otherwise.
+     */
     @discardableResult
     mutating func modifyNutrient(_ targetName: String, newValue: Double? = nil, newUnit: NutrientUnit? = nil) -> Bool {
         for i in nutritionList.indices {
@@ -110,10 +114,12 @@ struct FoodItem: Identifiable {
         return false
     }
     
-    /// Delete a nutrient by name from this node’s children. Nutrient values are subtracted from parent nutrients if a nutrient is successfully deleted.
-    /// - Parameters:
-    ///   - targetName: The nutrient to remove.
-    /// - Returns: `true` if deletion occurred, `false` otherwise.
+    /**
+     Delete a nutrient by name from this node’s children. Nutrient values are subtracted from parent nutrients if a nutrient is successfully deleted.
+     - Parameters:
+        - targetName: The nutrient to remove.
+     - Returns: `true` if deletion occurred, `false` otherwise.
+     */
     @discardableResult
     mutating func deleteNutrient(_ targetName: String) -> Bool {
         for i in nutritionList.indices {
