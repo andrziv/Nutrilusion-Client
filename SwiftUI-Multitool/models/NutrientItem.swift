@@ -80,26 +80,6 @@ struct NutrientItem: Identifiable, Equatable {
         return result
     }
     
-    /// Append a nutrient item.
-    /// - Parameters:
-    ///   - child: The nutrient item to add.
-    ///   - directInsert: If true, bypasses the NutrientTree and just appends directly.
-    mutating func appendChildNutrient(_ child: NutrientItem, directInsert: Bool = false) {
-        if directInsert {
-            childNutrients.append(child)
-            return
-        }
-        
-        guard NutrientTree.shared.findNutrient(child.name) != nil else {
-            print("Nutrient \(child.name) not found in configured tree.")
-            return
-        }
-        
-        let parents = NutrientTree.shared.getParents(of: child.name, ignoringGenerics: true)
-        
-        insertAlongPath(path: parents + [child.name], child: child)
-    }
-    
     /// Modify a nutrient and propagate changes upward.
     /// Returns true if modification was applied.
     @discardableResult
@@ -128,10 +108,70 @@ struct NutrientItem: Identifiable, Equatable {
         return nil
     }
     
+    /// Adds nutrition value to the caller. If the nutrient doesn't exist in the tree, it will be added. If the target nutrient is a child of this nutrient, the changes will propagate from the target to the caller.
+    /// - Parameters:
+    ///   - other: The target nutrient whose values should be added to the tree. Nutrients are searched by name.
+    ///   - optimizeUnit: Whether or not the unit should be optimized given certain amount values:
+    ///      - 0 < value in grams < 0.001: Unit is set to micrograms
+    ///      - 0.001< value in grams < 1: unit is set to milligrams
+    ///      - else: value is set to grams
+    mutating func add(_ other: NutrientItem, optimizeUnit: Bool = true) {
+        if name == other.name {
+            let deltaGrams = other.unit.convertTo(other.amount, to: .grams)
+            applyDelta(deltaGrams, optimizeUnit: optimizeUnit)
+            
+            for child in other.childNutrients {
+                if let index = childNutrients.firstIndex(where: { $0.name == child.name }) {
+                    childNutrients[index].add(child, optimizeUnit: optimizeUnit)
+                } else {
+                    childNutrients.append(child)
+                }
+            }
+        } else {
+            if let index = childNutrients.firstIndex(where: { $0.name == other.name }) {
+                childNutrients[index].add(other, optimizeUnit: optimizeUnit)
+            } else {
+                childNutrients.append(other)
+            }
+        }
+    }
+    
+    /// Subtracts nutrition value from the caller. If the target nutrient is a child of this nutrient, the changes will propagate from the target to the caller
+    /// - Parameters:
+    ///   - other: The target nutrient whose values should be subtracted from the tree. Nutrients are searched by name.
+    ///   - optimizeUnit: Whether or not the unit should be optimized given certain amount values:
+    ///      - 0 < value in grams < 0.001: Unit is set to micrograms
+    ///      - 0.001< value in grams < 1: unit is set to milligrams
+    ///      - else: value is set to grams
+    mutating func subtract(_ other: NutrientItem, optimizeUnit: Bool = true) {
+        if name == other.name {
+            let deltaGrams = -other.unit.convertTo(other.amount, to: .grams)
+            applyDelta(deltaGrams, optimizeUnit: optimizeUnit)
+            
+            for child in other.childNutrients {
+                if let index = childNutrients.firstIndex(where: { $0.name == child.name }) {
+                    childNutrients[index].subtract(child, optimizeUnit: optimizeUnit)
+                } else {
+                    continue
+                }
+            }
+        } else {
+            if let index = childNutrients.firstIndex(where: { $0.name == other.name }) {
+                childNutrients[index].subtract(other, optimizeUnit: optimizeUnit)
+            } else {
+                return
+            }
+        }
+    }
+    
     /// Delete a nutrient by name from this node’s children (recursively).
     /// - Parameters:
     ///   - targetName: The nutrient to remove.
     ///   - adjustAmounts: Whether to subtract the removed amount from parent totals.
+    ///   - optimizeUnit: Whether or not the unit should be optimized given certain amount values:
+    ///      - 0 < value in grams < 0.001: Unit is set to micrograms
+    ///      - 0.001< value in grams < 1: unit is set to milligrams
+    ///      - else: value is set to grams
     /// - Returns: `true` if deletion occurred, `false` otherwise.
     @discardableResult
     mutating func deleteChildNutrient(_ targetName: String, adjustAmounts: Bool = true, optimizeUnit: Bool = false) -> Bool {
@@ -158,32 +198,6 @@ struct NutrientItem: Identifiable, Equatable {
         }
         
         return false
-    }
-    
-    /// Helper: walks down a path of names, auto-creating if needed, and aggregates amounts.
-    private mutating func insertAlongPath(path: [String], child: NutrientItem) {
-        guard let first = path.first else { return }
-        
-        if first == name {
-            // tally new totals given the added nutrient
-            let childGrams = child.unit.convertTo(child.amount)
-            let selfGrams = unit.convertTo(amount)
-            let totalGrams = selfGrams + childGrams
-            
-            // change unit if needed to make sure that the numbers aren't too small or large
-            optimizeUnitFor(totalGrams)
-            
-            let rest = Array(path.dropFirst())
-            if let next = rest.first {
-                if let index = childNutrients.firstIndex(where: { $0.name == next }) {
-                    childNutrients[index].insertAlongPath(path: rest, child: child)
-                } else {
-                    var newNode = NutrientItem(name: next, amount: 0, unit: child.unit)
-                    newNode.insertAlongPath(path: rest, child: child)
-                    childNutrients.append(newNode)
-                }
-            }
-        }
     }
     
     /// Apply local update logic
@@ -225,7 +239,29 @@ struct NutrientItem: Identifiable, Equatable {
         return childrenGrams
     }
     
+    // used to get around Swift's ridiculous Double implementation where 1.001 - 0.001 results in a value < 1
     private func roundProper(_ value: Double) -> Double {
         return round(value, exp: 6)
+    }
+    
+    /// add helper (uses path)
+    private mutating func add(_ value: Double, unit: NutrientUnit, path: [String], optimizeUnit: Bool = true) {
+        guard let first = path.first else { return }
+        
+        if first == name {
+            let deltaGrams = unit.convertTo(value, to: .grams)
+            applyDelta(deltaGrams, optimizeUnit: optimizeUnit)
+            
+            let rest = Array(path.dropFirst())
+            if let next = rest.first {
+                if let index = childNutrients.firstIndex(where: { $0.name == next }) {
+                    childNutrients[index].add(value, unit: unit, path: rest, optimizeUnit: optimizeUnit)
+                } else {
+                    var newNode = NutrientItem(name: next, amount: 0, unit: unit)
+                    newNode.add(value, unit: unit, path: rest, optimizeUnit: optimizeUnit)
+                    childNutrients.append(newNode)
+                }
+            }
+        }
     }
 }

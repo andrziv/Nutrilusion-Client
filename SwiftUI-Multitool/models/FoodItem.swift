@@ -31,6 +31,10 @@ struct FoodItem: Identifiable {
         self.servingUnitMultiple = servingUnitMultiple
     }
     
+    /// Gets a NutrientItem with the given name from this FoodItem. Child nutrients of held nutrients are also searched for.
+    /// - Parameters:
+    ///   - nutrientType: The nutrient to get.
+    /// - Returns: `A NutrientItem with the given name` if one is held by this FoodItem, `nil` otherwise.
     func getNutrientValue(_ nutrientType: String) -> NutrientItem? {
         for nutrient in nutritionList {
             if nutrient.name == nutrientType {
@@ -47,6 +51,8 @@ struct FoodItem: Identifiable {
         return nil
     }
     
+    /// Gets a flattened list of all the nutrients held by this FoodItem.
+    /// - Returns: An array of all nutrients.
     func getAllNutrients() -> [NutrientItem] {
         var allNutrients: [NutrientItem] = []
         for nutrient in nutritionList {
@@ -65,7 +71,7 @@ struct FoodItem: Identifiable {
         for nutrientName in nameChain {
             for index in 0..<nutritionList.count {
                 if nutritionList[index].name == nutrientName {
-                    nutritionList[index].appendChildNutrient(NutrientItem(name: nutrientToAdd))
+                    nutritionList[index].add(NutrientItem(name: nutrientToAdd))
                     return
                 }
             }
@@ -77,6 +83,15 @@ struct FoodItem: Identifiable {
         }
     }
     
+    /// Modify a nutrient by name from this node’s children. Value changes will propagate upwards if the nutrient is a child to another nutrient.
+    /// - Parameters:
+    ///   - targetName: The nutrient to remove.
+    ///   - newValue: Change the value of the nutrient with the given name. If the value is between a certain threshold, the unit will automatically change unless a newUnit value is given..
+    ///         - 0 < value in grams < 0.001: Unit is set to micrograms
+    ///         - 0.001< value in grams < 1: unit is set to milligrams
+    ///         - else: value is set to grams
+    ///   - newUnit: Change the value of the unit.
+    /// - Returns: `true` if modification occurred, `false` otherwise.
     @discardableResult
     mutating func modifyNutrient(_ targetName: String, newValue: Double? = nil, newUnit: NutrientUnit? = nil) -> Bool {
         for i in nutritionList.indices {
@@ -95,11 +110,12 @@ struct FoodItem: Identifiable {
         return false
     }
     
-    /// Delete a nutrient by name from this node’s children (recursively).
+    /// Delete a nutrient by name from this node’s children. Nutrient values are subtracted from parent nutrients if a nutrient is successfully deleted.
     /// - Parameters:
     ///   - targetName: The nutrient to remove.
     /// - Returns: `true` if deletion occurred, `false` otherwise.
-    @discardableResult mutating func deleteNutrient(_ targetName: String) -> Bool {
+    @discardableResult
+    mutating func deleteNutrient(_ targetName: String) -> Bool {
         for i in nutritionList.indices {
             if nutritionList[i].name == targetName {
                 nutritionList.remove(at: i)
@@ -116,6 +132,47 @@ struct FoodItem: Identifiable {
         return false
     }
     
+    /// Add a FoodItem ingredient to this FoodItem.
+    /// - Parameters:
+    ///   - ingredient: The Fooditem ingredient to add.
+    ///   - addNutrients: If set to true, the addition of the ingredient will result in the ingredient's nutrients being added to the caller's nutrition info. If a nutrient does not exist within the caller's nutrient tree, the nutrient will be added outright.
+    mutating func addIngredient(_ ingredient: FoodItem, addNutrients: Bool = true) {
+        ingredientList.append(ingredient)
+        calories += ingredient.calories
+        
+        if addNutrients {
+            for nutrient in ingredient.nutritionList {
+                if let index = nutritionList.firstIndex(where: { $0.name == nutrient.name }) {
+                    nutritionList[index].add(nutrient)
+                } else {
+                    nutritionList.append(nutrient)
+                }
+            }
+        }
+    }
+    
+    /// Removes a FoodItem ingredient from this FoodItem.
+    /// - Parameters:
+    ///   - ingredient: The Fooditem ingredient to remove. Ingredients are compared by ID.
+    ///   - subtractNutrients: If set to true and the ingredient is held by the caller, the removal of the ingredient will result in the ingredient's nutrients being subtracted from the caller's nutrition info. If a nutrient ends at zero value, the nutrient will not be automatically removed.
+    mutating func removeIngredient(_ ingredient: FoodItem, subtractNutrients: Bool = true) {
+        if let existsAtIndex = ingredientList.firstIndex(where: { $0.id == ingredient.id }) {
+            ingredientList.remove(at: existsAtIndex)
+            calories -= ingredient.calories
+            
+            if subtractNutrients {
+                for nutrient in ingredient.nutritionList {
+                    if let index = nutritionList.firstIndex(where: { $0.name == nutrient.name }) {
+                        nutritionList[index].subtract(nutrient)
+                    } else {
+                        continue
+                    }
+                }
+            }
+        }
+    }
+    
+    // just creates a chain of nutrient items corresponding to a given nutrient name array
     private func generateNutrientItemChain(_ nutrientToChain: [String]) -> NutrientItem? {
         if nutrientToChain.isEmpty {
             return nil

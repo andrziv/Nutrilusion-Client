@@ -51,7 +51,7 @@ struct BuilderCreatorModeView: View {
             SearchPopupView(mealGroups: mealGroups) {
                 self.showIngredientList = false
             } itemTapAction: { newIngredient in
-                foodItem.ingredientList.append(newIngredient) // TODO: have it properly add nutrients on ingredient addition
+                foodItem.addIngredient(newIngredient)
                 self.showIngredientList = false
             }
         }
@@ -83,7 +83,7 @@ private struct IngredientListEditorialView: View {
     let mealGroups: [MealGroup]
     
     private func deleteIngredient(_ ingredient: FoodItem) {
-        foodItem.ingredientList.remove(at: foodItem.ingredientList.firstIndex(where: { $0.id == ingredient.id })!)
+        foodItem.removeIngredient(ingredient)
     }
     
     var body: some View {
