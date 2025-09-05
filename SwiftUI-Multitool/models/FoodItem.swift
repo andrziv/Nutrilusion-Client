@@ -99,13 +99,38 @@ struct FoodItem: Identifiable, Equatable {
         // new chain from scratch
         let parents = NutrientTree.shared.getParents(of: nutrientToAdd.name, ignoringGenerics: true)
         let chain = parents + [nutrientToAdd.name]
-        if var newChain = generateNutrientItemChain(chain) {
-            newChain.modify(nutrientToAdd.name, newValue: nutrientToAdd.amount, newUnit: nutrientToAdd.unit)
-            nutritionList.append(newChain)
+        let result = addDirectNutrientChain(nutrientToAdd, nameChain: chain)
+        return result
+    }
+    
+    private mutating func addDirectNutrientChain(_ nutrientToAdd: NutrientItem, nameChain: [String]) -> Bool {
+        if var nutrientChain = generateNutrientItemChain(nameChain) {
+            nutrientChain.modify(nutrientToAdd.name, newValue: nutrientToAdd.amount, newUnit: nutrientToAdd.unit)
+            
+            let order = NutrientTree.shared.getChildOrder(of: "Nutrients", ignoringGenerics: true)
+            if !order.isEmpty, let idx = findInsertIndex(for: nutrientChain.name, order: order) {
+                nutritionList.insert(nutrientChain, at: idx)
+            } else {
+                nutritionList.append(nutrientChain)
+            }
+            
             return true
         }
         
         return false
+    }
+    
+    /// find index to insert child based on config order
+    private func findInsertIndex(for childName: String, order: [String]) -> Int? {
+        guard let desiredIndex = order.firstIndex(of: childName) else { return nil }
+        
+        for (i, existing) in nutritionList.enumerated() {
+            if let existingIdx = order.firstIndex(of: existing.name), existingIdx > desiredIndex {
+                return i
+            }
+        }
+        
+        return nil
     }
     
     /**

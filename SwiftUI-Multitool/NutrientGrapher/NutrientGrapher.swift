@@ -94,6 +94,25 @@ final class NutrientTree: ObservableObject {
             return kids.map{ $0.name }
         }
     }
+    
+    func getChildOrder(of parent: String, ignoringGenerics: Bool = false) -> [String] {
+        guard let node = lookup[parent.lowercased()] else { return [] }
+        return childOrder(from: node, ignoringGenerics: ignoringGenerics)
+    }
+
+    private func childOrder(from node: Nutrient, ignoringGenerics: Bool) -> [String] {
+        guard let kids = node.children else { return [] }
+        var result: [String] = []
+        for child in kids {
+            if ignoringGenerics && child.ignoreGeneric {
+                // use ignored generic's children in place of generic
+                result.append(contentsOf: childOrder(from: child, ignoringGenerics: ignoringGenerics))
+            } else {
+                result.append(child.name)
+            }
+        }
+        return result
+    }
 }
 
 // MARK: - SwiftUI View

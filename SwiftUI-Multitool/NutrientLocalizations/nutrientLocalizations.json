@@ -595,46 +595,46 @@
             }
         },
         {
-            "name": "Vitamin B1",
+            "name": "Thiamin",
             "translations": {
                 "en": [
-                    "Vitamin B1"
+                    "Thiamin"
                 ],
                 "fr": [
-                    "Vitamine B1"
+                    "Thiamine"
                 ]
             }
         },
         {
-            "name": "Vitamin B2",
+            "name": "Riboflavin",
             "translations": {
                 "en": [
-                    "Vitamin B2"
+                    "Riboflavin"
                 ],
                 "fr": [
-                    "Vitamine B2"
+                    "Riboflavin"
                 ]
             }
         },
         {
-            "name": "Vitamin B3",
+            "name": "Niacin",
             "translations": {
                 "en": [
-                    "Vitamin B3"
+                    "Niacin"
                 ],
                 "fr": [
-                    "Vitamine B3"
+                    "Niacine"
                 ]
             }
         },
         {
-            "name": "Vitamin B5",
+            "name": "Pantothenic Acid",
             "translations": {
                 "en": [
-                    "Vitamin B5"
+                    "Pantothenic Acid", "Pantothenate"
                 ],
                 "fr": [
-                    "Vitamine B5"
+                    "Pantothenic Acid"
                 ]
             }
         },
@@ -650,24 +650,24 @@
             }
         },
         {
-            "name": "Vitamin B7",
+            "name": "Biotin",
             "translations": {
                 "en": [
-                    "Vitamin B7"
+                    "Biotin"
                 ],
                 "fr": [
-                    "Vitamine B7"
+                    "Biotin"
                 ]
             }
         },
         {
-            "name": "Vitamin B9",
+            "name": "Folate",
             "translations": {
                 "en": [
-                    "Vitamin B9"
+                    "Folate"
                 ],
                 "fr": [
-                    "Vitamine B9"
+                    "Folate"
                 ]
             }
         },

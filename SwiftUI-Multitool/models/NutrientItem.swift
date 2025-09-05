@@ -310,16 +310,34 @@ struct NutrientItem: Identifiable, Equatable {
     
     /// directly adds a child
     private mutating func addChild(_ other: NutrientItem, adjustAmounts: Bool, optimizeUnit: Bool) {
-        if let index = childNutrients.firstIndex(where: { $0.name == other.name }) {
-            childNutrients[index].add(other, adjustAmounts: adjustAmounts, optimizeUnit: optimizeUnit, directInsert: true)
+        if let idx = childNutrients.firstIndex(where: { $0.name == other.name }) {
+            childNutrients[idx].add(other, adjustAmounts: adjustAmounts, optimizeUnit: optimizeUnit, directInsert: true)
         } else {
-            childNutrients.append(other)
+            let order = NutrientTree.shared.getChildOrder(of: name, ignoringGenerics: true)
+            if !order.isEmpty, let targetIndex = findInsertIndex(for: other.name, order: order) {
+                childNutrients.insert(other, at: targetIndex)
+            } else {
+                childNutrients.append(other) // no config order
+            }
         }
         
         if adjustAmounts {
             let childGrams = other.unit.convertTo(other.amount, to: .grams)
             applyDelta(childGrams, optimizeUnit: optimizeUnit)
         }
+    }
+
+    /// find index to insert child based on config order
+    private func findInsertIndex(for childName: String, order: [String]) -> Int? {
+        guard let desiredIndex = order.firstIndex(of: childName) else { return nil }
+        
+        for (i, existing) in childNutrients.enumerated() {
+            if let existingIdx = order.firstIndex(of: existing.name), existingIdx > desiredIndex {
+                return i
+            }
+        }
+        
+        return nil 
     }
     
     /// add helper (uses raw path)
