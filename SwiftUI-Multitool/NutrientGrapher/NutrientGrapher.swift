@@ -121,6 +121,7 @@ struct NutrientBrowser: View {
     @State private var query: String = ""
     @State private var resultParents: [String] = []
     @State private var resultChildren: [String] = []
+    @State private var resultChildrenOrder: [String] = []
     
     var body: some View {
         NavigationView {
@@ -145,6 +146,16 @@ struct NutrientBrowser: View {
                     }
                 }
                 
+                if !resultChildrenOrder.isEmpty {
+                    VStack(alignment: .leading) {
+                        Text("Child Order:")
+                            .font(.headline)
+                        ForEach(resultChildrenOrder, id: \.self) { child in
+                            Text("• \(child)")
+                        }
+                    }
+                }
+                
                 Spacer()
             }
             .navigationTitle("Nutrient Browser")
@@ -155,6 +166,7 @@ struct NutrientBrowser: View {
         guard !query.isEmpty else { return }
         resultParents = tree.getParents(of: query)
         resultChildren = tree.getChildren(of: query)
+        resultChildrenOrder = tree.getChildOrder(of: query, ignoringGenerics: true)
     }
 }
 

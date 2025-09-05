@@ -82,7 +82,7 @@
             "children": [
                 {
                     "name": "Vitamins",
-                    "ignoreGeneric": true,
+                    "ignoreGeneric": false,
                     "children": [
                         {
                             "name": "Vitamin D",
@@ -144,7 +144,7 @@
                 },
                 {
                     "name": "Minerals",
-                    "ignoreGeneric": true,
+                    "ignoreGeneric": false,
                     "children": [
                         {
                             "name": "Potassium",
