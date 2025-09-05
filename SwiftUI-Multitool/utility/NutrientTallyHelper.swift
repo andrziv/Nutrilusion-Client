@@ -28,7 +28,7 @@ func sumNutrients(_ nutrientType: String, _ foods: [LoggedMealItem]) -> Double {
 }
 
 func getNutrientValue(_ nutrientType: String, _ food: LoggedMealItem) -> Double {
-    if let nutrient = food.meal.getNutrientValue(nutrientType) {
+    if let nutrient = food.meal.getNutrient(nutrientType) {
         return food.servingMultiple * nutrient.amount
     }
     return 0

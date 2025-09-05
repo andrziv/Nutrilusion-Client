@@ -1,0 +1,1082 @@
+{
+    "localizations": [
+        {
+            "name": "Calories",
+            "translations": {
+                "en": [
+                    "Calories", "Calorie"
+                ],
+                "fr": [
+                    "Calories", "Énergie"
+                ]
+            }
+        },
+        {
+            "name": "Cholesterol",
+            "translations": {
+                "en": [
+                    "Cholesterol"
+                ],
+                "fr": [
+                    "Cholestérol"
+                ]
+            }
+        },
+        {
+            "name": "Carbohydrates",
+            "translations": {
+                "en": [
+                    "Carbohydrates", "Carbohydrate"
+                ],
+                "fr": [
+                    "Glucides"
+                ]
+            }
+        },
+        {
+            "name": "Sugars",
+            "translations": {
+                "en": [
+                    "Sugar", "Sugars", "Total Sugars"
+                ],
+                "fr": [
+                    "Sucres"
+                ]
+            }
+        },
+        {
+            "name": "Glucose",
+            "translations": {
+                "en": [
+                    "Glucose"
+                ],
+                "fr": [
+                    "Glucose"
+                ]
+            }
+        },
+        {
+            "name": "Fructose",
+            "translations": {
+                "en": [
+                    "Fructose"
+                ],
+                "fr": [
+                    "Fructose"
+                ]
+            }
+        },
+        {
+            "name": "Galactose",
+            "translations": {
+                "en": [
+                    "Galactose"
+                ],
+                "fr": [
+                    "Galactose"
+                ]
+            }
+        },
+        {
+            "name": "Sucrose",
+            "translations": {
+                "en": [
+                    "Sucrose"
+                ],
+                "fr": [
+                    "Sucrose"
+                ]
+            }
+        },
+        {
+            "name": "Lactose",
+            "translations": {
+                "en": [
+                    "Lactose"
+                ],
+                "fr": [
+                    "Lactose"
+                ]
+            }
+        },
+        {
+            "name": "Maltose",
+            "translations": {
+                "en": [
+                    "Maltose"
+                ],
+                "fr": [
+                    "Maltose"
+                ]
+            }
+        },
+        {
+            "name": "Starch",
+            "translations": {
+                "en": [
+                    "Starch"
+                ],
+                "fr": [
+                    "Amidon"
+                ]
+            }
+        },
+        {
+            "name": "Fiber",
+            "translations": {
+                "en": [
+                    "Fiber", "Dietary Fiber"
+                ],
+                "fr": [
+                    "Fibres", "Fibres alimentaires"
+                ]
+            }
+        },
+        {
+            "name": "Soluble fiber",
+            "translations": {
+                "en": [
+                    "Soluble Fiber"
+                ],
+                "fr": [
+                    "Fibres solubles"
+                ]
+            }
+        },
+        {
+            "name": "Insoluble fiber",
+            "translations": {
+                "en": [
+                    "Insoluble Fiber"
+                ],
+                "fr": [
+                    "Fibres insolubles"
+                ]
+            }
+        },
+        {
+            "name": "Fats",
+            "translations": {
+                "en": [
+                    "Fats", "Total Fat"
+                ],
+                "fr": [
+                    "Lipides"
+                ]
+            }
+        },
+        {
+            "name": "Saturated Fat",
+            "translations": {
+                "en": [
+                    "Saturated"
+                ],
+                "fr": [
+                    "Saturés"
+                ]
+            }
+        },
+        {
+            "name": "Unsaturated Fat",
+            "translations": {
+                "en": [
+                    "Unsaturated Fat"
+                ],
+                "fr": [
+                    "Unsaturated Fat"
+                ]
+            }
+        },
+        {
+            "name": "Monounsaturated",
+            "translations": {
+                "en": [
+                    "Monounsaturated"
+                ],
+                "fr": [
+                    "Monoinsaturés"
+                ]
+            }
+        },
+        {
+            "name": "Oleic acid",
+            "translations": {
+                "en": [
+                    "Oleic acid"
+                ],
+                "fr": [
+                    "Oleic acid"
+                ]
+            }
+        },
+        {
+            "name": "Polyunsaturated",
+            "translations": {
+                "en": [
+                    "Polyunsaturated"
+                ],
+                "fr": [
+                    "Polyinsaturés"
+                ]
+            }
+        },
+        {
+            "name": "Omega-3",
+            "translations": {
+                "en": [
+                    "Omega-3"
+                ],
+                "fr": [
+                    "Oméga-3"
+                ]
+            }
+        },
+        {
+            "name": "Alpha-linolenic acid",
+            "translations": {
+                "en": [
+                    "Alpha-linolenic acid"
+                ],
+                "fr": [
+                    "Alpha-linolenic acid"
+                ]
+            }
+        },
+        {
+            "name": "Eicosapentaenoic acid",
+            "translations": {
+                "en": [
+                    "Eicosapentaenoic acid"
+                ],
+                "fr": [
+                    "Eicosapentaenoic acid"
+                ]
+            }
+        },
+        {
+            "name": "Docosahexaenoic acid",
+            "translations": {
+                "en": [
+                    "Docosahexaenoic acid"
+                ],
+                "fr": [
+                    "Docosahexaenoic acid"
+                ]
+            }
+        },
+        {
+            "name": "Omega-6",
+            "translations": {
+                "en": [
+                    "Omega-6"
+                ],
+                "fr": [
+                    "Oméga-6"
+                ]
+            }
+        },
+        {
+            "name": "Linoleic acid",
+            "translations": {
+                "en": [
+                    "Linoleic acid"
+                ],
+                "fr": [
+                    "Linoleic acid"
+                ]
+            }
+        },
+        {
+            "name": "Arachidonic acid",
+            "translations": {
+                "en": [
+                    "Arachidonic acid"
+                ],
+                "fr": [
+                    "Arachidonic acid"
+                ]
+            }
+        },
+        {
+            "name": "Trans Fat",
+            "translations": {
+                "en": [
+                    "Trans", "Trans Fat"
+                ],
+                "fr": [
+                    "Trans", "Trans Fat"
+                ]
+            }
+        },
+        {
+            "name": "Proteins",
+            "translations": {
+                "en": [
+                    "Proteins"
+                ],
+                "fr": [
+                    "Protéines"
+                ]
+            }
+        },
+        {
+            "name": "Histidine",
+            "translations": {
+                "en": [
+                    "Histidine"
+                ],
+                "fr": [
+                    "Histidine"
+                ]
+            }
+        },
+        {
+            "name": "Isoleucine",
+            "translations": {
+                "en": [
+                    "Isoleucine"
+                ],
+                "fr": [
+                    "Isoleucine"
+                ]
+            }
+        },
+        {
+            "name": "Leucine",
+            "translations": {
+                "en": [
+                    "Leucine"
+                ],
+                "fr": [
+                    "Leucine"
+                ]
+            }
+        },
+        {
+            "name": "Lysine",
+            "translations": {
+                "en": [
+                    "Lysine"
+                ],
+                "fr": [
+                    "Lysine"
+                ]
+            }
+        },
+        {
+            "name": "Methionine",
+            "translations": {
+                "en": [
+                    "Methionine"
+                ],
+                "fr": [
+                    "Methionine"
+                ]
+            }
+        },
+        {
+            "name": "Phenylalanine",
+            "translations": {
+                "en": [
+                    "Phenylalanine"
+                ],
+                "fr": [
+                    "Phenylalanine"
+                ]
+            }
+        },
+        {
+            "name": "Threonine",
+            "translations": {
+                "en": [
+                    "Threonine"
+                ],
+                "fr": [
+                    "Threonine"
+                ]
+            }
+        },
+        {
+            "name": "Tryptophan",
+            "translations": {
+                "en": [
+                    "Tryptophan"
+                ],
+                "fr": [
+                    "Tryptophan"
+                ]
+            }
+        },
+        {
+            "name": "Valine",
+            "translations": {
+                "en": [
+                    "Valine"
+                ],
+                "fr": [
+                    "Valine"
+                ]
+            }
+        },
+        {
+            "name": "Alanine",
+            "translations": {
+                "en": [
+                    "Alanine"
+                ],
+                "fr": [
+                    "Alanine"
+                ]
+            }
+        },
+        {
+            "name": "Asparagine",
+            "translations": {
+                "en": [
+                    "Asparagine"
+                ],
+                "fr": [
+                    "Asparagine"
+                ]
+            }
+        },
+        {
+            "name": "Aspartic acid",
+            "translations": {
+                "en": [
+                    "Aspartic acid"
+                ],
+                "fr": [
+                    "Aspartic acid"
+                ]
+            }
+        },
+        {
+            "name": "Glutamic acid",
+            "translations": {
+                "en": [
+                    "Glutamic acid"
+                ],
+                "fr": [
+                    "Glutamic acid"
+                ]
+            }
+        },
+        {
+            "name": "Serine",
+            "translations": {
+                "en": [
+                    "Serine"
+                ],
+                "fr": [
+                    "Serine"
+                ]
+            }
+        },
+        {
+            "name": "Arginine",
+            "translations": {
+                "en": [
+                    "Arginine"
+                ],
+                "fr": [
+                    "Arginine"
+                ]
+            }
+        },
+        {
+            "name": "Cysteine",
+            "translations": {
+                "en": [
+                    "Cysteine"
+                ],
+                "fr": [
+                    "Cysteine"
+                ]
+            }
+        },
+        {
+            "name": "Glutamine",
+            "translations": {
+                "en": [
+                    "Glutamine"
+                ],
+                "fr": [
+                    "Glutamine"
+                ]
+            }
+        },
+        {
+            "name": "Glycine",
+            "translations": {
+                "en": [
+                    "Glycine"
+                ],
+                "fr": [
+                    "Glycine"
+                ]
+            }
+        },
+        {
+            "name": "Proline",
+            "translations": {
+                "en": [
+                    "Proline"
+                ],
+                "fr": [
+                    "Proline"
+                ]
+            }
+        },
+        {
+            "name": "Tyrosine",
+            "translations": {
+                "en": [
+                    "Tyrosine"
+                ],
+                "fr": [
+                    "Tyrosine"
+                ]
+            }
+        },
+        {
+            "name": "Water",
+            "translations": {
+                "en": [
+                    "Water"
+                ],
+                "fr": [
+                    "Water"
+                ]
+            }
+        },
+        {
+            "name": "Vitamin A",
+            "translations": {
+                "en": [
+                    "Vitamin A"
+                ],
+                "fr": [
+                    "Vitamine A"
+                ]
+            }
+        },
+        {
+            "name": "Vitamin D",
+            "translations": {
+                "en": [
+                    "Vitamin D"
+                ],
+                "fr": [
+                    "Vitamine D"
+                ]
+            }
+        },
+        {
+            "name": "Vitamin E",
+            "translations": {
+                "en": [
+                    "Vitamin E"
+                ],
+                "fr": [
+                    "Vitamine E"
+                ]
+            }
+        },
+        {
+            "name": "Vitamin K",
+            "translations": {
+                "en": [
+                    "Vitamin K"
+                ],
+                "fr": [
+                    "Vitamine K"
+                ]
+            }
+        },
+        {
+            "name": "Vitamin B1",
+            "translations": {
+                "en": [
+                    "Vitamin B1"
+                ],
+                "fr": [
+                    "Vitamine B1"
+                ]
+            }
+        },
+        {
+            "name": "Vitamin B2",
+            "translations": {
+                "en": [
+                    "Vitamin B2"
+                ],
+                "fr": [
+                    "Vitamine B2"
+                ]
+            }
+        },
+        {
+            "name": "Vitamin B3",
+            "translations": {
+                "en": [
+                    "Vitamin B3"
+                ],
+                "fr": [
+                    "Vitamine B3"
+                ]
+            }
+        },
+        {
+            "name": "Vitamin B5",
+            "translations": {
+                "en": [
+                    "Vitamin B5"
+                ],
+                "fr": [
+                    "Vitamine B5"
+                ]
+            }
+        },
+        {
+            "name": "Vitamin B6",
+            "translations": {
+                "en": [
+                    "Vitamin B6"
+                ],
+                "fr": [
+                    "Vitamine B6"
+                ]
+            }
+        },
+        {
+            "name": "Vitamin B7",
+            "translations": {
+                "en": [
+                    "Vitamin B7"
+                ],
+                "fr": [
+                    "Vitamine B7"
+                ]
+            }
+        },
+        {
+            "name": "Vitamin B9",
+            "translations": {
+                "en": [
+                    "Vitamin B9"
+                ],
+                "fr": [
+                    "Vitamine B9"
+                ]
+            }
+        },
+        {
+            "name": "Vitamin B12",
+            "translations": {
+                "en": [
+                    "Vitamin B12"
+                ],
+                "fr": [
+                    "Vitamine B12"
+                ]
+            }
+        },
+        {
+            "name": "Vitamin C",
+            "translations": {
+                "en": [
+                    "Vitamin C"
+                ],
+                "fr": [
+                    "Vitamine C"
+                ]
+            }
+        },
+        {
+            "name": "Calcium",
+            "translations": {
+                "en": [
+                    "Calcium"
+                ],
+                "fr": [
+                    "Calcium"
+                ]
+            }
+        },
+        {
+            "name": "Phosphorus",
+            "translations": {
+                "en": [
+                    "Phosphorus"
+                ],
+                "fr": [
+                    "Phosphore"
+                ]
+            }
+        },
+        {
+            "name": "Potassium",
+            "translations": {
+                "en": [
+                    "Potassium"
+                ],
+                "fr": [
+                    "Potassium"
+                ]
+            }
+        },
+        {
+            "name": "Sodium",
+            "translations": {
+                "en": [
+                    "Sodium"
+                ],
+                "fr": [
+                    "Sodium"
+                ]
+            }
+        },
+        {
+            "name": "Magnesium",
+            "translations": {
+                "en": [
+                    "Magnesium"
+                ],
+                "fr": [
+                    "Magnésium"
+                ]
+            }
+        },
+        {
+            "name": "Chloride",
+            "translations": {
+                "en": [
+                    "Chloride"
+                ],
+                "fr": [
+                    "Chlorure"
+                ]
+            }
+        },
+        {
+            "name": "Sulfur",
+            "translations": {
+                "en": [
+                    "Sulfur"
+                ],
+                "fr": [
+                    "Sulfur"
+                ]
+            }
+        },
+        {
+            "name": "Iron",
+            "translations": {
+                "en": [
+                    "Iron"
+                ],
+                "fr": [
+                    "Fer"
+                ]
+            }
+        },
+        {
+            "name": "Zinc",
+            "translations": {
+                "en": [
+                    "Zinc"
+                ],
+                "fr": [
+                    "Zinc"
+                ]
+            }
+        },
+        {
+            "name": "Copper",
+            "translations": {
+                "en": [
+                    "Copper"
+                ],
+                "fr": [
+                    "Cuivre"
+                ]
+            }
+        },
+        {
+            "name": "Manganese",
+            "translations": {
+                "en": [
+                    "Manganese"
+                ],
+                "fr": [
+                    "Manganèse"
+                ]
+            }
+        },
+        {
+            "name": "Iodine",
+            "translations": {
+                "en": [
+                    "Iodine"
+                ],
+                "fr": [
+                    "Iodine"
+                ]
+            }
+        },
+        {
+            "name": "Selenium",
+            "translations": {
+                "en": [
+                    "Selenium"
+                ],
+                "fr": [
+                    "Sélénium"
+                ]
+            }
+        },
+        {
+            "name": "Fluoride",
+            "translations": {
+                "en": [
+                    "Fluoride"
+                ],
+                "fr": [
+                    "Fluoride"
+                ]
+            }
+        },
+        {
+            "name": "Chromium",
+            "translations": {
+                "en": [
+                    "Chromium"
+                ],
+                "fr": [
+                    "Chrome"
+                ]
+            }
+        },
+        {
+            "name": "Molybdenum",
+            "translations": {
+                "en": [
+                    "Molybdenum"
+                ],
+                "fr": [
+                    "Molybdène"
+                ]
+            }
+        },
+        {
+            "name": "Boron",
+            "translations": {
+                "en": [
+                    "Boron"
+                ],
+                "fr": [
+                    "Boron"
+                ]
+            }
+        },
+        {
+            "name": "Nickel",
+            "translations": {
+                "en": [
+                    "Nickel"
+                ],
+                "fr": [
+                    "Nickel"
+                ]
+            }
+        },
+        {
+            "name": "Silicon",
+            "translations": {
+                "en": [
+                    "Silicon"
+                ],
+                "fr": [
+                    "Silicon"
+                ]
+            }
+        },
+        {
+            "name": "Vanadium",
+            "translations": {
+                "en": [
+                    "Vanadium"
+                ],
+                "fr": [
+                    "Vanadium"
+                ]
+            }
+        },
+        {
+            "name": "Phytonutrients",
+            "translations": {
+                "en": [
+                    "Phytonutrients"
+                ],
+                "fr": [
+                    "Phytonutrients"
+                ]
+            }
+        },
+        {
+            "name": "Polyphenols",
+            "translations": {
+                "en": [
+                    "Polyphenols"
+                ],
+                "fr": [
+                    "Polyphenols"
+                ]
+            }
+        },
+        {
+            "name": "Flavonoids",
+            "translations": {
+                "en": [
+                    "Flavonoids"
+                ],
+                "fr": [
+                    "Flavonoids"
+                ]
+            }
+        },
+        {
+            "name": "Phenolic acids",
+            "translations": {
+                "en": [
+                    "Phenolic acids"
+                ],
+                "fr": [
+                    "Phenolic acids"
+                ]
+            }
+        },
+        {
+            "name": "Lignans",
+            "translations": {
+                "en": [
+                    "Lignans"
+                ],
+                "fr": [
+                    "Lignans"
+                ]
+            }
+        },
+        {
+            "name": "Carotenoids",
+            "translations": {
+                "en": [
+                    "Carotenoids"
+                ],
+                "fr": [
+                    "Carotenoids"
+                ]
+            }
+        },
+        {
+            "name": "Beta-carotene",
+            "translations": {
+                "en": [
+                    "Beta-carotene"
+                ],
+                "fr": [
+                    "Beta-carotene"
+                ]
+            }
+        },
+        {
+            "name": "Lycopene",
+            "translations": {
+                "en": [
+                    "Lycopene"
+                ],
+                "fr": [
+                    "Lycopene"
+                ]
+            }
+        },
+        {
+            "name": "Lutein",
+            "translations": {
+                "en": [
+                    "Lutein"
+                ],
+                "fr": [
+                    "Lutein"
+                ]
+            }
+        },
+        {
+            "name": "Zeaxanthin",
+            "translations": {
+                "en": [
+                    "Zeaxanthin"
+                ],
+                "fr": [
+                    "Zeaxanthin"
+                ]
+            }
+        },
+        {
+            "name": "Glucosinolates",
+            "translations": {
+                "en": [
+                    "Glucosinolates"
+                ],
+                "fr": [
+                    "Glucosinolates"
+                ]
+            }
+        },
+        {
+            "name": "Choline",
+            "translations": {
+                "en": [
+                    "Choline"
+                ],
+                "fr": [
+                    "Choline"
+                ]
+            }
+        },
+        {
+            "name": "Carnitine",
+            "translations": {
+                "en": [
+                    "Carnitine"
+                ],
+                "fr": [
+                    "Carnitine"
+                ]
+            }
+        },
+        {
+            "name": "Creatine",
+            "translations": {
+                "en": [
+                    "Creatine"
+                ],
+                "fr": [
+                    "Creatine"
+                ]
+            }
+        },
+        {
+            "name": "Coenzyme Q10",
+            "translations": {
+                "en": [
+                    "Coenzyme Q10"
+                ],
+                "fr": [
+                    "Coenzyme Q10"
+                ]
+            }
+        }
+    ]
+}

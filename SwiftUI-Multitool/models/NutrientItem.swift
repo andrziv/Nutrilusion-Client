@@ -116,25 +116,63 @@ struct NutrientItem: Identifiable, Equatable {
     }
     
     /**
-     Adds nutrition value to the caller. If the nutrient doesn't exist in the tree, it will be added. If the target nutrient is a child of this nutrient, the changes will propagate from the target to the caller.
+     Adds nutrition value to the caller. If the nutrient doesn't exist at the expected location, it will be added. If the target nutrient is a child of this nutrient, the changes will propagate from the target to the caller.
      - Parameters:
          - other: The target nutrient whose values should be added to the tree. Nutrients are searched by name.
+         - adjustAmounts: Set this to add values. Set this to false if you just want to add children to be automatically placed without affecting parent values.
          - optimizeUnit: Whether or not the unit should be optimized given certain amount values:
              - 0 < value in grams < 0.001: Unit is set to micrograms
              - 0.001< value in grams < 1: unit is set to milligrams
              - else: value is set to grams
+         - directInsert: Ignores the proper nutrient hierarchy and adds nutrient as a direct child.
+     - Returns: Whether or not the addition was successful.
      */
-    mutating func add(_ other: NutrientItem, optimizeUnit: Bool = true) {
-        if name == other.name {
-            let deltaGrams = other.unit.convertTo(other.amount, to: .grams)
-            applyDelta(deltaGrams, optimizeUnit: optimizeUnit)
-            
-            for child in other.childNutrients {
-                addChild(child, optimizeUnit: optimizeUnit)
-            }
-        } else {
-            addChild(other, optimizeUnit: optimizeUnit)
+    @discardableResult
+    mutating func add(_ other: NutrientItem, adjustAmounts: Bool = true, optimizeUnit: Bool = true, directInsert: Bool = false) -> Bool {
+        if directInsert {
+            addChild(other, adjustAmounts: adjustAmounts, optimizeUnit: optimizeUnit)
+            return true
         }
+        
+        guard NutrientTree.shared.findNutrient(other.name) != nil else {
+            print("Nutrient \(other.name) not found in configured tree, discarding.")
+            return false
+        }
+        
+        let parents = NutrientTree.shared.getParents(of: other.name, ignoringGenerics: true)
+        let path = parents + [other.name]
+        
+        let result = insertAlongPath(path: path, child: other, adjustAmounts: adjustAmounts, optimizeUnit: optimizeUnit)
+        return result
+    }
+    
+    /// Insert along a resolved hierarchy path
+    @discardableResult
+    private mutating func insertAlongPath(path: [String], child: NutrientItem, adjustAmounts: Bool, optimizeUnit: Bool) -> Bool {
+        guard let first = path.first else { return false }
+        
+        if first == name {
+            if adjustAmounts {
+                let childGrams = child.unit.convertTo(child.amount, to: .grams)
+                let selfGrams = unit.convertTo(amount, to: .grams)
+                let totalGrams = selfGrams + childGrams
+                applyModification(newValue: unit.convertFrom(totalGrams), optimizeUnit: optimizeUnit)
+            }
+            
+            let rest = Array(path.dropFirst())
+            if let next = rest.first {
+                if let index = childNutrients.firstIndex(where: { $0.name == next }) { // further down the existing chain
+                    childNutrients[index].insertAlongPath(path: rest, child: child, adjustAmounts: adjustAmounts, optimizeUnit: optimizeUnit)
+                } else {
+                    var newNode = NutrientItem(name: next, amount: child.amount, unit: child.unit) // create new nodes chain
+                    newNode.insertAlongPath(path: rest, child: child, adjustAmounts: adjustAmounts, optimizeUnit: optimizeUnit)
+                    childNutrients.append(newNode)
+                }
+            }
+            return true
+        }
+        
+        return false
     }
     
     /**
@@ -199,6 +237,33 @@ struct NutrientItem: Identifiable, Equatable {
         return false
     }
     
+    /**
+     Recalculate this nutrient's entire nutrient subtree(s) values.
+     - Parameters:
+         - optimizeUnit: Whether or not the unit should be optimized given certain amount values:
+             - 0 < value in grams < 0.001: Unit is set to micrograms
+             - 0.001< value in grams < 1: unit is set to milligrams
+             - else: value is set to grams
+     */
+    mutating func recalculateTree(optimizeUnit: Bool = true) {
+        for i in childNutrients.indices {
+            childNutrients[i].recalculateTree(optimizeUnit: optimizeUnit)
+        }
+        _ = recalculateFromChildren(optimizeUnit: optimizeUnit)
+    }
+    
+    /// Recalculate this node’s value based on its children.
+    /// Returns true if recalculation was performed.
+    @discardableResult
+    private mutating func recalculateFromChildren(optimizeUnit: Bool = true) -> Bool {
+        guard !childNutrients.isEmpty else { return false }
+        
+        let childrenGrams = childNutrients.map { $0.totalInGrams() }.reduce(0, +)
+        applyModification(newValue: unit.convertFrom(childrenGrams),
+                          optimizeUnit: optimizeUnit)
+        return true
+    }
+    
     /// Apply local update logic
     private mutating func applyModification(newValue: Double? = nil, newUnit: NutrientUnit? = nil, unitConversion: Bool = false, optimizeUnit: Bool = false) {
         if let newUnit = newUnit, let newValue = newValue {
@@ -243,11 +308,17 @@ struct NutrientItem: Identifiable, Equatable {
         return round(value, exp: 6)
     }
     
-    private mutating func addChild(_ child: NutrientItem, optimizeUnit: Bool = true) {
-        if let index = childNutrients.firstIndex(where: { $0.name == child.name }) {
-            childNutrients[index].add(child, optimizeUnit: optimizeUnit)
+    /// directly adds a child
+    private mutating func addChild(_ other: NutrientItem, adjustAmounts: Bool, optimizeUnit: Bool) {
+        if let index = childNutrients.firstIndex(where: { $0.name == other.name }) {
+            childNutrients[index].add(other, adjustAmounts: adjustAmounts, optimizeUnit: optimizeUnit, directInsert: true)
         } else {
-            childNutrients.append(child)
+            childNutrients.append(other)
+        }
+        
+        if adjustAmounts {
+            let childGrams = other.unit.convertTo(other.amount, to: .grams)
+            applyDelta(childGrams, optimizeUnit: optimizeUnit)
         }
     }
     

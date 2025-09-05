@@ -236,6 +236,11 @@
           "name": "Water",
           "ignoreGeneric": false
         }
+        ,
+        {
+          "name": "Cholesterol",
+          "ignoreGeneric": false
+        }
       ]
     },
     {
@@ -248,7 +253,7 @@
           "children": [
             {
               "name": "Fat-Soluble",
-              "ignoreGeneric": false,
+              "ignoreGeneric": true,
               "children": [
                 {
                   "name": "Vitamin A",
@@ -270,7 +275,7 @@
             },
             {
               "name": "Water-Soluble",
-              "ignoreGeneric": false,
+              "ignoreGeneric": true,
               "children": [
                 {
                   "name": "Vitamin B1",
@@ -318,7 +323,7 @@
           "children": [
             {
               "name": "Major Minerals (Macrominerals)",
-              "ignoreGeneric": false,
+              "ignoreGeneric": true,
               "children": [
                 {
                   "name": "Calcium",
@@ -352,7 +357,7 @@
             },
             {
               "name": "Trace Minerals (Microminerals)",
-              "ignoreGeneric": false,
+              "ignoreGeneric": true,
               "children": [
                 {
                   "name": "Iron",
@@ -394,7 +399,7 @@
             },
             {
               "name": "Ultra-trace Minerals",
-              "ignoreGeneric": false,
+              "ignoreGeneric": true,
               "children": [
                 {
                   "name": "Boron",

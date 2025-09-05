@@ -8,7 +8,7 @@
 import Foundation
 
 // Used for both Recipes and Ingredients
-struct FoodItem: Identifiable {
+struct FoodItem: Identifiable, Equatable {
     let id: UUID
     var name: String
     var calories: Int
@@ -37,7 +37,7 @@ struct FoodItem: Identifiable {
      - nutrientType: The nutrient to get.
      - Returns: `A NutrientItem with the given name` if one is held by this FoodItem, `nil` otherwise.
      */
-    func getNutrientValue(_ nutrientType: String) -> NutrientItem? {
+    func getNutrient(_ nutrientType: String) -> NutrientItem? {
         for nutrient in nutritionList {
             if nutrient.name == nutrientType {
                 return nutrient
@@ -64,32 +64,55 @@ struct FoodItem: Identifiable {
         return allNutrients
     }
     
-    /// Create a nutrient by name using proper nutrient hierarchical structure.
-    /// - Parameters:
-    ///   - nutrientToAdd: The nutrient to create.
-    mutating func createNutrientChain(_ nutrientToAdd: String) {
-        var nameChain: [String] = NutrientTree.shared.getParents(of: nutrientToAdd, ignoringGenerics: true)
-        
-        for nutrientName in nameChain {
-            for index in 0..<nutritionList.count {
-                if nutritionList[index].name == nutrientName {
-                    nutritionList[index].add(NutrientItem(name: nutrientToAdd))
-                    return
-                }
-            }
-        }
-        
-        nameChain.append(nutrientToAdd)
-        if let nutrientChain = generateNutrientItemChain(nameChain) {
-            nutritionList.append(nutrientChain)
-        }
+    /**
+     Create a nutrient using proper nutrient hierarchical structure.
+     - Parameters:
+       - nutrientToAdd: The nutrient to create.
+     - Returns: True if the item was newly created, false otherwise
+     */
+    @discardableResult
+    mutating func createNutrientChain(_ nutrientToAdd: String) -> Bool {
+        return createNutrientChain(NutrientItem(name: nutrientToAdd))
     }
     
     /**
-     Modify a nutrient by name from this node’s children. Value changes will propagate upwards if the nutrient is a child to another nutrient.
+     Create a nutrient using proper nutrient hierarchical structure.
+     - Parameters:
+       - nutrientToAdd: The nutrient to create.
+       - sumNutrients: Determines if the added nutrient should add its values to every parent this nutrient will be a child to.
+     - Returns: True if the item was newly created, false otherwise
+     */
+    @discardableResult
+    mutating func createNutrientChain(_ nutrientToAdd: NutrientItem, propagateAmounts: Bool = true) -> Bool {
+        guard NutrientTree.shared.findNutrient(nutrientToAdd.name) != nil else {
+            print("Nutrient \(nutrientToAdd.name) not found in NutrientTree.")
+            return false
+        }
+        
+        for i in nutritionList.indices {
+            let result = nutritionList[i].add(nutrientToAdd, adjustAmounts: propagateAmounts, directInsert: false)
+            if result {
+                return false
+            }
+        }
+        
+        // new chain from scratch
+        let parents = NutrientTree.shared.getParents(of: nutrientToAdd.name, ignoringGenerics: true)
+        let chain = parents + [nutrientToAdd.name]
+        if var newChain = generateNutrientItemChain(chain) {
+            newChain.modify(nutrientToAdd.name, newValue: nutrientToAdd.amount, newUnit: nutrientToAdd.unit)
+            nutritionList.append(newChain)
+            return true
+        }
+        
+        return false
+    }
+    
+    /**
+     Modify a nutrient by name from this item's nutrition list. Value changes will propagate upwards if the nutrient is a child to another nutrient.
      - Parameters:
      - targetName: The nutrient to remove.
-         - newValue: Change the value of the nutrient with the given name. If the value is between a certain threshold, the unit will automatically change unless a newUnit value is given..
+         - newValue: Change the value of the nutrient with the given name. If the value is between a certain threshold, the unit will automatically change unless a newUnit value is given.
              - 0 < value in grams < 0.001: Unit is set to micrograms
              - 0.001< value in grams < 1: unit is set to milligrams
              - else: value is set to grams
@@ -115,13 +138,14 @@ struct FoodItem: Identifiable {
     }
     
     /**
-     Delete a nutrient by name from this node’s children. Nutrient values are subtracted from parent nutrients if a nutrient is successfully deleted.
+     Delete a nutrient by name from this item's nutrition list. Nutrient values are subtracted from parent nutrients if a nutrient is successfully deleted.
      - Parameters:
         - targetName: The nutrient to remove.
+        - adjustAmounts: If set, deleting a nutrient will cause a cascading removal of its value from all of the parents of this Nutrient
      - Returns: `true` if deletion occurred, `false` otherwise.
      */
     @discardableResult
-    mutating func deleteNutrient(_ targetName: String) -> Bool {
+    mutating func deleteNutrient(_ targetName: String, adjustAmounts: Bool = true) -> Bool {
         for i in nutritionList.indices {
             if nutritionList[i].name == targetName {
                 nutritionList.remove(at: i)
@@ -130,12 +154,26 @@ struct FoodItem: Identifiable {
         }
         
         for i in nutritionList.indices {
-            if nutritionList[i].deleteChildNutrient(targetName, adjustAmounts: true, optimizeUnit: true) {
+            if nutritionList[i].deleteChildNutrient(targetName, adjustAmounts: adjustAmounts, optimizeUnit: true) {
                 return true
             }
         }
         
         return false
+    }
+    
+    /**
+     Recalculate a nutrient's values from its children.
+     - Parameters:
+        - targetNames: The nutrient(s) to recalculate.
+     */
+    mutating func recalculateNutrients(_ targetNames: [String]) {
+        for name in targetNames {
+            if var target = getNutrient(name) {
+                target.recalculateTree()
+                replaceNutrient(target)
+            }
+        }
     }
     
     /// Add a FoodItem ingredient to this FoodItem.
@@ -192,6 +230,19 @@ struct FoodItem: Identifiable {
         }
         
         return nutrientItemParent
+    }
+    
+    private mutating func replaceNutrient(_ updated: NutrientItem) {
+        for i in nutritionList.indices {
+            if nutritionList[i].name == updated.name {
+                nutritionList[i] = updated
+                return
+            }
+            if let idx = nutritionList[i].childNutrients.firstIndex(where: { $0.name == updated.name }) {
+                nutritionList[i].childNutrients[idx] = updated
+                return
+            }
+        }
     }
 }
 

@@ -10,10 +10,25 @@ import SwiftUI
 
 struct CameraCreatorModeView: View {
     @Binding var foodItem: FoodItem
+    @State private var intermediateResult: FoodItem?
+    
+    init(foodItem: Binding<FoodItem>) {
+        self._foodItem = foodItem
+        self.intermediateResult = foodItem.wrappedValue
+    }
     
     var body: some View {
         VStack {
-            Text("Camera Mode")
+            if intermediateResult != nil {
+                ManualCreatorModeView(foodItem: $foodItem)
+            } else {
+                NutritionLiveScannerView(foodItem: $intermediateResult)
+            }
+        }
+        .onChange(of: intermediateResult) { _, newValue in
+            if let newValue = newValue {
+                foodItem = newValue 
+            }
         }
     }
 }
