@@ -89,7 +89,7 @@ struct NutrientTreeButtonChildView: View {
     var disabledList: [String]
     @Binding var isShowing: Bool
     private(set) var depth: Int = 0
-    @State private var isExpanded: BlockState
+    @State private var blockMode: BlockState
     
     init(foodItem: Binding<FoodItem>, nutrientName: String, nutrientTree: NutrientTree = .shared, disabledList: [String] = [], isShowing: Binding<Bool>, depth: Int = 0) {
         self._foodItem = foodItem
@@ -101,7 +101,7 @@ struct NutrientTreeButtonChildView: View {
         self._isShowing = isShowing
         
         self.depth = depth
-        self.isExpanded = !nutrientTree.getChildren(of: nutrientName).isEmpty ? .expanded : .noChildren
+        self.blockMode = !nutrientTree.getChildren(of: nutrientName).isEmpty ? .expanded : .noChildren
     }
     
     private func depthColor(_ depth: Int) -> Color {
@@ -120,11 +120,11 @@ struct NutrientTreeButtonChildView: View {
     }
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading) {
             NutrientTreeBlockEntryView(
                 text: nutrientName,
                 backgroundColour: depthColor(depth),
-                isExpanded: $isExpanded,
+                blockMode: $blockMode,
                 disableReason: getDisableReason()) {
                     let backgroundColour = depthColor(depth)
                     if getDisableReason() == .none {
@@ -138,12 +138,11 @@ struct NutrientTreeButtonChildView: View {
                                 .foregroundStyle(.secondaryText)
                                 .padding(.vertical, 5)
                                 .frame(maxWidth: .infinity)
-                                .background(RoundedRectangle(cornerRadius: 7).fill(backgroundColour.mix(with: .backgroundColour, by: 0.2).opacity(0.8)))
-                                .padding(.horizontal)
+                                .background(RoundedRectangle(cornerRadius: 7).fill(backgroundColour.mix(with: .secondaryText, by: 0.1).opacity(0.5)))
                         }
                     }
-                    
-                    if isExpanded == .expanded {
+                } content: {
+                    if blockMode == .expanded {
                         ForEach(nutrientTree.getChildren(of: nutrientName), id: \.self) { child in
                             NutrientTreeButtonChildView(
                                 foodItem: $foodItem,
@@ -153,10 +152,9 @@ struct NutrientTreeButtonChildView: View {
                                 isShowing: $isShowing,
                                 depth: depth + 1
                             )
-                            
                             .transition(.opacity.combined(with: .blurReplace))
                         }
-                        .padding(.horizontal, 5)
+                        .padding(.leading, 15)
                     }
                 }
                 .id("nutrient-\(nutrientName)")
@@ -164,104 +162,111 @@ struct NutrientTreeButtonChildView: View {
     }
 }
 
-fileprivate struct NutrientTreeBlockEntryView<Content: View>: View {
+fileprivate struct NutrientTreeBlockEntryView<HeaderContent: View, BodyContent: View>: View {
     let text: String
     let backgroundColour: Color
-    @Binding var isExpanded: BlockState
+    @Binding var blockMode: BlockState
     var disableReason: DisableReason
-    let content: Content
     
-    init(text: String, backgroundColour: Color, isExpanded: Binding<BlockState>, disableReason: DisableReason = .none, @ViewBuilder content: () -> Content) {
+    let headerContent: HeaderContent
+    let content: BodyContent
+    
+    init(text: String, backgroundColour: Color, blockMode: Binding<BlockState>, disableReason: DisableReason = .none, @ViewBuilder headerContent: () -> HeaderContent, @ViewBuilder content: () -> BodyContent) {
         self.text = text
         self.backgroundColour = backgroundColour
         
-        self._isExpanded = isExpanded
+        self._blockMode = blockMode
         self.disableReason = disableReason
         
+        self.headerContent = headerContent()
         self.content = content()
     }
     
     var body: some View {
         VStack {
             Button {
-                if isExpanded == .expanded {
-                    isExpanded = .minimized
-                } else if isExpanded == .minimized {
-                    isExpanded = .expanded
-                } 
+                withAnimation {
+                    if blockMode == .expanded {
+                        blockMode = .minimized
+                    } else if blockMode == .minimized {
+                        blockMode = .expanded
+                    }
+                }
             } label: {
-                NutrientTreeBlockEntryHeaderView(text: text, backgroundColour: backgroundColour, isExpanded: isExpanded, disableReason: disableReason)
+                NutrientTreeBlockEntryHeaderView(text: text, backgroundColour: backgroundColour, blockMode: blockMode, disableReason: disableReason, content: headerContent)
             }
             
             content
         }
-        .padding(.bottom, isExpanded == .noChildren ? 15 : 5)
-        .overlay{
-            RoundedRectangle(cornerRadius: 10)
-                .stroke(style: StrokeStyle(lineWidth: 6))
-                .foregroundStyle(backgroundColour.mix(with: .backgroundColour, by: 0.5))
-        }
         .clipShape(RoundedRectangle(cornerRadius: 10))
-        .animation(.snappy, value: isExpanded)
     }
 }
 
-fileprivate struct NutrientTreeBlockEntryHeaderView: View {
+fileprivate struct NutrientTreeBlockEntryHeaderView<Content: View>: View {
     let text: String
     let backgroundColour: Color
-    let isExpanded: BlockState
+    let blockMode: BlockState
     let disableReason: DisableReason
+    
+    let content: Content
+    
+    private func padding() -> Edge.Set {
+        if disableReason == .none {
+            return .top
+        } else {
+            if blockMode == .expanded {
+                return .top
+            }
+            
+            return .vertical
+        }
+    }
     
     var body: some View {
         VStack {
             HStack {
-                if isExpanded != .noChildren {
-                    Image(systemName: isExpanded == .expanded ? "chevron.down" : "chevron.right")
+                if blockMode != .noChildren {
+                    Image(systemName: blockMode == .expanded ? "chevron.down" : "chevron.right")
                         .font(.caption)
                         .foregroundColor(.primaryText)
                 }
                 
                 Text(text)
-                    .fontWeight(isExpanded == .noChildren ? .regular : .semibold)
+                    .fontWeight(blockMode == .noChildren ? .regular : .semibold)
                     .foregroundStyle(.primaryText)
                 
                 Spacer()
+                
+                StatusBadge(disableReason: disableReason, backgroundColour: backgroundColour)
+                    .scaledToFit()
+                    .minimumScaleFactor(0.4)
             }
             
-            HStack {
-                AddabilityReasonView(isActive: disableReason == .isBroadCategory, disableReason: .isBroadCategory, backgroundColour: backgroundColour)
-                AddabilityReasonView(isActive: disableReason == .alreadyAdded, disableReason: .alreadyAdded, backgroundColour: backgroundColour)
-                AddabilityReasonView(isActive: disableReason == .none, disableReason: .none, backgroundColour: backgroundColour)
-            }
-            .scaledToFit()
-            .minimumScaleFactor(0.4)
+            content
         }
-        .padding(.horizontal)
-        .padding(.top)
-        .background(Rectangle().fill(backgroundColour).blur(radius: 40))
+        .padding()
+        .background(RoundedRectangle(cornerRadius: 10).fill(backgroundColour.mix(with: .backgroundColour, by: 0.5)))
     }
 }
 
-fileprivate struct AddabilityReasonView: View {
-    var isActive: Bool = true
+
+fileprivate struct StatusBadge: View {
     var disableReason: DisableReason
     var backgroundColour: Color = .clear
     
     var body: some View {
         HStack {
             Image(systemName: disableReason.iconName)
-                .foregroundStyle(isActive ? disableReason.iconColour : .secondaryText)
+                .foregroundStyle(disableReason.iconColour)
             
-            if isActive {
                 Text(disableReason.title)
-            }
         }
         .font(.caption)
         .fontWeight(.medium)
         .foregroundStyle(.secondaryText)
         .padding(.horizontal, 4)
         .padding(.vertical, 2)
-        .background(RoundedRectangle(cornerRadius: 7).fill(backgroundColour.mix(with: .backgroundColour, by: 0.2).opacity(0.5)))
+        .background(RoundedRectangle(cornerRadius: 7).fill(backgroundColour.mix(with: .secondaryText, by: 0.1).opacity(0.5)))
     }
 }
 
