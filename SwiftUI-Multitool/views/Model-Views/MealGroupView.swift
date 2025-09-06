@@ -27,7 +27,6 @@ struct MealGroupView: View {
                 ))
         }
         .clipShape(RoundedRectangle(cornerRadius: 20))
-        .shadow(color: .primaryText.opacity(0.08), radius: 8, x: 0, y: 6)
         .padding(.horizontal)
         .animation(.interpolatingSpring(mass: 1, stiffness: 188, damping: 23), value: isExpanded)
     }
@@ -58,7 +57,6 @@ struct MealGroupHeader: View {
                         Image(systemName: "xmark.circle.fill")
                             .font(.title2)
                             .foregroundStyle(emblem.mix(with: .primaryText, by: 0.3))
-                            .shadow(radius: 2)
                     }
                 }
             }
