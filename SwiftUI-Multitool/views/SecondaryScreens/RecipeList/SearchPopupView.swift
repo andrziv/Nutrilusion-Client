@@ -26,7 +26,7 @@ struct SearchPopupView: View {
     
     var body: some View {
         VStack {
-            BasicTextField("Search for Recipe Names... eg: Lasagna", text: $viewModel.searchText)
+            BasicTextField("Search for Recipe Names... eg: Lasagna", text: $viewModel.searchText, outlineWidth: 0, background: .secondaryBackground)
                 .focused($searchFocus)
                 .onAppear {
                     withAnimation {
@@ -41,11 +41,14 @@ struct SearchPopupView: View {
                     FoodItemView(foodItem: meal.foodItem, mealGroup: meal.mealGroup)
                 }
             }
+            .clipShape(RoundedRectangle(cornerRadius: 12))
             
-            ImagedButton(title: "Dismiss", icon: "xmark", circleColour: .clear, cornerRadius: 10, action: exitAction)
+            ImagedButton(title: "Dismiss", icon: "xmark", circleColour: .clear, cornerRadius: 10, maxWidth: .infinity, action: exitAction)
                 .frame(maxWidth: .infinity)
+            
+            Spacer()
         }
-        .basicBackground(background: .secondaryBackground)
+        .basicBackground(shadowRadius: 0, background: .secondaryBackground.opacity(0.5))
     }
 }
 

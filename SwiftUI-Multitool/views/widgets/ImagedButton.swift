@@ -14,6 +14,7 @@ struct ImagedButton<T>: View {
     var fontColour: Color = .primaryText
     var circleColour: Color = .blue
     var cornerRadius: CGFloat = 12
+    var maxWidth: CGFloat?
     
     let action: (T) -> Void
     var item: T
@@ -35,9 +36,10 @@ struct ImagedButton<T>: View {
             .foregroundStyle(fontColour)
             .padding(.vertical, 8)
             .padding(.horizontal, 12)
+            .frame(maxWidth: maxWidth)
             .background(
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                    .fill(.backgroundColour.opacity(0.6))
+                    .fill(.secondaryBackground)
             )
         }
     }
@@ -49,12 +51,14 @@ extension ImagedButton where T == Void {
          fontColour: Color = .primaryText,
          circleColour: Color = .blue,
          cornerRadius: CGFloat = 12,
+         maxWidth: CGFloat? = nil,
          action: @escaping () -> Void) {
         self.title = title
         self.icon = icon
         self.fontColour = fontColour
         self.circleColour = circleColour
         self.cornerRadius = cornerRadius
+        self.maxWidth = maxWidth
         self.action = { _ in action() }
     }
 }

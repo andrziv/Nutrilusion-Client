@@ -85,6 +85,8 @@ struct RecipeCreatorView: View {
                 
                 ImagedButton(title: "Save & Exit", icon: "tray.and.arrow.down.fill", circleColour: .clear, cornerRadius: 10, action: onSaveAction, item: (selectedMealGroup, draftFoodItem))
             }
+            
+            Spacer()
         }
         .basicBackground()
     }

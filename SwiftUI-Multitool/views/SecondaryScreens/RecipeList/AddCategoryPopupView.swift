@@ -16,10 +16,9 @@ struct AddCategoryPopupView: View {
     @State private var colourPicked: Color = .blue
     
     var body: some View {
-        VStack {
+        VStack(spacing: 5) {
             MealGroupPreviewView(searchString: $searchString, colourPicked: $colourPicked)
                 .background(RoundedRectangle(cornerRadius: 10).fill(.backgroundColour))
-                .frame(maxHeight: 500)
             
             Spacer()
             
@@ -36,7 +35,7 @@ struct AddCategoryPopupView: View {
                     screenMode = nil
                 }
                 
-                ImagedButton(title: "Create Category", icon: "plus", circleColour: .clear, cornerRadius: 10) {
+                ImagedButton(title: "Create Category", icon: "plus", circleColour: .clear, cornerRadius: 10, maxWidth: .infinity) {
                     // TODO: Change this to use CoreData later...
                     mealGroups.append(MealGroup(id: UUID(uuidString: "10000000-0000-0000-0000-000000000000")!, name: searchString, meals: [], colour: colourPicked.toHex()!))
                     screenMode = nil
