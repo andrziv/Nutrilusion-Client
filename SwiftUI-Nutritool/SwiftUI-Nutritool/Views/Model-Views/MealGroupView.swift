@@ -10,6 +10,7 @@ import SwiftUI
 struct MealGroupView: View {
     var group: MealGroup
     @State var isExpanded: Bool = false
+    var foodTapAction: (FoodItem) -> Void = { _ in }
     
     var body: some View {
         let emblem = Color(hex: group.colour)
@@ -18,7 +19,7 @@ struct MealGroupView: View {
             MealGroupHeader(group: group, isExpanded: $isExpanded, emblem: emblem)
                 .background(emblem.opacity(0.4))
             
-            MealGroupBody(group: group, isExpanded: isExpanded, emblem: emblem)
+            MealGroupBody(group: group, isExpanded: isExpanded, emblem: emblem, foodTapAction: foodTapAction)
                 .transition(.asymmetric(
                     insertion: .move(edge: .top).combined(with: .opacity),
                     removal: .opacity
@@ -68,10 +69,16 @@ struct MealGroupBody: View {
     let isExpanded: Bool
     let emblem: Color
     
+    let foodTapAction: (FoodItem) -> Void
+    
     var body: some View {
         if isExpanded {
             LazyVScroll(items: group.meals, spacing: 12) { meal in
-                FoodItemView(foodItem: meal)
+                Button() {
+                    foodTapAction(meal)
+                } label: {
+                    FoodItemView(foodItem: meal)
+                }
             }
             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
             .padding()

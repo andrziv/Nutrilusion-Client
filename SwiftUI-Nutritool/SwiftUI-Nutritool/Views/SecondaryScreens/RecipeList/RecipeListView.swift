@@ -19,6 +19,22 @@ enum RecipeListViewMode: Identifiable {
         case .addRecipe: return 3
         }
     }
+    
+    var title: String {
+        switch self {
+        case .search: return ""
+        case .addCategory: return "Category"
+        case .addRecipe: return "Recipe"
+        }
+    }
+    
+    var icon: String {
+        switch self {
+        case .search: return "magnifyingglass"
+        case .addCategory: return "folder.badge.plus"
+        case .addRecipe: return "plus.circle"
+        }
+    }
 }
 
 // TODO: temp to make the adding work. Eventually replace with real ViewModel + Persistance
@@ -31,6 +47,8 @@ struct RecipeListView: View {
     @StateObject var model = MealGroupsModel()
     @State private var mode: RecipeListViewMode? = nil
     
+    let foodTapAction: (FoodItem) -> Void
+    
     private func appendNewItem(_ newItem: FoodItem, selectedMealGroup: MealGroup) {
         if let index = model.mealGroups.firstIndex(where: { $0.id == selectedMealGroup.id }) {
             var group = model.mealGroups[index]
@@ -42,9 +60,11 @@ struct RecipeListView: View {
     var body: some View {
         ZStack(alignment: .bottom) {
             LazyVScroll(items: model.mealGroups, spacing: 0) { mealGroup in
-                MealGroupView(group: mealGroup, isExpanded: true)
-                    .padding(.top)
-                    .padding(.bottom, model.mealGroups.last == mealGroup ? 65 : 0)
+                MealGroupView(group: mealGroup, isExpanded: true) { foodItem in
+                    foodTapAction(foodItem)
+                }
+                .padding(.top)
+                .padding(.bottom, model.mealGroups.last == mealGroup ? 65 : 0)
             }
             
             FloatingActionMenu(mode: $mode)
@@ -58,7 +78,7 @@ struct RecipeListView: View {
                 SearchPopupView(mealGroups: model.mealGroups) {
                     self.mode = nil
                 } itemTapAction: { foodItem in
-                    // TODO: adding food item to logger
+                    foodTapAction(foodItem)
                     self.mode = nil
                 }
                 .transition(.move(edge: .bottom))
@@ -86,10 +106,10 @@ private struct FloatingActionMenu: View {
     var body: some View {
         HStack {
             HStack(spacing: 24) {
-                VerticalActionButton(title: "Category", icon: "folder.badge.plus") {
+                VerticalActionButton(title: RecipeListViewMode.addCategory.title, icon: RecipeListViewMode.addCategory.icon) {
                     mode = .addCategory
                 }
-                VerticalActionButton(title: "Recipe", icon: "plus.circle") {
+                VerticalActionButton(title: RecipeListViewMode.addRecipe.title, icon: RecipeListViewMode.addRecipe.icon) {
                     mode = .addRecipe
                 }
             }
@@ -100,7 +120,7 @@ private struct FloatingActionMenu: View {
                     .fill(.ultraThinMaterial)
             )
             
-            VerticalActionButton(title: "", icon: "magnifyingglass") {
+            VerticalActionButton(title: RecipeListViewMode.search.title, icon: RecipeListViewMode.search.icon) {
                 mode = .search
             }
             .padding(15)
@@ -137,5 +157,7 @@ struct VerticalActionButton: View {
 
 
 #Preview {
-    RecipeListView()
+    RecipeListView() { foodItem in
+        
+    }
 }

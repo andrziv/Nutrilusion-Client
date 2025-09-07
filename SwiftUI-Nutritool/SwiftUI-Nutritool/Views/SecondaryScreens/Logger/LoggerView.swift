@@ -78,7 +78,9 @@ struct LoggerView: View {
         }
         .padding(.horizontal)
         .sheet(isPresented: $isShowingRecipesMenu) {
-            RecipeListView()
+            RecipeListView() { foodItem in
+                
+            }
         }
     }
 }
