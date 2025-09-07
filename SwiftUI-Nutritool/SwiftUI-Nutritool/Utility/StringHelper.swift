@@ -1,6 +1,6 @@
 //
 //  StringHelper.swift
-//  SwiftUI-Multitool
+//  SwiftUI-Nutritool
 //
 //  Created by Andrej Zivkovic on 2025-07-31.
 //

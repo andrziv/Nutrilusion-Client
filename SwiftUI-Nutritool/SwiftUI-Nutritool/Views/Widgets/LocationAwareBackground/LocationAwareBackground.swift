@@ -1,6 +1,6 @@
 //
 //  LocationAwareBackground.swift
-//  SwiftUI-Multitool
+//  SwiftUI-Nutritool
 //
 //  Created by ChatGPT on 2025-08-09.
 //

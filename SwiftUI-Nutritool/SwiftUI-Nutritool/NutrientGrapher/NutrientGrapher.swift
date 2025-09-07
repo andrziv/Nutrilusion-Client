@@ -1,6 +1,6 @@
 //
 //  NutrientGrapher.swift
-//  SwiftUI-Multitool
+//  SwiftUI-Nutritool
 //
 //  Created by ChatGPT on 2025-08-16.
 //  TODO: Looks safe at immediate glance. Get around to rewriting this in your own way if needed.

@@ -1,6 +1,6 @@
 //
 //  NoiseShader.metal
-//  SwiftUI-Multitool
+//  SwiftUI-Nutritool
 //
 //  Created by Andrej Zivkovic on 2025-08-08.
 //
