@@ -29,7 +29,6 @@ class MealGroupsModel: ObservableObject {
 // TODO: refactor and get rid of all the magic numbers used for testing
 struct RecipeListView: View {
     @StateObject var model = MealGroupsModel()
-    @State private var showAddSubMenu: Bool = false
     @State private var mode: RecipeListViewMode? = nil
     
     private func appendNewItem(_ newItem: FoodItem, selectedMealGroup: MealGroup) {
@@ -41,17 +40,21 @@ struct RecipeListView: View {
     }
     
     var body: some View {
-        ZStack(alignment: .bottomTrailing) {
+        ZStack(alignment: .bottom) {
             LazyVScroll(items: model.mealGroups, spacing: 0) { mealGroup in
                 MealGroupView(group: mealGroup, isExpanded: true)
                     .padding(.top)
+                    .padding(.bottom, model.mealGroups.last == mealGroup ? 65 : 0)
             }
             
-            FloatingActionButtonToolbar(isShowingSubMenu: $showAddSubMenu, recipeListScreenMode: $mode)
+            FloatingActionMenu(mode: $mode)
+                .padding(.horizontal, 20)
+                .padding(.bottom, 20)
         }
+        .ignoresSafeArea(.all, edges: .bottom)
         .fullScreenCover(item: $mode) { mode in
-            // Popups from submenu
-            if mode == .search {
+            switch mode {
+            case .search:
                 SearchPopupView(mealGroups: model.mealGroups) {
                     self.mode = nil
                 } itemTapAction: { foodItem in
@@ -59,10 +62,12 @@ struct RecipeListView: View {
                     self.mode = nil
                 }
                 .transition(.move(edge: .bottom))
-            } else if mode == .addCategory {
+                
+            case .addCategory:
                 AddCategoryPopupView(screenMode: $mode, mealGroups: $model.mealGroups)
                     .transition(.move(edge: .bottom))
-            } else if mode == .addRecipe {
+                
+            case .addRecipe:
                 RecipeCreatorView(foodItem: FoodItem(name: ""), mealGroups: model.mealGroups) {
                     self.mode = nil
                 } onSaveAction: { selectedGroup, editedFoodItem in
@@ -72,120 +77,64 @@ struct RecipeListView: View {
                 .transition(.move(edge: .bottom))
             }
         }
-        .background(.ultraThinMaterial)
     }
 }
 
-// "FAB" Menu
-struct FloatingActionButtonToolbar: View {
-    @Binding var isShowingSubMenu: Bool
-    @Binding var recipeListScreenMode: RecipeListViewMode?
+private struct FloatingActionMenu: View {
+    @Binding var mode: RecipeListViewMode?
     
     var body: some View {
-        ZStack(alignment: .bottomTrailing) {
-            // kludge to close the menu when user taps outside of the menu
-            if isShowingSubMenu {
-                Color.black.opacity(0.001)
-                    .ignoresSafeArea()
-                    .onTapGesture {
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                            isShowingSubMenu = false
-                        }
-                    }
+        HStack {
+            HStack(spacing: 24) {
+                VerticalActionButton(title: "Category", icon: "folder.badge.plus") {
+                    mode = .addCategory
+                }
+                VerticalActionButton(title: "Recipe", icon: "plus.circle") {
+                    mode = .addRecipe
+                }
             }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 7.5)
+            .background(
+                Capsule()
+                    .fill(.ultraThinMaterial)
+            )
             
-            // Submenu expanding from FAB
-            ReLiSubMenu(screenMode: $recipeListScreenMode, showingCustomMenu: $isShowingSubMenu)
-                .foregroundStyle(.primaryText)
-                .padding(.trailing, 20)
-                .padding(.bottom, 20)
-                .scaleEffect(isShowingSubMenu ? 1 : 0.05, anchor: .bottomTrailing)
-                .opacity(isShowingSubMenu ? 1 : 0)
-                .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isShowingSubMenu)
-            
-            ReLiButton(isShowingSubMenu: $isShowingSubMenu)
-                .padding(.trailing, isShowingSubMenu ? 10 : 20)
-                .padding(.bottom, isShowingSubMenu ? 10 : 20)
-                .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isShowingSubMenu)
-                .zIndex(2)
+            VerticalActionButton(title: "", icon: "magnifyingglass") {
+                mode = .search
+            }
+            .padding(15)
+            .background(
+                Circle()
+                    .fill(.ultraThinMaterial)
+            )
         }
     }
 }
 
-struct ReLiSubMenu: View {
-    @Binding var screenMode: RecipeListViewMode?
-    @Binding var showingCustomMenu: Bool
+// TODO: refactor ImagedButton to either be horizontal or vertical and use that instead?
+struct VerticalActionButton: View {
+    let title: String
+    let icon: String
+    let action: () -> Void
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            ImagedButton(title: "Search Recipe", icon: "magnifyingglass") {
-                screenMode = .search
-                showingCustomMenu = false
+        Button(action: action) {
+            VStack(spacing: 4) {
+                Image(systemName: icon)
+                    .font(.title3)
+                if !title.isEmpty {
+                    Text(title)
+                        .font(.caption2)
+                }
             }
-            ImagedButton(title: "Add Category", icon: "folder.badge.plus") {
-                screenMode = .addCategory
-                showingCustomMenu = false
-            }
-            ImagedButton(title: "Add Recipe", icon: "plus.circle") {
-                screenMode = .addRecipe
-                showingCustomMenu = false
-            }
+            .foregroundStyle(.primaryText)
+            .foregroundStyle(.primary)
+            .frame(minWidth: 56)
         }
-        .padding(14)
-        .background(
-            // Glassy background with blur + gradient
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .fill(.ultraThinMaterial)
-                .shadow(color: .primaryText.opacity(0.15), radius: 10, x: 0, y: 5)
-        )
     }
 }
 
-struct ReLiButton: View {
-    @Binding var isShowingSubMenu: Bool
-    
-    var body: some View {
-        Button {
-            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                isShowingSubMenu.toggle()
-            }
-        } label: {
-            Image(systemName: "plus")
-                .rotationEffect(.degrees(isShowingSubMenu ? 45 : 0))
-                .font(.system(size: 18, weight: .bold))
-                .foregroundStyle(.primaryText)
-                .padding(16)
-                .background(
-                    ZStack {
-                        Circle()
-                            .fill(
-                                LinearGradient(
-                                    gradient: Gradient(colors: [
-                                        .backgroundColour.opacity(0.8),
-                                        .blue.opacity(0.8)
-                                    ]),
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
-                            )
-                        
-                        // glass-like blur (SwiftUI normal blur no bueno)
-                        Circle()
-                            .fill(.backgroundColour.opacity(0.1))
-                            .background(.thinMaterial,
-                                        in: Circle()
-                            )
-                    }
-                )
-                .overlay(
-                    Circle()
-                        .stroke(.blue.opacity(0.4), lineWidth: 0.5)
-                )
-                .shadow(color: .primaryText.opacity(0.03), radius: 10, x: 0, y: 5)
-                .scaleEffect(isShowingSubMenu ? 0.8 : 1.0)
-        }
-    }
-}
 
 #Preview {
     RecipeListView()

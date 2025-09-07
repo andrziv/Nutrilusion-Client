@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct MealGroup: Identifiable {
+struct MealGroup: Identifiable, Equatable {
     let id: UUID
     var name: String
     var meals: [FoodItem]
