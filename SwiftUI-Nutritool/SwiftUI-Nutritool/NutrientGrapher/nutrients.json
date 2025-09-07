@@ -1,0 +1,206 @@
+{
+    "name": "Nutrients",
+    "ignoreGeneric": true,
+    "children": [
+        {
+            "name": "Macronutrients",
+            "ignoreGeneric": true,
+            "children": [
+                {
+                    "name": "Fats",
+                    "ignoreGeneric": false,
+                    "children": [
+                        {
+                            "name": "Saturated Fat",
+                            "ignoreGeneric": false,
+                        },
+                        {
+                            "name": "Trans Fat",
+                            "ignoreGeneric": false,
+                        },
+                        {
+                            "name": "Polyunsaturated",
+                            "ignoreGeneric": false,
+                            "children": [
+                                {
+                                    "name": "Omega-6",
+                                    "ignoreGeneric": false,
+                                },
+                                {
+                                    "name": "Omega-3",
+                                    "ignoreGeneric": false,
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Monounsaturated",
+                            "ignoreGeneric": false,
+                        }
+                    ]
+                },
+                {
+                    "name": "Carbohydrates",
+                    "ignoreGeneric": false,
+                    "children": [
+                        {
+                            "name": "Fiber",
+                            "ignoreGeneric": false,
+                            "children": [
+                                {
+                                    "name": "Soluble fiber",
+                                    "ignoreGeneric": false
+                                },
+                                {
+                                    "name": "Insoluble fiber",
+                                    "ignoreGeneric": false
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Sugars",
+                            "ignoreGeneric": false,
+                        }
+                    ]
+                },
+                {
+                    "name": "Proteins",
+                    "ignoreGeneric": false,
+                },
+                {
+                    "name": "Cholesterol",
+                    "ignoreGeneric": false,
+                },
+                {
+                    "name": "Sodium",
+                    "ignoreGeneric": false,
+                }
+            ]
+        },
+        {
+            "name": "Micronutrients",
+            "ignoreGeneric": true,
+            "children": [
+                {
+                    "name": "Vitamins",
+                    "ignoreGeneric": false,
+                    "children": [
+                        {
+                            "name": "Vitamin D",
+                            "ignoreGeneric": false,
+                        },
+                        {
+                            "name": "Vitamin C",
+                            "ignoreGeneric": false,
+                        },
+                        {
+                            "name": "Vitamin A",
+                            "ignoreGeneric": false,
+                        },
+                        {
+                            "name": "Vitamin E",
+                            "ignoreGeneric": false,
+                        },
+                        {
+                            "name": "Vitamin K",
+                            "ignoreGeneric": false,
+                        },
+                        {
+                            "name": "Thiamin",
+                            "ignoreGeneric": false,
+                        },
+                        {
+                            "name": "Riboflavin",
+                            "ignoreGeneric": false,
+                        },
+                        {
+                            "name": "Niacin",
+                            "ignoreGeneric": false,
+                        },
+                        {
+                            "name": "Vitamin B6",
+                            "ignoreGeneric": false,
+                        },
+                        {
+                            "name": "Folate",
+                            "ignoreGeneric": false,
+                        },
+                        {
+                            "name": "Vitamin B12",
+                            "ignoreGeneric": false,
+                        },
+                        {
+                            "name": "Pantothenic Acid",
+                            "ignoreGeneric": false,
+                        },
+                        {
+                            "name": "Biotin",
+                            "ignoreGeneric": false,
+                        },
+                        {
+                            "name": "Choline",
+                            "ignoreGeneric": false,
+                        }
+                    ]
+                },
+                {
+                    "name": "Minerals",
+                    "ignoreGeneric": false,
+                    "children": [
+                        {
+                            "name": "Potassium",
+                            "ignoreGeneric": false,
+                        },
+                        {
+                            "name": "Calcium",
+                            "ignoreGeneric": false,
+                        },
+                        {
+                            "name": "Iron",
+                            "ignoreGeneric": false,
+                        },
+                        {
+                            "name": "Magnesium",
+                            "ignoreGeneric": false,
+                        },
+                        {
+                            "name": "Zinc",
+                            "ignoreGeneric": false,
+                        },
+                        {
+                            "name": "Phosphorus",
+                            "ignoreGeneric": false,
+                        },
+                        {
+                            "name": "Copper",
+                            "ignoreGeneric": false,
+                        },
+                        {
+                            "name": "Manganese",
+                            "ignoreGeneric": false,
+                        },
+                        {
+                            "name": "Selenium",
+                            "ignoreGeneric": false,
+                        },
+                        {
+                            "name": "Chromium",
+                            "ignoreGeneric": false,
+                        },
+                        {
+                            "name": "Molybdenum",
+                            "ignoreGeneric": false,
+                        },
+                        {
+                            "name": "Chloride",
+                            "ignoreGeneric": false,
+                        },
+                        {
+                            "name": "Iodine",
+                            "ignoreGeneric": false,
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
