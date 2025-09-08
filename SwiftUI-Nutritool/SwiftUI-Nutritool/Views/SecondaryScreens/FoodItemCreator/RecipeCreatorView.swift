@@ -84,9 +84,9 @@ struct RecipeCreatorView: View {
                 .background(RoundedRectangle(cornerRadius: 10).fill(.secondaryBackground))
             
             HStack {
-                ImagedButton(title: "Exit", icon: "xmark", circleColour: .clear, cornerRadius: 10, action: onExitAction)
+                ImagedButton(title: "Exit", icon: "xmark", circleColour: .clear, cornerRadius: 10, iconPlacement: .trailing, action: onExitAction)
                 
-                ImagedButton(title: "Save & Exit", icon: "tray.and.arrow.down.fill", circleColour: .clear, cornerRadius: 10, maxWidth: .infinity,
+                ImagedButton(title: "Save & Exit", icon: "tray.and.arrow.down.fill", circleColour: .clear, cornerRadius: 10, maxWidth: .infinity, iconPlacement: .leading,
                              action: onSaveAction, item: (selectedMealGroup, draftFoodItem))
             }
             

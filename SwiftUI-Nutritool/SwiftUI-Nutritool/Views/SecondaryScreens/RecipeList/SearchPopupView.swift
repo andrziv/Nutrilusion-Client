@@ -58,7 +58,7 @@ struct SearchPopupView: View {
             }
             .clipShape(RoundedRectangle(cornerRadius: 12))
             
-            ImagedButton(title: "Dismiss", icon: "xmark", circleColour: .clear, cornerRadius: 10, maxWidth: .infinity, action: exitAction)
+            ImagedButton(title: "Exit", icon: "xmark", circleColour: .clear, cornerRadius: 10, maxWidth: .infinity, action: exitAction)
                 .frame(maxWidth: .infinity)
             
             Spacer()
