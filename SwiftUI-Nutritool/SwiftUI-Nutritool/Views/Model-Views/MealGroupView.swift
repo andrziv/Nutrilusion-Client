@@ -8,7 +8,8 @@
 import SwiftUI
 
 struct MealGroupView: View {
-    var group: MealGroup
+    @Binding var group: MealGroup
+    var editingAllowed: Bool = false
     @State var isExpanded: Bool = false
     var foodTapAction: (FoodItem) -> Void = { _ in }
     
@@ -19,7 +20,7 @@ struct MealGroupView: View {
             MealGroupHeader(group: group, isExpanded: $isExpanded, emblem: emblem)
                 .background(emblem.opacity(0.4))
             
-            MealGroupBody(group: group, isExpanded: isExpanded, emblem: emblem, foodTapAction: foodTapAction)
+            MealGroupBody(group: $group, editingAllowed: editingAllowed, isExpanded: isExpanded, emblem: emblem, foodTapAction: foodTapAction)
                 .transition(.asymmetric(
                     insertion: .move(edge: .top).combined(with: .opacity),
                     removal: .opacity
@@ -65,7 +66,8 @@ struct MealGroupHeader: View {
 }
 
 struct MealGroupBody: View {
-    let group: MealGroup
+    @Binding var group: MealGroup
+    var editingAllowed: Bool
     let isExpanded: Bool
     let emblem: Color
     
@@ -73,11 +75,11 @@ struct MealGroupBody: View {
     
     var body: some View {
         if isExpanded {
-            LazyVScroll(items: group.meals, spacing: 12) { meal in
+            LazyVScroll(items: $group.meals, spacing: 12) { $meal in
                 Button() {
                     foodTapAction(meal)
                 } label: {
-                    FoodItemView(foodItem: meal)
+                    FoodItemView(foodItem: $meal, editingAllowed: editingAllowed)
                 }
             }
             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
@@ -89,6 +91,6 @@ struct MealGroupBody: View {
 
 
 #Preview {
-    MealGroupView(group: MockData.sampleMealGroup)
-    MealGroupView(group: MockData.sampleMealGroup, isExpanded: true)
+    MealGroupView(group: .constant(MockData.sampleMealGroup))
+    MealGroupView(group: .constant(MockData.sampleMealGroup), editingAllowed: true, isExpanded: true)
 }

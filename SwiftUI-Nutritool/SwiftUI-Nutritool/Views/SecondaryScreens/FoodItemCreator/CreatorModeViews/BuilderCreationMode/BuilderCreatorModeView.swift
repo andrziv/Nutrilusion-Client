@@ -48,7 +48,7 @@ struct BuilderCreatorModeView: View {
             }
         }
         .fullScreenCover(isPresented: $showIngredientList) {
-            SearchPopupView(mealGroups: mealGroups) {
+            SearchPopupView(mealGroups: mealGroups, allowEditing: false) {
                 self.showIngredientList = false
             } itemTapAction: { newIngredient in
                 foodItem.addIngredient(newIngredient)
@@ -88,11 +88,11 @@ private struct IngredientListEditorialView: View {
     
     var body: some View {
         VStack {
-            ForEach (foodItem.ingredientList) { meal in
+            ForEach ($foodItem.ingredientList) { $meal in
                 SwipeableRow {
                     deleteIngredient(meal)
                 } content: {
-                    FoodItemView(foodItem: meal)
+                    FoodItemView(foodItem: $meal)
                 }
             }
         }

@@ -59,8 +59,8 @@ struct RecipeListView: View {
     
     var body: some View {
         ZStack(alignment: .bottom) {
-            LazyVScroll(items: model.mealGroups, spacing: 0) { mealGroup in
-                MealGroupView(group: mealGroup, isExpanded: true) { foodItem in
+            LazyVScroll(items: $model.mealGroups, spacing: 0) { $mealGroup in
+                MealGroupView(group: $mealGroup, editingAllowed: true, isExpanded: true) { foodItem in
                     foodTapAction(foodItem)
                 }
                 .padding(.top)
@@ -75,7 +75,7 @@ struct RecipeListView: View {
         .fullScreenCover(item: $mode) { mode in
             switch mode {
             case .search:
-                SearchPopupView(mealGroups: model.mealGroups) {
+                SearchPopupView(mealGroups: $model.mealGroups, allowEditing: true) {
                     self.mode = nil
                 } itemTapAction: { foodItem in
                     foodTapAction(foodItem)
@@ -91,7 +91,10 @@ struct RecipeListView: View {
                 RecipeCreatorView(foodItem: FoodItem(name: ""), mealGroups: model.mealGroups) {
                     self.mode = nil
                 } onSaveAction: { selectedGroup, editedFoodItem in
-                    appendNewItem(editedFoodItem, selectedMealGroup: selectedGroup)
+                    if let selectedGroup = selectedGroup {
+                        appendNewItem(editedFoodItem, selectedMealGroup: selectedGroup)
+                    }
+                    
                     self.mode = nil
                 }
                 .transition(.move(edge: .bottom))

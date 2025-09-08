@@ -8,12 +8,14 @@
 import SwiftUI
 
 struct FoodItemView: View {
-    var foodItem: FoodItem
+    @Binding var foodItem: FoodItem
     var mealGroup: MealGroup? = nil
+    var editingAllowed: Bool = false
     @State var isExpanded: Bool = false
     var textColor: Color = .primaryText
     var subtextColor: Color = .secondaryText
     var backgroundColor: Color = .backgroundColour
+    @State private var showFoodEditor: Bool = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -26,7 +28,15 @@ struct FoodItemView: View {
                     .opacity(0.5)
             }
             
-            FoodItemBody(foodItem: foodItem, isExpanded: $isExpanded)
+            FoodItemBody(foodItem: foodItem, editingAllowed: editingAllowed, isExpanded: $isExpanded, showFoodEditor: $showFoodEditor)
+        }
+        .sheet(isPresented: $showFoodEditor) {
+            RecipeCreatorView(foodItem: foodItem, mealGroups: []) {
+                showFoodEditor = false
+            } onSaveAction: { _, editedFoodItem in
+                showFoodEditor = false
+                foodItem = editedFoodItem
+            }
         }
         .padding()
         .background(.regularMaterial)
@@ -78,8 +88,10 @@ struct FoodItemHeader: View {
 }
 
 struct FoodItemBody: View {
-    let foodItem: FoodItem
+    var foodItem: FoodItem
+    let editingAllowed: Bool
     @Binding var isExpanded: Bool
+    @Binding var showFoodEditor: Bool
     var textColour: Color = .primaryText
     var subtextColour: Color = .secondaryText
     
@@ -118,7 +130,7 @@ struct FoodItemBody: View {
             }
             
             if isExpanded {
-                ExpandedFoodItemControlRow(isExpanded: $isExpanded)
+                ExpandedFoodItemControlRow(foodItem: foodItem, editingAllowed: editingAllowed, isExpanded: $isExpanded, showRecipeEditor: $showFoodEditor)
             }
         }
         .transition(.asymmetric(
@@ -206,7 +218,10 @@ struct MinimizedFoodItemControlRow: View {
 }
 
 struct ExpandedFoodItemControlRow: View {
+    var foodItem: FoodItem
+    let editingAllowed: Bool
     @Binding var isExpanded: Bool
+    @Binding var showRecipeEditor: Bool
     
     var body: some View {
         ZStack(alignment: .trailing) {
@@ -219,25 +234,27 @@ struct ExpandedFoodItemControlRow: View {
                     .frame(maxWidth: .infinity)
             }
             
-            Button {
-                // TODO: Fill out later when recipe editing becomes available
-            } label: {
-                Image(systemName: "pencil")
-                    .foregroundStyle(.primaryText)
-                    .font(.callout)
-                    .padding(.horizontal)
-                    .padding(.vertical, 4)
-                    .overlay(content: {
-                        RoundedRectangle(cornerRadius: 100)
-                            .fill(.secondaryText)
-                            .opacity(0.2)
-                    })
+            if editingAllowed {
+                Button {
+                    showRecipeEditor = true
+                } label: {
+                    Image(systemName: "pencil")
+                        .foregroundStyle(.primaryText)
+                        .font(.callout)
+                        .padding(.horizontal)
+                        .padding(.vertical, 4)
+                        .overlay(content: {
+                            RoundedRectangle(cornerRadius: 100)
+                                .fill(.secondaryText)
+                                .opacity(0.2)
+                        })
+                }
             }
         }
     }
 }
 
 #Preview {
-    FoodItemView(foodItem: MockData.foodItemList[0], mealGroup: MockData.sampleMealGroup, backgroundColor: .backgroundColour)
-    FoodItemView(foodItem: MockData.foodItemList[0], mealGroup: MockData.sampleMealGroup, isExpanded: true, backgroundColor: .backgroundColour)
+    FoodItemView(foodItem: .constant(MockData.foodItemList[0]), mealGroup: MockData.sampleMealGroup, backgroundColor: .backgroundColour)
+    FoodItemView(foodItem: .constant(MockData.foodItemList[0]), mealGroup: MockData.sampleMealGroup, editingAllowed: true, isExpanded: true, backgroundColor: .backgroundColour)
 }

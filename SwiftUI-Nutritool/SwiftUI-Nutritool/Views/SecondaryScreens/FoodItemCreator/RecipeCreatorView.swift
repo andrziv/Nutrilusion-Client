@@ -39,35 +39,38 @@ struct RecipeCreatorView: View {
     let foodItem: FoodItem
     let mealGroups: [MealGroup]
     let onExitAction: () -> Void
-    let onSaveAction: (MealGroup, FoodItem) -> Void
+    let onSaveAction: (MealGroup?, FoodItem) -> Void
     
     @State private var draftFoodItem: FoodItem
-    @State private var selectedMealGroup: MealGroup
+    @State private var selectedMealGroup: MealGroup?
     @State private var selectedMode: RecipeCreatorMode
     
-    init(foodItem: FoodItem, mealGroups: [MealGroup], onExitAction: @escaping () -> Void, onSaveAction: @escaping (MealGroup, FoodItem) -> Void) {
+    init(foodItem: FoodItem, mealGroups: [MealGroup], onExitAction: @escaping () -> Void, onSaveAction: @escaping (MealGroup?, FoodItem) -> Void) {
         self.foodItem = foodItem
         self.mealGroups = mealGroups
         self.onExitAction = onExitAction
         self.onSaveAction = onSaveAction
         
         self.draftFoodItem = foodItem
+        
         self.selectedMealGroup = mealGroups.first { group in
             group.meals.contains { $0.id == foodItem.id }
-        } ?? mealGroups[0]
+        } ?? (mealGroups.isEmpty ? nil : mealGroups.first!)
         self.selectedMode = .builder
     }
     
     var body: some View {
         VStack {
             HStack {
+                let bgColourHex = selectedMealGroup?.colour ?? Color("backgroundColour").mix(with: .primaryText, by: 0.3).toHex()!
+                let backgroundColour = Color(hex: bgColourHex)
                 FoodItemBasicInfoEditors(titleInput: $draftFoodItem.name,
                                          unitSingularInput: $draftFoodItem.servingUnit,
                                          unitPluralInput: $draftFoodItem.servingUnitMultiple,
                                          selectedGroup: $selectedMealGroup,
                                          availableMealGroups: mealGroups)
                 .padding(5)
-                .background(Rectangle().fill(Color(hex: selectedMealGroup.colour)).blur(radius: 200))
+                .background(Rectangle().fill(backgroundColour).blur(radius: 200))
                 .clipShape(
                     RoundedRectangle(cornerRadius: 10)
                 )
@@ -83,7 +86,8 @@ struct RecipeCreatorView: View {
             HStack {
                 ImagedButton(title: "Exit", icon: "xmark", circleColour: .clear, cornerRadius: 10, action: onExitAction)
                 
-                ImagedButton(title: "Save & Exit", icon: "tray.and.arrow.down.fill", circleColour: .clear, cornerRadius: 10, maxWidth: .infinity, action: onSaveAction, item: (selectedMealGroup, draftFoodItem))
+                ImagedButton(title: "Save & Exit", icon: "tray.and.arrow.down.fill", circleColour: .clear, cornerRadius: 10, maxWidth: .infinity,
+                             action: onSaveAction, item: (selectedMealGroup, draftFoodItem))
             }
             
             Spacer()
@@ -96,7 +100,7 @@ private struct FoodItemBasicInfoEditors: View {
     @Binding var titleInput: String
     @Binding var unitSingularInput: String
     @Binding var unitPluralInput: String
-    @Binding var selectedGroup: MealGroup
+    @Binding var selectedGroup: MealGroup?
     var availableMealGroups: [MealGroup]
     
     var body: some View {
@@ -128,7 +132,23 @@ private struct FoodItemBasicInfoEditors: View {
                 .textInputAutocapitalization(.never)
             }
             
-            FoodGroupPicker(mealgroups: availableMealGroups, selectedGroup: $selectedGroup)
+            if let selectionBinding = Binding<MealGroup>($selectedGroup), !availableMealGroups.isEmpty {
+                FoodGroupPicker(mealgroups: availableMealGroups, selectedGroup: selectionBinding)
+            } else {
+                HStack {
+                    Spacer()
+                    
+                    Text("No Categories Available")
+                    
+                    Spacer()
+                }
+                .padding(.horizontal, 8)
+                .padding(.vertical, 5)
+                .background(
+                    RoundedRectangle(cornerRadius: 7)
+                        .fill(.secondaryBackground.opacity(0.45))
+                )
+            }
         }
     }
 }

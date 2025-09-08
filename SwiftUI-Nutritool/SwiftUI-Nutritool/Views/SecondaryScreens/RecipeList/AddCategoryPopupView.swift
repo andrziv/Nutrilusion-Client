@@ -54,7 +54,7 @@ struct MealGroupPreviewView: View {
     
     var body: some View {
         ZStack(alignment: .top) {
-            MealGroupView(group: MealGroup(id: UUID(), name: searchString, meals: [MockData.sampleFoodItem], colour: colourPicked.toHex()!))
+            MealGroupView(group: .constant(MealGroup(id: UUID(), name: searchString, meals: [MockData.sampleFoodItem], colour: colourPicked.toHex()!)))
                 .id(searchString + (colourPicked.toHex() ?? ""))
                 .padding(.vertical)
             
