@@ -228,7 +228,7 @@ fileprivate struct NutrientTreeBlockEntryHeaderView<Content: View>: View {
                 if blockMode != .noChildren {
                     Image(systemName: blockMode == .expanded ? "chevron.down" : "chevron.right")
                         .font(.caption)
-                        .foregroundColor(.primaryText)
+                        .foregroundStyle(.primaryText)
                 }
                 
                 Text(text)

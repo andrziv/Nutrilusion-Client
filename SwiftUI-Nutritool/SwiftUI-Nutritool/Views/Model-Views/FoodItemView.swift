@@ -117,16 +117,7 @@ struct FoodItemBody: View {
             }
             
             if isExpanded && !foodItem.ingredientList.isEmpty {
-                Text("Ingredients")
-                    .font(.subheadline)
-                    .bold()
-                    .padding(.top, 6)
-                
-                ForEach(foodItem.ingredientList) { ingredient in
-                    Text(ingredient.name)
-                        .font(.footnote)
-                        .foregroundColor(.secondary)
-                }
+                FoodItemIngredientShowcase(foodItem: foodItem)
             }
             
             if isExpanded {
@@ -187,11 +178,39 @@ struct ChildNutrientRecursionView: View {
                 HStack {
                     Image(systemName: "arrow.turn.down.right")
                     NutrientItemView(nutrientOfInterest: childNutrient, viewType: .txt)
-                        .fontWeight(.light)
                 }
+                .foregroundStyle(.primaryText)
+                .fontWeight(.light)
+                
                 ChildNutrientRecursionView(nutrient: childNutrient, isOrigin: false)
             }
             .padding(.leading, isOrigin ? 0 : 25)
+        }
+    }
+}
+
+struct FoodItemIngredientShowcase: View {
+    let foodItem: FoodItem
+    
+    var body: some View {
+        Text("Ingredients")
+            .font(.subheadline)
+            .fontWeight(.semibold)
+            .foregroundStyle(.primaryText)
+            .padding(.top, 6)
+        
+        ForEach(foodItem.ingredientList) { ingredient in
+            HStack {
+                Text(ingredient.name)
+                    .font(.footnote)
+                    .foregroundStyle(.secondaryText)
+                
+                Spacer()
+                
+                Text(ServingSizeText(ingredient))
+                    .font(.footnote)
+                    .foregroundStyle(.secondaryText)
+            }
         }
     }
 }

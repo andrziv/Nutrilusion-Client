@@ -120,14 +120,11 @@ struct ServingSizeView: View {
     var secondaryTextColor: Color = .secondaryText
     
     var body: some View {
-        let servingTotal = foodItem.servingAmount
-        let isUnitMultiple = servingTotal > 1
+        
         switch viewType {
         case .img:
-            Label("\(RoundingDouble(servingTotal)) " +
-                  "\(isUnitMultiple ? foodItem.servingUnitMultiple : foodItem.servingUnit)",
-                  systemImage: "dot.square")
-            .foregroundStyle(primaryTextColor)
+            Label(ServingSizeText(foodItem), systemImage: "dot.square")
+                .foregroundStyle(primaryTextColor)
         case .txt:
             HStack {
                 Text("Serving Size")
@@ -135,7 +132,7 @@ struct ServingSizeView: View {
                 
                 Spacer()
                 
-                Text("\(RoundingDouble(servingTotal)) \(isUnitMultiple ? foodItem.servingUnitMultiple : foodItem.servingUnit)")
+                Text(ServingSizeText(foodItem))
                     .foregroundStyle(secondaryTextColor)
             }
         }
@@ -169,4 +166,11 @@ struct MealServingSizeView: View {
             }
         }
     }
+}
+
+func ServingSizeText(_ foodItem: FoodItem) -> String {
+    let servingTotal = foodItem.servingAmount
+    let isUnitMultiple = servingTotal > 1
+    
+    return "\(RoundingDouble(servingTotal)) \(isUnitMultiple ? foodItem.servingUnitMultiple : foodItem.servingUnit)"
 }

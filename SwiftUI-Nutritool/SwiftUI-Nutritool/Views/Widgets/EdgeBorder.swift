@@ -77,7 +77,10 @@ struct EdgeBorder: ViewModifier {
         
         content
             .padding(alignment.paddingAlignment, thickness)
-            .background(Rectangle().frame(width: width, height: height, alignment: alignment.borderAlignment).foregroundColor(colour), alignment: alignment.borderAlignment)
+            .background(
+                Rectangle()
+                    .frame(width: width, height: height, alignment: alignment.borderAlignment)
+                    .foregroundStyle(colour), alignment: alignment.borderAlignment)
     }
 }
 

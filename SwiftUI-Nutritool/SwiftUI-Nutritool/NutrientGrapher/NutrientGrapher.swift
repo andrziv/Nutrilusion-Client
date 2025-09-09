@@ -133,7 +133,7 @@ struct NutrientBrowser: View {
                 if !resultParents.isEmpty {
                     Text("Parents: \(resultParents.joined(separator: " → "))")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondaryText)
                 }
                 
                 if !resultChildren.isEmpty {

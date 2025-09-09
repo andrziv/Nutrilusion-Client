@@ -45,7 +45,7 @@ struct MealGroupHeader: View {
         HStack {
             Text(group.name)
                 .font(.headline)
-                .foregroundStyle(.primary)
+                .foregroundStyle(.primaryText)
             
             Spacer()
             
@@ -55,7 +55,7 @@ struct MealGroupHeader: View {
                 Image(systemName: "chevron.down.circle.fill")
                     .font(.title2)
                     .rotationEffect(.degrees(isExpanded ? 180 : 0))
-                    .foregroundStyle(emblem.mix(with: .primary, by: 0.3))
+                    .foregroundStyle(emblem.mix(with: .primaryText, by: 0.3))
                     .symbolRenderingMode(.hierarchical)
             }
             .buttonStyle(.plain)
