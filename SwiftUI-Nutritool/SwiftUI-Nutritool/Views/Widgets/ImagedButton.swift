@@ -41,65 +41,89 @@ enum IconPlacement {
     }
 }
 
-struct ImagedButton<T>: View {
-    let title: String
+struct ImagedButton<Item>: View {
+    let title: String?
     let icon: String
+    
     var fontColour: Color = .primaryText
+    var imageFont: Font = .callout
+    var textFont: Font = .headline
+    
     var circleColour: Color = .blue
     var cornerRadius: CGFloat = 12
-    var maxWidth: CGFloat?
+    var verticalPadding: CGFloat = 11.5
+    var horizontalPadding: CGFloat = 12
+    var maxWidth: CGFloat? = nil
+    var backgroundColour: Color = .secondaryBackground
+    
     var iconPlacement: IconPlacement = .leading
     
-    let action: (T) -> Void
-    var item: T
+    let item: Item
+    let action: (Item) -> Void
     
     var body: some View {
         Button {
             action(item)
         } label: {
-            iconPlacement.arrange(icon: iconView, label: textView)
+            iconPlacement
+                .arrange(icon: iconView, label: textView)
                 .foregroundStyle(fontColour)
-                .padding(.vertical, 8)
-                .padding(.horizontal, 12)
+                .padding(.vertical, verticalPadding)
+                .padding(.horizontal, horizontalPadding)
                 .frame(maxWidth: maxWidth)
                 .background(
                     RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                        .fill(.secondaryBackground)
+                        .fill(backgroundColour)
                 )
         }
     }
     
     private var iconView: some View {
         Image(systemName: icon)
-            .frame(width: 28, height: 28)
-            .background(
-                Circle()
-                    .fill(circleColour.opacity(0.2))
-            )
+            .font(imageFont)
+            .background(Circle().fill(circleColour.opacity(0.2)))
     }
     
     private var textView: some View {
-        Text(title)
-            .font(.headline)
+        if let title {
+            AnyView(Text(title).font(textFont))
+        } else {
+            AnyView(EmptyView())
+        }
     }
 }
 
-extension ImagedButton where T == Void {
-    init(title: String,
+extension ImagedButton where Item == Void {
+    init(title: String?,
          icon: String,
          fontColour: Color = .primaryText,
+         imageFont: Font = .callout,
+         textFont: Font = .headline,
          circleColour: Color = .blue,
          cornerRadius: CGFloat = 12,
+         verticalPadding: CGFloat = 11.5,
+         horizontalPadding: CGFloat = 12,
          maxWidth: CGFloat? = nil,
+         backgroundColour: Color = .secondaryBackground,
          iconPlacement: IconPlacement = .leading,
          action: @escaping () -> Void) {
         self.title = title
         self.icon = icon
+        
         self.fontColour = fontColour
+        self.imageFont = imageFont
+        self.textFont = textFont
+        
         self.circleColour = circleColour
         self.cornerRadius = cornerRadius
+        self.verticalPadding = verticalPadding
+        self.horizontalPadding = horizontalPadding
         self.maxWidth = maxWidth
+        self.backgroundColour = backgroundColour
+        
         self.iconPlacement = iconPlacement
+        
         self.action = { _ in action() }
+        self.item = ()
     }
 }

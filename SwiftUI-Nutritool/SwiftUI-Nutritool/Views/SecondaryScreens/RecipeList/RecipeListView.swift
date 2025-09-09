@@ -20,9 +20,9 @@ enum RecipeListViewMode: Identifiable {
         }
     }
     
-    var title: String {
+    var title: String? {
         switch self {
-        case .search: return ""
+        case .search: return nil
         case .addCategory: return "Category"
         case .addRecipe: return "Recipe"
         }
@@ -108,11 +108,13 @@ private struct FloatingActionMenu: View {
     
     var body: some View {
         HStack {
+            Spacer()
+            
             HStack(spacing: 24) {
-                VerticalActionButton(title: RecipeListViewMode.addCategory.title, icon: RecipeListViewMode.addCategory.icon) {
+                FloatingMenuButton(title: RecipeListViewMode.addCategory.title, icon: RecipeListViewMode.addCategory.icon) {
                     mode = .addCategory
                 }
-                VerticalActionButton(title: RecipeListViewMode.addRecipe.title, icon: RecipeListViewMode.addRecipe.icon) {
+                FloatingMenuButton(title: RecipeListViewMode.addRecipe.title, icon: RecipeListViewMode.addRecipe.icon) {
                     mode = .addRecipe
                 }
             }
@@ -123,7 +125,7 @@ private struct FloatingActionMenu: View {
                     .fill(.ultraThinMaterial)
             )
             
-            VerticalActionButton(title: RecipeListViewMode.search.title, icon: RecipeListViewMode.search.icon) {
+            FloatingMenuButton(title: RecipeListViewMode.search.title, icon: RecipeListViewMode.search.icon) {
                 mode = .search
             }
             .padding(15)
@@ -135,26 +137,21 @@ private struct FloatingActionMenu: View {
     }
 }
 
-// TODO: refactor ImagedButton to either be horizontal or vertical and use that instead?
-struct VerticalActionButton: View {
-    let title: String
+private struct FloatingMenuButton: View {
+    let title: String?
     let icon: String
     let action: () -> Void
     
     var body: some View {
-        Button(action: action) {
-            VStack(spacing: 4) {
-                Image(systemName: icon)
-                    .font(.title3)
-                if !title.isEmpty {
-                    Text(title)
-                        .font(.caption2)
-                }
-            }
-            .foregroundStyle(.primaryText)
-            .foregroundStyle(.primary)
-            .frame(minWidth: 56)
-        }
+        ImagedButton(title: title,
+                     icon: icon,
+                     textFont: .caption2,
+                     circleColour: .clear,
+                     verticalPadding: 0,
+                     horizontalPadding: 0,
+                     backgroundColour: .clear,
+                     iconPlacement: .top,
+                     action: action)
     }
 }
 

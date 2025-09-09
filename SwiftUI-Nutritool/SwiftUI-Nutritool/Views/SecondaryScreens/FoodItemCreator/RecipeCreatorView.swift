@@ -87,7 +87,7 @@ struct RecipeCreatorView: View {
                 ImagedButton(title: "Exit", icon: "xmark", circleColour: .clear, cornerRadius: 10, iconPlacement: .trailing, action: onExitAction)
                 
                 ImagedButton(title: "Save & Exit", icon: "tray.and.arrow.down.fill", circleColour: .clear, cornerRadius: 10, maxWidth: .infinity, iconPlacement: .leading,
-                             action: onSaveAction, item: (selectedMealGroup, draftFoodItem))
+                             item: (selectedMealGroup, draftFoodItem), action: onSaveAction)
             }
             
             Spacer()
