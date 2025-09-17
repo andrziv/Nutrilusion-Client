@@ -142,6 +142,7 @@ private struct FoodItemBasicInfoEditors: View {
                     
                     Spacer()
                 }
+                .foregroundStyle(.primaryText)
                 .padding(.horizontal, 8)
                 .padding(.vertical, 5)
                 .background(
