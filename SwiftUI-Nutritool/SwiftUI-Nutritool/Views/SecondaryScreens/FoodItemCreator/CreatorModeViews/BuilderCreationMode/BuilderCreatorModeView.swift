@@ -87,7 +87,7 @@ private struct IngredientListEditorialView: View {
     }
     
     var body: some View {
-        VStack {
+        VStack(spacing: 12) {
             ForEach ($foodItem.ingredientList) { $meal in
                 SwipeableRow {
                     deleteIngredient(meal)
