@@ -204,7 +204,7 @@ struct FoodItem: Identifiable, Equatable {
     /// Add a FoodItem ingredient to this FoodItem.
     /// - Parameters:
     ///   - ingredient: The Fooditem ingredient to add.
-    ///   - addNutrients: If set to true, the addition of the ingredient will result in the ingredient's nutrients being added to the caller's nutrition info. If a nutrient does not exist within the caller's nutrient tree, the nutrient will be added outright.
+    ///   - addNutrients: If set to `true`, the addition of the ingredient will result in the ingredient's nutrients being added to the caller's nutrition info. If a nutrient does not exist within the caller's nutrient tree, the nutrient will be added outright.
     mutating func addIngredient(_ ingredient: FoodItem, addNutrients: Bool = true) {
         ingredientList.append(ingredient)
         calories += ingredient.calories
@@ -223,7 +223,7 @@ struct FoodItem: Identifiable, Equatable {
     /// Removes a FoodItem ingredient from this FoodItem.
     /// - Parameters:
     ///   - ingredient: The Fooditem ingredient to remove. Ingredients are compared by ID.
-    ///   - subtractNutrients: If set to true and the ingredient is held by the caller, the removal of the ingredient will result in the ingredient's nutrients being subtracted from the caller's nutrition info. If a nutrient ends at zero value, the nutrient will not be automatically removed.
+    ///   - subtractNutrients: If set to `true` and the ingredient is held by the caller, the removal of the ingredient will result in the ingredient's nutrients being subtracted from the caller's nutrition info. If a nutrient ends at zero value, the nutrient will not be automatically removed.
     mutating func removeIngredient(_ ingredient: FoodItem, subtractNutrients: Bool = true) {
         if let existsAtIndex = ingredientList.firstIndex(where: { $0.id == ingredient.id }) {
             ingredientList.remove(at: existsAtIndex)
@@ -239,6 +239,25 @@ struct FoodItem: Identifiable, Equatable {
                 }
             }
         }
+    }
+    
+    /// Checks if this FoodItem contains a given ingredient, either directly or within nested child ingredients.
+    /// - Parameter ingredient: The ingredient to search for.
+    /// - Returns: `true` if the ingredient is found anywhere within this FoodItem, `false` otherwise.
+    func containsIngredient(_ ingredient: FoodItem) -> Bool {
+        // direct match
+        if ingredientList.contains(where: { $0.id == ingredient.id }) {
+            return true
+        }
+        
+        // recursive search
+        for child in ingredientList {
+            if child.containsIngredient(ingredient) {
+                return true
+            }
+        }
+        
+        return false
     }
     
     // just creates a chain of nutrient items corresponding to a given nutrient name array
@@ -370,6 +389,7 @@ struct MockData {
                                                   NutrientItem(name: "Sugar", amount: 1.0, unit: .grams)])
                 ],
                 ingredientList: [
+                    sampleFoodItem,
                     FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000113")!, name: "Pasta Sheets", calories: 150),
                     FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000114")!, name: "Ground Beef", calories: 200),
                     FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000115")!, name: "Tomato Sauce", calories: 50),

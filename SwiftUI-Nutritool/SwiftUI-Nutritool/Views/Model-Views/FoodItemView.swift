@@ -9,7 +9,9 @@ import SwiftUI
 
 struct FoodItemView: View {
     @Binding var foodItem: FoodItem
-    var mealGroup: MealGroup? = nil
+    var associatedMealGroup: MealGroup? = nil
+    var otherGroups: [MealGroup]? = nil
+    var showGroupInfo: Bool = false
     var editingAllowed: Bool = false
     @State var isExpanded: Bool = false
     var textColor: Color = .primaryText
@@ -17,9 +19,22 @@ struct FoodItemView: View {
     var backgroundColor: Color = .backgroundColour
     @State private var showFoodEditor: Bool = false
     
+    private func combinedMealGroups() -> [MealGroup] {
+        var combined: [MealGroup] = []
+
+        if let group = associatedMealGroup {
+            combined.append(group)
+        }
+        if let groups = otherGroups {
+            combined.append(contentsOf: groups)
+        }
+        
+        return combined
+    }
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            FoodItemHeader(foodItem: foodItem, mealGroup: mealGroup, isExpanded: isExpanded)
+            FoodItemHeader(foodItem: foodItem, mealGroup: associatedMealGroup, showGroupInfo: showGroupInfo, isExpanded: isExpanded)
             
             if !isExpanded {
                 Line()
@@ -31,9 +46,9 @@ struct FoodItemView: View {
             FoodItemBody(foodItem: foodItem, editingAllowed: editingAllowed, isExpanded: $isExpanded, showFoodEditor: $showFoodEditor)
         }
         .sheet(isPresented: $showFoodEditor) {
-            RecipeCreatorView(foodItem: foodItem, mealGroups: []) {
+            RecipeCreatorView(foodItem: foodItem, mealGroups: combinedMealGroups()) {
                 showFoodEditor = false
-            } onSaveAction: { _, editedFoodItem in
+            } onSaveAction: { potentialNewGroup, editedFoodItem in
                 showFoodEditor = false
                 foodItem = editedFoodItem
             }
@@ -48,6 +63,7 @@ struct FoodItemView: View {
 struct FoodItemHeader: View {
     let foodItem: FoodItem
     let mealGroup: MealGroup?
+    let showGroupInfo: Bool
     var isExpanded: Bool = false
     var textColour: Color = .primaryText
     var subtextColour: Color = .secondaryText
@@ -61,7 +77,7 @@ struct FoodItemHeader: View {
                     .fontWeight(.bold)
                     .foregroundStyle(textColour)
                 
-                if !isExpanded, let mealGroup = mealGroup {
+                if !isExpanded, let mealGroup = mealGroup, showGroupInfo {
                     Text(mealGroup.name)
                         .font(.footnote)
                         .fontWeight(.semibold)
@@ -75,7 +91,7 @@ struct FoodItemHeader: View {
                 ServingSizeView(foodItem: foodItem, primaryTextColor: subtextColour)
                     .labelStyle(CustomLabel(spacing: 5))
                     .font(.footnote)
-            } else if let mealGroup = mealGroup {
+            } else if let mealGroup = mealGroup, showGroupInfo {
                 Spacer()
                 
                 Text(mealGroup.name)
@@ -274,6 +290,6 @@ struct ExpandedFoodItemControlRow: View {
 }
 
 #Preview {
-    FoodItemView(foodItem: .constant(MockData.foodItemList[0]), mealGroup: MockData.sampleMealGroup, backgroundColor: .backgroundColour)
-    FoodItemView(foodItem: .constant(MockData.foodItemList[0]), mealGroup: MockData.sampleMealGroup, editingAllowed: true, isExpanded: true, backgroundColor: .backgroundColour)
+    FoodItemView(foodItem: .constant(MockData.foodItemList[0]), associatedMealGroup: MockData.sampleMealGroup, showGroupInfo: false, backgroundColor: .backgroundColour)
+    FoodItemView(foodItem: .constant(MockData.foodItemList[0]), associatedMealGroup: MockData.sampleMealGroup, showGroupInfo: true, editingAllowed: true, isExpanded: true, backgroundColor: .backgroundColour)
 }

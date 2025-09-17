@@ -9,6 +9,7 @@ import SwiftUI
 
 struct MealGroupView: View {
     @Binding var group: MealGroup
+    var otherGroups: [MealGroup]? = nil
     var editingAllowed: Bool = false
     @State var isExpanded: Bool = false
     var foodTapAction: (FoodItem) -> Void = { _ in }
@@ -20,7 +21,7 @@ struct MealGroupView: View {
             MealGroupHeader(group: group, isExpanded: $isExpanded, emblem: emblem)
                 .background(emblem.opacity(0.4))
             
-            MealGroupBody(group: $group, editingAllowed: editingAllowed, isExpanded: isExpanded, emblem: emblem, foodTapAction: foodTapAction)
+            MealGroupBody(group: $group, otherGroups: otherGroups, editingAllowed: editingAllowed, isExpanded: isExpanded, emblem: emblem, foodTapAction: foodTapAction)
                 .transition(.asymmetric(
                     insertion: .move(edge: .top).combined(with: .opacity),
                     removal: .opacity
@@ -67,6 +68,7 @@ struct MealGroupHeader: View {
 
 struct MealGroupBody: View {
     @Binding var group: MealGroup
+    let otherGroups: [MealGroup]?
     var editingAllowed: Bool
     let isExpanded: Bool
     let emblem: Color
@@ -79,7 +81,7 @@ struct MealGroupBody: View {
                 Button {
                     foodTapAction(meal)
                 } label: {
-                    FoodItemView(foodItem: $meal, editingAllowed: editingAllowed)
+                    FoodItemView(foodItem: $meal, associatedMealGroup: group, otherGroups: otherGroups, editingAllowed: editingAllowed)
                 }
                 .buttonStyle(.plain)
             }

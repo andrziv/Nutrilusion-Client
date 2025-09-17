@@ -50,9 +50,18 @@ struct BuilderCreatorModeView: View {
         .fullScreenCover(isPresented: $showIngredientList) {
             SearchPopupView(mealGroups: mealGroups, allowEditing: false) {
                 self.showIngredientList = false
-            } itemTapAction: { newIngredient in
+            } itemTapAction: { _, newIngredient in
                 foodItem.addIngredient(newIngredient)
                 self.showIngredientList = false
+            } isItemDisabled: { candidate in
+                candidate.id == foodItem.id || candidate.containsIngredient(foodItem)
+            } overlayProvider: { candidate in
+                if candidate.id == foodItem.id {
+                    return AnyView(BlockedOverlay(label: "Item Being Edited", colour: .red))
+                } else if candidate.containsIngredient(foodItem) {
+                    return AnyView(BlockedOverlay(label: "Contains Current Item", colour: .orange))
+                }
+                return AnyView(EmptyView())
             }
         }
     }
@@ -120,6 +129,27 @@ private struct BuilderModeSwitcherView: View {
                 }
             }
         }
+    }
+}
+
+private struct BlockedOverlay: View {
+    let label: String
+    let colour: Color
+    
+    var body: some View {
+        ZStack(alignment: .topTrailing) {
+            RoundedRectangle(cornerRadius: 12)
+                .fill(colour.opacity(0.05))
+            
+            Text(label)
+                .font(.caption2.bold())
+                .padding(4)
+                .background(colour.opacity(0.9))
+                .foregroundColor(.white)
+                .cornerRadius(6)
+                .padding(6)
+        }
+        .allowsHitTesting(false)
     }
 }
 

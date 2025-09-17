@@ -57,10 +57,23 @@ struct RecipeListView: View {
         }
     }
     
+    private func removeItem(_ toRemove: FoodItem, from mealGroup: MealGroup) {
+        if let index = model.mealGroups.firstIndex(where: { $0.id == mealGroup.id }) {
+            var group = model.mealGroups[index]
+            if let removedItemIndex = group.meals.firstIndex(where: { $0.id == toRemove.id }) {
+                group.meals.remove(at: removedItemIndex)
+                model.mealGroups[index] = group
+            }
+        }
+    }
+    
     var body: some View {
         ZStack(alignment: .bottom) {
             LazyVScroll(items: $model.mealGroups, spacing: 0) { $mealGroup in
-                MealGroupView(group: $mealGroup, editingAllowed: true, isExpanded: true) { foodItem in
+                // TODO: look at this later and maybe make it so that we aren't doing an extra level of iterations?
+                let otherGroups = model.mealGroups.filter { $0.id != mealGroup.id }
+                
+                MealGroupView(group: $mealGroup, otherGroups: otherGroups, editingAllowed: true, isExpanded: true) { foodItem in
                     foodTapAction(foodItem)
                 }
                 .padding(.top)
@@ -77,7 +90,7 @@ struct RecipeListView: View {
             case .search:
                 SearchPopupView(mealGroups: $model.mealGroups, allowEditing: true) {
                     self.mode = nil
-                } itemTapAction: { foodItem in
+                } itemTapAction: { _, foodItem in
                     foodTapAction(foodItem)
                     self.mode = nil
                 }

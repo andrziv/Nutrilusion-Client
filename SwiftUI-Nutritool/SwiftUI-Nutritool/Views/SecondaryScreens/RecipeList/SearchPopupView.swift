@@ -10,25 +10,40 @@ import SwiftUI
 
 struct SearchPopupView: View {
     let exitAction: () -> Void
-    let itemTapAction: (FoodItem) -> Void
+    let itemTapAction: (MealGroup?, FoodItem) -> Void
     let allowEditing: Bool
+    
+    let isItemDisabled: ((FoodItem) -> Bool)?
+    let overlayProvider: ((FoodItem) -> AnyView)?
     
     @Binding private var mealGroups: [MealGroup]
     @StateObject private var viewModel: FoodItemSearchViewModel
     @FocusState private var searchFocus: Bool
     
-    init(mealGroups: [MealGroup], allowEditing: Bool, exitAction: @escaping () -> Void, itemTapAction: @escaping (FoodItem) -> Void) {
+    init(mealGroups: [MealGroup], allowEditing: Bool,
+         exitAction: @escaping () -> Void, itemTapAction: @escaping (MealGroup?, FoodItem) -> Void,
+         isItemDisabled: ((FoodItem) -> Bool)? = nil, overlayProvider: ((FoodItem) -> AnyView)? = nil) {
         self.allowEditing = allowEditing
         self.exitAction = exitAction
         self.itemTapAction = itemTapAction
+        
+        self.isItemDisabled = isItemDisabled
+        self.overlayProvider = overlayProvider
+        
         self._viewModel = StateObject(wrappedValue: FoodItemSearchViewModel(groups: mealGroups))
         self._mealGroups = .constant(mealGroups)
     }
     
-    init(mealGroups: Binding<[MealGroup]>, allowEditing: Bool, exitAction: @escaping () -> Void, itemTapAction: @escaping (FoodItem) -> Void) {
+    init(mealGroups: Binding<[MealGroup]>, allowEditing: Bool,
+         exitAction: @escaping () -> Void, itemTapAction: @escaping (MealGroup?, FoodItem) -> Void,
+         isItemDisabled: ((FoodItem) -> Bool)? = nil, overlayProvider: ((FoodItem) -> AnyView)? = nil) {
         self.allowEditing = allowEditing
         self.exitAction = exitAction
         self.itemTapAction = itemTapAction
+        
+        self.isItemDisabled = isItemDisabled
+        self.overlayProvider = overlayProvider
+        
         self._viewModel = StateObject(wrappedValue: FoodItemSearchViewModel(groups: mealGroups.wrappedValue))
         self._mealGroups = mealGroups
     }
@@ -45,15 +60,32 @@ struct SearchPopupView: View {
             
             LazyVScroll(items: viewModel.filteredPairs) { pair in
                 if let resolved = viewModel.resolveBindings(in: $mealGroups, for: pair) {
+                    let group = resolved.mealGroup
+                    let item = resolved.foodItem.wrappedValue
+                    let disabled = isItemDisabled?(item) ?? false
+                    let otherGroups = mealGroups.filter { $0.id != group.id }
+                    
                     Button {
-                        itemTapAction(resolved.foodItem.wrappedValue)
+                        if !disabled {
+                            itemTapAction(group, item)
+                        }
                     } label: {
-                        FoodItemView(
-                            foodItem: resolved.foodItem,
-                            mealGroup: resolved.mealGroup,
-                            editingAllowed: allowEditing
-                        )
+                        ZStack {
+                            FoodItemView(
+                                foodItem: resolved.foodItem,
+                                associatedMealGroup: group,
+                                otherGroups: otherGroups,
+                                showGroupInfo: true,
+                                editingAllowed: allowEditing
+                            )
+                            .opacity(disabled ? 0.4 : 1.0)
+                            
+                            if let overlay = overlayProvider?(item) {
+                                overlay
+                            }
+                        }
                     }
+                    .disabled(disabled)
                 }
             }
             .clipShape(RoundedRectangle(cornerRadius: 12))
@@ -73,7 +105,7 @@ struct SearchPopupView: View {
 #Preview {
     SearchPopupView(mealGroups: MockData.mealGroupList, allowEditing: true) {
         
-    } itemTapAction: { foodItem in
+    } itemTapAction: { potentialMealGroup, foodItem in
         
     }
 }
