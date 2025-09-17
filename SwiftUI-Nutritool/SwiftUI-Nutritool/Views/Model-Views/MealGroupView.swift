@@ -76,11 +76,12 @@ struct MealGroupBody: View {
     var body: some View {
         if isExpanded {
             LazyVScroll(items: $group.meals, spacing: 12) { $meal in
-                Button() {
+                Button {
                     foodTapAction(meal)
                 } label: {
                     FoodItemView(foodItem: $meal, editingAllowed: editingAllowed)
                 }
+                .buttonStyle(.plain)
             }
             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
             .padding()
