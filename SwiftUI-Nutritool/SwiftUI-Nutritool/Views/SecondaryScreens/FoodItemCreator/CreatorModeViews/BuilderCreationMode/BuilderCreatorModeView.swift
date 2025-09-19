@@ -32,8 +32,8 @@ fileprivate enum BuilderRecipeCreatorMode: Int, CaseIterable {
 }
 
 struct BuilderCreatorModeView: View {
-    @Binding var foodItem: FoodItem
-    let mealGroups: [MealGroup]
+    @Binding var draftFoodItem: FoodItem
+    @ObservedObject var viewModel: NutriToolFoodViewModel
     @State private var selectedMode: BuilderRecipeCreatorMode = .ingredients
     @State private var showIngredientList: Bool = false
     
@@ -42,23 +42,23 @@ struct BuilderCreatorModeView: View {
             BuilderModeSwitcherView(selectedMode: $selectedMode)
             
             if selectedMode == .ingredients {
-                IngredientEditorialView(foodItem: $foodItem, mealGroups: mealGroups, showIngredientList: $showIngredientList)
+                IngredientEditorialView(draftFoodItem: $draftFoodItem, viewModel: viewModel, showIngredientList: $showIngredientList)
             } else if selectedMode == .details {
-                ManualCreatorModeView(foodItem: $foodItem)
+                ManualCreatorModeView(foodItem: $draftFoodItem)
             }
         }
         .fullScreenCover(isPresented: $showIngredientList) {
-            SearchPopupView(mealGroups: mealGroups, allowEditing: false) {
+            SearchPopupView(foodViewModel: viewModel, allowEditing: false) {
                 self.showIngredientList = false
             } itemTapAction: { _, newIngredient in
-                foodItem.addIngredient(newIngredient)
+                draftFoodItem.addIngredient(newIngredient)
                 self.showIngredientList = false
             } isItemDisabled: { candidate in
-                candidate.id == foodItem.id || candidate.containsIngredient(foodItem)
+                candidate.id == draftFoodItem.id || candidate.containsIngredient(draftFoodItem)
             } overlayProvider: { candidate in
-                if candidate.id == foodItem.id {
+                if candidate.id == draftFoodItem.id {
                     return AnyView(BlockedOverlay(label: "Item Being Edited", colour: .red))
-                } else if candidate.containsIngredient(foodItem) {
+                } else if candidate.containsIngredient(draftFoodItem) {
                     return AnyView(BlockedOverlay(label: "Contains Current Item", colour: .orange))
                 }
                 return AnyView(EmptyView())
@@ -68,14 +68,14 @@ struct BuilderCreatorModeView: View {
 }
 
 struct IngredientEditorialView: View {
-    @Binding var foodItem: FoodItem
-    let mealGroups: [MealGroup]
+    @Binding var draftFoodItem: FoodItem
+    @ObservedObject var viewModel: NutriToolFoodViewModel
     @Binding var showIngredientList: Bool
     
     var body: some View {
         VStack {
             ScrollView {
-                IngredientListEditorialView(foodItem: $foodItem, mealGroups: mealGroups)
+                IngredientListEditorialView(draftFoodItem: $draftFoodItem, viewModel: viewModel)
             }
             
             Button {
@@ -88,20 +88,25 @@ struct IngredientEditorialView: View {
 }
 
 private struct IngredientListEditorialView: View {
-    @Binding var foodItem: FoodItem
-    let mealGroups: [MealGroup]
+    @Binding var draftFoodItem: FoodItem
+    @ObservedObject var viewModel: NutriToolFoodViewModel
     
     private func deleteIngredient(_ ingredient: FoodItem) {
-        foodItem.removeIngredient(ingredient)
+        draftFoodItem.removeIngredient(ingredient)
     }
     
     var body: some View {
         VStack(spacing: 12) {
-            ForEach ($foodItem.ingredientList) { $meal in
+            ForEach(draftFoodItem.ingredientList) { ingredient in
                 SwipeableRow {
-                    deleteIngredient(meal)
+                    deleteIngredient(ingredient)
                 } content: {
-                    FoodItemView(foodItem: $meal)
+                    FoodItemView(
+                        foodItemID: ingredient.id,
+                        viewModel: viewModel,
+                        showGroupInfo: false,
+                        editingAllowed: false
+                    )
                 }
             }
         }
@@ -154,5 +159,6 @@ private struct BlockedOverlay: View {
 }
 
 #Preview {
-    BuilderCreatorModeView(foodItem: .constant(MockData.sampleFoodItem), mealGroups: MockData.mealGroupList)
+    let viewModel = NutriToolFoodViewModel(repository: MockFoodRepository())
+    BuilderCreatorModeView(draftFoodItem: .constant(MockData.sampleFoodItem), viewModel: viewModel)
 }

@@ -37,47 +37,24 @@ enum RecipeListViewMode: Identifiable {
     }
 }
 
-// TODO: temp to make the adding work. Eventually replace with real ViewModel + Persistance
-class MealGroupsModel: ObservableObject {
-    @Published var mealGroups: [MealGroup] = MockData.mealGroupList
-}
-
 // TODO: refactor and get rid of all the magic numbers used for testing
 struct RecipeListView: View {
-    @StateObject var model = MealGroupsModel()
+    @ObservedObject var viewModel: NutriToolFoodViewModel
     @State private var mode: RecipeListViewMode? = nil
     
     let foodTapAction: (FoodItem) -> Void
     
-    private func appendNewItem(_ newItem: FoodItem, selectedMealGroup: MealGroup) {
-        if let index = model.mealGroups.firstIndex(where: { $0.id == selectedMealGroup.id }) {
-            var group = model.mealGroups[index]
-            group.meals.append(newItem)
-            model.mealGroups[index] = group
-        }
-    }
-    
-    private func removeItem(_ toRemove: FoodItem, from mealGroup: MealGroup) {
-        if let index = model.mealGroups.firstIndex(where: { $0.id == mealGroup.id }) {
-            var group = model.mealGroups[index]
-            if let removedItemIndex = group.meals.firstIndex(where: { $0.id == toRemove.id }) {
-                group.meals.remove(at: removedItemIndex)
-                model.mealGroups[index] = group
-            }
-        }
-    }
-    
     var body: some View {
         ZStack(alignment: .bottom) {
-            LazyVScroll(items: $model.mealGroups, spacing: 0) { $mealGroup in
-                // TODO: look at this later and maybe make it so that we aren't doing an extra level of iterations?
-                let otherGroups = model.mealGroups.filter { $0.id != mealGroup.id }
-                
-                MealGroupView(group: $mealGroup, otherGroups: otherGroups, editingAllowed: true, isExpanded: true) { foodItem in
+            LazyVScroll(items: viewModel.mealGroups, spacing: 0) { mealGroup in
+                MealGroupView(viewModel: viewModel,
+                              group: mealGroup,
+                              editingAllowed: true,
+                              isExpanded: true) { foodItem in
                     foodTapAction(foodItem)
                 }
                 .padding(.top)
-                .padding(.bottom, model.mealGroups.last == mealGroup ? 65 : 0)
+                .padding(.bottom, viewModel.mealGroups.last == mealGroup ? 65 : 0)
             }
             
             FloatingActionMenu(mode: $mode)
@@ -88,33 +65,32 @@ struct RecipeListView: View {
         .fullScreenCover(item: $mode) { mode in
             switch mode {
             case .search:
-                SearchPopupView(mealGroups: $model.mealGroups, allowEditing: true) {
+                SearchPopupView(foodViewModel: viewModel, allowEditing: true) {
                     self.mode = nil
                 } itemTapAction: { _, foodItem in
                     foodTapAction(foodItem)
                     self.mode = nil
                 }
-                .transition(.move(edge: .bottom))
                 
             case .addCategory:
-                AddCategoryPopupView(screenMode: $mode, mealGroups: $model.mealGroups)
-                    .transition(.move(edge: .bottom))
+                AddCategoryPopupView(viewModel: viewModel, screenMode: $mode) { newMealGroup in
+                    viewModel.addGroup(newMealGroup)
+                }
                 
             case .addRecipe:
-                RecipeCreatorView(foodItem: FoodItem(name: ""), mealGroups: model.mealGroups) {
+                RecipeCreatorView(foodItem: FoodItem(name: ""), viewModel: viewModel) {
                     self.mode = nil
                 } onSaveAction: { selectedGroup, editedFoodItem in
                     if let selectedGroup = selectedGroup {
-                        appendNewItem(editedFoodItem, selectedMealGroup: selectedGroup)
+                        viewModel.addFood(editedFoodItem, to: selectedGroup)
                     }
-                    
                     self.mode = nil
                 }
-                .transition(.move(edge: .bottom))
             }
         }
     }
 }
+
 
 private struct FloatingActionMenu: View {
     @Binding var mode: RecipeListViewMode?
@@ -170,7 +146,7 @@ private struct FloatingMenuButton: View {
 
 
 #Preview {
-    RecipeListView() { foodItem in
+    RecipeListView(viewModel: NutriToolFoodViewModel(repository: MockFoodRepository())) { foodItem in
         
     }
 }

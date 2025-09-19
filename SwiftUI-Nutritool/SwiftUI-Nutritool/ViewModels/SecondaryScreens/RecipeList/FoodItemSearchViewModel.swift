@@ -9,35 +9,18 @@ import Foundation
 import Combine
 import SwiftUICore
 
-struct FoodItemGroupPair: Identifiable {
-    let id: UUID
-    let foodItemID: UUID
-    let foodItemName: String
-    let mealGroupID: UUID
-    let mealGroupName: String
-    
-    init(foodItem: FoodItem, mealGroup: MealGroup) {
-        self.id = UUID()
-        self.foodItemID = foodItem.id
-        self.foodItemName = foodItem.name
-        self.mealGroupID = mealGroup.id
-        self.mealGroupName = mealGroup.name
-    }
-}
-
 class FoodItemSearchViewModel: ObservableObject {
     @Published var searchText: String = ""
-    @Published var filteredPairs: [FoodItemGroupPair] = []
+    @Published var results: [FoodItem] = []
     
-    private var groups: [MealGroup]
+    @ObservedObject private var foodViewModel: NutriToolFoodViewModel
     private let searchDelayTime: Int
     private let resultLimit: Int
     private var cancellables = Set<AnyCancellable>()
-    
     private var currentSearchTask: Task<Void, Never>?
-    
-    init(groups: [MealGroup], searchDelayTime: Int = 300, resultLimit: Int = 100) {
-        self.groups = groups
+
+    init(foodViewModel: NutriToolFoodViewModel, searchDelayTime: Int = 300, resultLimit: Int = 100) {
+        self.foodViewModel = foodViewModel
         self.searchDelayTime = searchDelayTime
         self.resultLimit = resultLimit
         setupSearch()
@@ -57,48 +40,29 @@ class FoodItemSearchViewModel: ObservableObject {
         currentSearchTask?.cancel()
         
         guard !query.isEmpty else {
-            filteredPairs = []
+            results = []
             return
         }
         
         currentSearchTask = Task(priority: .userInitiated) {
-            let results = await Self.search(query: query, in: groups, limit: resultLimit)
+            let matches = await Self.search(query: query, in: foodViewModel.foods, limit: resultLimit)
             
             if !Task.isCancelled {
                 await MainActor.run {
-                    self.filteredPairs = results
+                    self.results = matches
                 }
             }
         }
     }
     
-    func resolveBindings(in mealGroups: Binding<[MealGroup]>, for pair: FoodItemGroupPair) -> (foodItem: Binding<FoodItem>, mealGroup: MealGroup)? {
-        guard
-            let groupIndex = mealGroups.wrappedValue.firstIndex(where: { $0.id == pair.mealGroupID }),
-            let foodIndex = mealGroups.wrappedValue[groupIndex].meals.firstIndex(where: { $0.id == pair.foodItemID })
-        else {
-            return nil
-        }
+    private static func search(query: String, in foods: [FoodItem], limit: Int) async -> [FoodItem] {
+        var results: [FoodItem] = []
         
-        let foodItemBinding = mealGroups[groupIndex].meals[foodIndex]
-        let mealGroupValue = mealGroups.wrappedValue[groupIndex]
-        return (foodItem: foodItemBinding, mealGroup: mealGroupValue)
-    }
-    
-    func refreshSearch(with newGroups: [MealGroup]) {
-        self.groups = newGroups
-        performSearch(searchText)
-    }
-    
-    private static func search(query: String, in groups: [MealGroup], limit: Int) async -> [FoodItemGroupPair] {
-        var results: [FoodItemGroupPair] = []
-        for group in groups {
-            for food in group.meals {
-                if Task.isCancelled { return [] }
-                if food.name.localizedCaseInsensitiveContains(query) {
-                    results.append(FoodItemGroupPair(foodItem: food, mealGroup: group))
-                    if results.count >= limit { return results }
-                }
+        for food in foods {
+            if Task.isCancelled { return [] }
+            if food.name.localizedCaseInsensitiveContains(query) {
+                results.append(food)
+                if results.count >= limit { return results }
             }
         }
         return results

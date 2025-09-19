@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23788.4" systemVersion="25A354" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithSwiftData="YES" userDefinedModelVersionIdentifier="">
+    <entity name="FoodItemEntity" representedClassName="FoodItemEntity" syncable="YES" codeGenerationType="class">
+        <attribute name="calories" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="servingAmount" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="servingUnit" optional="YES" attributeType="String"/>
+        <attribute name="servingUnitMultiple" optional="YES" attributeType="String"/>
+        <relationship name="ingredientOf" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="FoodItemEntity" inverseName="ingredients" inverseEntity="FoodItemEntity"/>
+        <relationship name="ingredients" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="FoodItemEntity" inverseName="ingredientOf" inverseEntity="FoodItemEntity"/>
+        <relationship name="mealGroups" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="MealGroupEntity" inverseName="foodItems" inverseEntity="MealGroupEntity"/>
+        <relationship name="nutrients" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="NutrientItemEntity" inverseName="nutrientOf" inverseEntity="NutrientItemEntity"/>
+    </entity>
+    <entity name="LoggedMealItemEntity" representedClassName="LoggedMealItemEntity" syncable="YES" codeGenerationType="class"/>
+    <entity name="MealGroupEntity" representedClassName="MealGroupEntity" syncable="YES" codeGenerationType="class">
+        <attribute name="colour" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <relationship name="foodItems" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="FoodItemEntity" inverseName="mealGroups" inverseEntity="FoodItemEntity"/>
+    </entity>
+    <entity name="NutrientItemEntity" representedClassName="NutrientItemEntity" syncable="YES" codeGenerationType="class">
+        <attribute name="amount" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="unit" optional="YES" attributeType="String"/>
+        <relationship name="childNutrients" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="NutrientItemEntity" inverseName="parentNutrient" inverseEntity="NutrientItemEntity"/>
+        <relationship name="nutrientOf" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FoodItemEntity" inverseName="nutrients" inverseEntity="FoodItemEntity"/>
+        <relationship name="parentNutrient" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="NutrientItemEntity" inverseName="childNutrients" inverseEntity="NutrientItemEntity"/>
+    </entity>
+</model>

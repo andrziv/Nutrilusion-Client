@@ -37,7 +37,8 @@ fileprivate enum RecipeCreatorMode: Int, CaseIterable {
 
 struct RecipeCreatorView: View {
     let foodItem: FoodItem
-    let mealGroups: [MealGroup]
+    @ObservedObject var viewModel: NutriToolFoodViewModel
+    
     let onExitAction: () -> Void
     let onSaveAction: (MealGroup?, FoodItem) -> Void
     
@@ -45,18 +46,20 @@ struct RecipeCreatorView: View {
     @State private var selectedMealGroup: MealGroup?
     @State private var selectedMode: RecipeCreatorMode
     
-    init(foodItem: FoodItem, mealGroups: [MealGroup], onExitAction: @escaping () -> Void, onSaveAction: @escaping (MealGroup?, FoodItem) -> Void) {
+    init(foodItem: FoodItem, viewModel: NutriToolFoodViewModel,
+         onExitAction: @escaping () -> Void, onSaveAction: @escaping (MealGroup?, FoodItem) -> Void) {
         self.foodItem = foodItem
-        self.mealGroups = mealGroups
+        self.viewModel = viewModel
         self.onExitAction = onExitAction
         self.onSaveAction = onSaveAction
         
-        self.draftFoodItem = foodItem
-        
-        self.selectedMealGroup = mealGroups.first { group in
-            group.meals.contains { $0.id == foodItem.id }
-        } ?? (mealGroups.isEmpty ? nil : mealGroups.first!)
-        self.selectedMode = .builder
+        self._draftFoodItem = State(initialValue: foodItem)
+        self._selectedMealGroup = State(initialValue:
+            viewModel.mealGroups.first { group in
+                group.foodIDs.contains(foodItem.id)
+            } ?? viewModel.mealGroups.first
+        )
+        self._selectedMode = State(initialValue: .builder)
     }
     
     var body: some View {
@@ -68,7 +71,7 @@ struct RecipeCreatorView: View {
                                          unitSingularInput: $draftFoodItem.servingUnit,
                                          unitPluralInput: $draftFoodItem.servingUnitMultiple,
                                          selectedGroup: $selectedMealGroup,
-                                         availableMealGroups: mealGroups)
+                                         availableMealGroups: viewModel.mealGroups)
                 .padding(5)
                 .background(Rectangle().fill(backgroundColour).blur(radius: 200))
                 .clipShape(
@@ -79,7 +82,7 @@ struct RecipeCreatorView: View {
                     .frame(maxWidth: 80)
             }
             
-            ContentView(foodItem: $draftFoodItem, mealGroupList: mealGroups, mode: selectedMode)
+            ContentView(foodItem: $draftFoodItem, viewModel: viewModel, mode: selectedMode)
                 .padding(10)
                 .background(RoundedRectangle(cornerRadius: 10).fill(.secondaryBackground))
             
@@ -219,7 +222,7 @@ private struct ModeSwitcherView: View {
 
 private struct ContentView: View {
     @Binding var foodItem: FoodItem
-    let mealGroupList: [MealGroup]
+    let viewModel: NutriToolFoodViewModel
     var mode: RecipeCreatorMode
     
     var body: some View {
@@ -227,7 +230,7 @@ private struct ContentView: View {
         case .manual:
             ManualCreatorModeView(foodItem: $foodItem)
         case .builder:
-            BuilderCreatorModeView(foodItem: $foodItem, mealGroups: mealGroupList)
+            BuilderCreatorModeView(draftFoodItem: $foodItem, viewModel: viewModel)
         case .camera:
             CameraCreatorModeView(foodItem: $foodItem)
         }
@@ -235,7 +238,8 @@ private struct ContentView: View {
 }
 
 #Preview {
-    RecipeCreatorView(foodItem: MockData.sampleFoodItem, mealGroups: MockData.mealGroupList) {
+    let viewModel = NutriToolFoodViewModel(repository: MockFoodRepository())
+    RecipeCreatorView(foodItem: MockData.sampleFoodItem, viewModel: viewModel) {
         
     } onSaveAction: { selectedGroup, foodItem in
         

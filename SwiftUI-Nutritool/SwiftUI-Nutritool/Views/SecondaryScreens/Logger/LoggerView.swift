@@ -35,8 +35,12 @@ fileprivate extension WeekDayType {
 }
 
 struct LoggerView: View {
-    let currentDate = Date()
-    @State private var selectedDay = SelectedDay(day: WeekDayType.fullWeek[Calendar.current.component(.weekday, from: Date()) - 1], date: Date())
+    @EnvironmentObject var foodViewModel: NutriToolFoodViewModel
+    
+    @State private var selectedDay = SelectedDay(
+        day: WeekDayType.fullWeek[Calendar.current.component(.weekday, from: Date()) - 1],
+        date: Date()
+    )
     @State private var loggedMealItems: [LoggedMealItem] = MockData.loggedMeals
     @State private var isShowingRecipesMenu: Bool = false
     
@@ -78,8 +82,8 @@ struct LoggerView: View {
         }
         .padding(.horizontal)
         .sheet(isPresented: $isShowingRecipesMenu) {
-            RecipeListView() { foodItem in
-                
+            RecipeListView(viewModel: foodViewModel) { foodItem in
+                // TODO: functionality for adding a foodItem to the logger view
             }
         }
     }

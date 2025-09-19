@@ -49,7 +49,7 @@ enum NutrientUnit: String, Codable, CustomStringConvertible, CaseIterable, Ident
 }
 
 struct NutrientItem: Identifiable, Equatable {
-    let id: UUID = UUID()
+    var id: UUID = UUID()
     var name: String
     var amount: Double = 0
     var unit: NutrientUnit = .grams

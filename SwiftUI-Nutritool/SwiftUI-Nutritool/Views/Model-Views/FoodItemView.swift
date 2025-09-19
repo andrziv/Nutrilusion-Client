@@ -8,55 +8,64 @@
 import SwiftUI
 
 struct FoodItemView: View {
-    @Binding var foodItem: FoodItem
-    var associatedMealGroup: MealGroup? = nil
-    var otherGroups: [MealGroup]? = nil
+    let foodItemID: UUID
+    @ObservedObject var viewModel: NutriToolFoodViewModel
+    
     var showGroupInfo: Bool = false
     var editingAllowed: Bool = false
     @State var isExpanded: Bool = false
+    @State private var showFoodEditor: Bool = false
+    
     var textColor: Color = .primaryText
     var subtextColor: Color = .secondaryText
     var backgroundColor: Color = .backgroundColour
-    @State private var showFoodEditor: Bool = false
     
-    private func combinedMealGroups() -> [MealGroup] {
-        var combined: [MealGroup] = []
-
-        if let group = associatedMealGroup {
-            combined.append(group)
-        }
-        if let groups = otherGroups {
-            combined.append(contentsOf: groups)
-        }
-        
-        return combined
+    let editingAction: ((MealGroup, FoodItem) -> Void)? = nil
+    
+    private var foodItem: FoodItem? {
+        viewModel.foodByID[foodItemID]
+    }
+    
+    private var associatedGroups: [MealGroup] {
+        viewModel.mealGroups.filter { $0.foodIDs.contains(foodItemID) }
     }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            FoodItemHeader(foodItem: foodItem, mealGroup: associatedMealGroup, showGroupInfo: showGroupInfo, isExpanded: isExpanded)
-            
-            if !isExpanded {
-                Line()
-                    .frame(height: 0.5)
-                    .background(.secondaryText)
-                    .opacity(0.5)
+            if let foodItem = foodItem {
+                VStack(alignment: .leading, spacing: 8) {
+                    FoodItemHeader(foodItem: foodItem, mealGroup: associatedGroups.first, showGroupInfo: showGroupInfo, isExpanded: isExpanded)
+                    
+                    if !isExpanded {
+                        Line()
+                            .frame(height: 0.5)
+                            .background(.secondaryText)
+                            .opacity(0.5)
+                    }
+                    
+                    FoodItemBody(foodItem: foodItem, editingAllowed: editingAllowed, isExpanded: $isExpanded, showFoodEditor: $showFoodEditor)
+                }
+                .sheet(isPresented: $showFoodEditor) {
+                    RecipeCreatorView(foodItem: foodItem, viewModel: viewModel, onExitAction: { showFoodEditor = false }) { potentialNewGroup, editedFoodItem in
+                        showFoodEditor = false
+                        
+                        if let editingAction = editingAction, let newGroup = potentialNewGroup {
+                            editingAction(newGroup, editedFoodItem)
+                        } else if let newGroup = potentialNewGroup {
+                            let currentGroup = associatedGroups.first
+                            if let currentGroup = currentGroup, currentGroup.id != newGroup.id {
+                                viewModel.moveFood(editedFoodItem, from: currentGroup, to: newGroup)
+                            }
+                            viewModel.updateFood(editedFoodItem)
+                        }
+                    }
+                }
+                .padding()
+                .background(.regularMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .animation(.easeInOut(duration: 0.25), value: isExpanded)
             }
-            
-            FoodItemBody(foodItem: foodItem, editingAllowed: editingAllowed, isExpanded: $isExpanded, showFoodEditor: $showFoodEditor)
         }
-        .sheet(isPresented: $showFoodEditor) {
-            RecipeCreatorView(foodItem: foodItem, mealGroups: combinedMealGroups()) {
-                showFoodEditor = false
-            } onSaveAction: { potentialNewGroup, editedFoodItem in
-                showFoodEditor = false
-                foodItem = editedFoodItem
-            }
-        }
-        .padding()
-        .background(.regularMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
-        .animation(.easeInOut(duration: 0.25), value: isExpanded)
     }
 }
 
@@ -290,6 +299,8 @@ struct ExpandedFoodItemControlRow: View {
 }
 
 #Preview {
-    FoodItemView(foodItem: .constant(MockData.foodItemList[0]), associatedMealGroup: MockData.sampleMealGroup, showGroupInfo: false, backgroundColor: .backgroundColour)
-    FoodItemView(foodItem: .constant(MockData.foodItemList[0]), associatedMealGroup: MockData.sampleMealGroup, showGroupInfo: true, editingAllowed: true, isExpanded: true, backgroundColor: .backgroundColour)
+    let foodItemID = MockData.foodItemList[0].id
+    let viewModel = NutriToolFoodViewModel(repository: MockFoodRepository())
+    FoodItemView(foodItemID: foodItemID, viewModel: viewModel, showGroupInfo: false, backgroundColor: .backgroundColour)
+    FoodItemView(foodItemID: foodItemID, viewModel: viewModel, showGroupInfo: true, editingAllowed: true, isExpanded: true, backgroundColor: .backgroundColour)
 }

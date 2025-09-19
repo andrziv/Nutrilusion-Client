@@ -8,10 +8,12 @@
 import SwiftUI
 
 struct MealGroupView: View {
-    @Binding var group: MealGroup
-    var otherGroups: [MealGroup]? = nil
+    @ObservedObject var viewModel: NutriToolFoodViewModel
+    var group: MealGroup
+    
     var editingAllowed: Bool = false
     @State var isExpanded: Bool = false
+    
     var foodTapAction: (FoodItem) -> Void = { _ in }
     
     var body: some View {
@@ -21,11 +23,16 @@ struct MealGroupView: View {
             MealGroupHeader(group: group, isExpanded: $isExpanded, emblem: emblem)
                 .background(emblem.opacity(0.4))
             
-            MealGroupBody(group: $group, otherGroups: otherGroups, editingAllowed: editingAllowed, isExpanded: isExpanded, emblem: emblem, foodTapAction: foodTapAction)
-                .transition(.asymmetric(
-                    insertion: .move(edge: .top).combined(with: .opacity),
-                    removal: .opacity
-                ))
+            MealGroupBody(viewModel: viewModel,
+                          group: group,
+                          editingAllowed: editingAllowed,
+                          isExpanded: isExpanded,
+                          emblem: emblem,
+                          foodTapAction: foodTapAction)
+            .transition(.asymmetric(
+                insertion: .move(edge: .top).combined(with: .opacity),
+                removal: .opacity
+            ))
         }
         .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
         .background(
@@ -67,9 +74,9 @@ struct MealGroupHeader: View {
 }
 
 struct MealGroupBody: View {
-    @Binding var group: MealGroup
-    let otherGroups: [MealGroup]?
-    var editingAllowed: Bool
+    @ObservedObject var viewModel: NutriToolFoodViewModel
+    let group: MealGroup
+    let editingAllowed: Bool
     let isExpanded: Bool
     let emblem: Color
     
@@ -77,11 +84,11 @@ struct MealGroupBody: View {
     
     var body: some View {
         if isExpanded {
-            LazyVScroll(items: $group.meals, spacing: 12) { $meal in
+            LazyVScroll(items: viewModel.foods(in: group), spacing: 12) { meal in
                 Button {
                     foodTapAction(meal)
                 } label: {
-                    FoodItemView(foodItem: $meal, associatedMealGroup: group, otherGroups: otherGroups, editingAllowed: editingAllowed)
+                    FoodItemView(foodItemID: meal.id, viewModel: viewModel, editingAllowed: editingAllowed)
                 }
                 .buttonStyle(.plain)
             }
@@ -94,6 +101,8 @@ struct MealGroupBody: View {
 
 
 #Preview {
-    MealGroupView(group: .constant(MockData.sampleMealGroup))
-    MealGroupView(group: .constant(MockData.sampleMealGroup), editingAllowed: true, isExpanded: true)
+    let mealGroup = MockData.sampleMealGroup
+    let mockViewModel = NutriToolFoodViewModel(repository: MockFoodRepository())
+    MealGroupView(viewModel: mockViewModel, group: mealGroup)
+    MealGroupView(viewModel: mockViewModel, group: mealGroup, editingAllowed: true, isExpanded: true)
 }

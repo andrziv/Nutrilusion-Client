@@ -485,7 +485,6 @@ struct MockData {
                 servingAmount: 350.0,
                 servingUnit: "mL",
                 servingUnitMultiple: "mL"
-                
             ),
             FoodItem(
                 id: UUID(uuidString: "00000000-0000-0000-0000-000000000019")!,
@@ -535,7 +534,7 @@ struct MockData {
         
         for i in 1...50000 {
             let item = FoodItem(
-                id: UUID(), // unique each time
+                id: UUID(),
                 name: "Generated Food Item \(i)",
                 calories: Int.random(in: 50...700),
                 nutritionList: [

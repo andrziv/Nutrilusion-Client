@@ -35,7 +35,7 @@ fileprivate enum TabbedItems: Int, CaseIterable {
     }
 }
 
-struct MealTrackerTabView: View {
+struct NutriMainTabView: View {
     @State private var selectedTab: TabbedItems = .logger
     
     var body: some View {
@@ -100,7 +100,7 @@ struct BackgroundView: View {
     }
 }
 
-extension MealTrackerTabView {
+extension NutriMainTabView {
     func CustomTabItem(imageName: String, title: String, isActive: Bool) -> some View{
         Label(title, systemImage: imageName)
             .fontWeight(isActive ? .semibold : .regular)
@@ -113,5 +113,6 @@ extension MealTrackerTabView {
 }
 
 #Preview {
-    MealTrackerTabView()
+    NutriMainTabView()
+        .environmentObject(NutriToolFoodViewModel(repository: MockFoodRepository()))
 }

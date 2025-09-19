@@ -9,15 +9,17 @@
 import SwiftUI
 
 struct AddCategoryPopupView: View {
+    @ObservedObject var viewModel: NutriToolFoodViewModel
     @Binding var screenMode: RecipeListViewMode?
-    @Binding var mealGroups: [MealGroup]
+    
+    let creationAction: (MealGroup) -> Void
     
     @State private var searchString: String = ""
     @State private var colourPicked: Color = .blue
     
     var body: some View {
         VStack(spacing: 5) {
-            MealGroupPreviewView(searchString: $searchString, colourPicked: $colourPicked)
+            MealGroupPreviewView(viewModel: viewModel, searchString: $searchString, colourPicked: $colourPicked)
                 .background(RoundedRectangle(cornerRadius: 10).fill(.backgroundColour))
             
             Spacer()
@@ -36,8 +38,7 @@ struct AddCategoryPopupView: View {
                 }
                 
                 ImagedButton(title: "Create Category", icon: "plus", circleColour: .clear, cornerRadius: 10, maxWidth: .infinity, iconPlacement: .leading) {
-                    // TODO: Change this to use CoreData later...
-                    mealGroups.append(MealGroup(id: UUID(uuidString: "10000000-0000-0000-0000-000000000000")!, name: searchString, meals: [], colour: colourPicked.toHex()!))
+                    creationAction(MealGroup(id: UUID(), name: searchString, foodIDs: [], colour: colourPicked.toHex()!))
                     screenMode = nil
                 }
             }
@@ -49,14 +50,19 @@ struct AddCategoryPopupView: View {
 }
 
 struct MealGroupPreviewView: View {
+    @ObservedObject var viewModel: NutriToolFoodViewModel
     @Binding var searchString: String
     @Binding var colourPicked: Color
     
     var body: some View {
         ZStack(alignment: .top) {
-            MealGroupView(group: .constant(MealGroup(id: UUID(), name: searchString, meals: [MockData.sampleFoodItem], colour: colourPicked.toHex()!)))
-                .id(searchString + (colourPicked.toHex() ?? ""))
-                .padding(.vertical)
+            MealGroupView(viewModel: viewModel,
+                          group: MealGroup(id: UUID(),
+                                           name: searchString,
+                                           foodIDs: [MockData.sampleFoodItem.id],
+                                           colour: colourPicked.toHex()!))
+            .id(searchString + (colourPicked.toHex() ?? ""))
+            .padding(.vertical)
             
             BottomTrailing {
                 BreathingTextBoxView(text: "Preview")
@@ -68,5 +74,8 @@ struct MealGroupPreviewView: View {
 }
 
 #Preview {
-    AddCategoryPopupView(screenMode: .constant(.addCategory), mealGroups: .constant(MockData.mealGroupList))
+    let viewModel = NutriToolFoodViewModel(repository: MockFoodRepository())
+    AddCategoryPopupView(viewModel: viewModel, screenMode: .constant(.addCategory)) { newMealGroup in
+        
+    }
 }

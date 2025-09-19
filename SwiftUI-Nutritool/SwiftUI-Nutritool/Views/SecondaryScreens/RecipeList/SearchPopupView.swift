@@ -9,6 +9,7 @@
 import SwiftUI
 
 struct SearchPopupView: View {
+    @ObservedObject var foodViewModel: NutriToolFoodViewModel
     let exitAction: () -> Void
     let itemTapAction: (MealGroup?, FoodItem) -> Void
     let allowEditing: Bool
@@ -16,41 +17,25 @@ struct SearchPopupView: View {
     let isItemDisabled: ((FoodItem) -> Bool)?
     let overlayProvider: ((FoodItem) -> AnyView)?
     
-    @Binding private var mealGroups: [MealGroup]
-    @StateObject private var viewModel: FoodItemSearchViewModel
+    @StateObject private var searchViewModel: FoodItemSearchViewModel
     @FocusState private var searchFocus: Bool
     
-    init(mealGroups: [MealGroup], allowEditing: Bool,
+    init(foodViewModel: NutriToolFoodViewModel,
+         allowEditing: Bool,
          exitAction: @escaping () -> Void, itemTapAction: @escaping (MealGroup?, FoodItem) -> Void,
          isItemDisabled: ((FoodItem) -> Bool)? = nil, overlayProvider: ((FoodItem) -> AnyView)? = nil) {
+        self.foodViewModel = foodViewModel
         self.allowEditing = allowEditing
         self.exitAction = exitAction
         self.itemTapAction = itemTapAction
-        
         self.isItemDisabled = isItemDisabled
         self.overlayProvider = overlayProvider
-        
-        self._viewModel = StateObject(wrappedValue: FoodItemSearchViewModel(groups: mealGroups))
-        self._mealGroups = .constant(mealGroups)
-    }
-    
-    init(mealGroups: Binding<[MealGroup]>, allowEditing: Bool,
-         exitAction: @escaping () -> Void, itemTapAction: @escaping (MealGroup?, FoodItem) -> Void,
-         isItemDisabled: ((FoodItem) -> Bool)? = nil, overlayProvider: ((FoodItem) -> AnyView)? = nil) {
-        self.allowEditing = allowEditing
-        self.exitAction = exitAction
-        self.itemTapAction = itemTapAction
-        
-        self.isItemDisabled = isItemDisabled
-        self.overlayProvider = overlayProvider
-        
-        self._viewModel = StateObject(wrappedValue: FoodItemSearchViewModel(groups: mealGroups.wrappedValue))
-        self._mealGroups = mealGroups
+        self._searchViewModel = StateObject(wrappedValue: FoodItemSearchViewModel(foodViewModel: foodViewModel))
     }
     
     var body: some View {
         VStack {
-            BasicTextField("Search for Recipe Names... eg: Lasagna", text: $viewModel.searchText, outlineWidth: 0, background: .secondaryBackground)
+            BasicTextField("Search for Recipe Names... eg: Lasagna", text: $searchViewModel.searchText, outlineWidth: 0, background: .secondaryBackground)
                 .focused($searchFocus)
                 .onAppear {
                     withAnimation {
@@ -58,29 +43,24 @@ struct SearchPopupView: View {
                     }
                 }
             
-            LazyVScroll(items: viewModel.filteredPairs) { pair in
-                if let resolved = viewModel.resolveBindings(in: $mealGroups, for: pair) {
-                    let group = resolved.mealGroup
-                    let item = resolved.foodItem.wrappedValue
-                    let disabled = isItemDisabled?(item) ?? false
-                    let otherGroups = mealGroups.filter { $0.id != group.id }
-                    
+            LazyVScroll(items: searchViewModel.results) { foodItem in
+                let disabled = isItemDisabled?(foodItem) ?? false
+                if let group = foodViewModel.group(for: foodItem) {
                     Button {
                         if !disabled {
-                            itemTapAction(group, item)
+                            itemTapAction(group, foodItem)
                         }
                     } label: {
                         ZStack {
                             FoodItemView(
-                                foodItem: resolved.foodItem,
-                                associatedMealGroup: group,
-                                otherGroups: otherGroups,
+                                foodItemID: foodItem.id,
+                                viewModel: foodViewModel,
                                 showGroupInfo: true,
                                 editingAllowed: allowEditing
                             )
                             .opacity(disabled ? 0.4 : 1.0)
                             
-                            if let overlay = overlayProvider?(item) {
+                            if let overlay = overlayProvider?(foodItem) {
                                 overlay
                             }
                         }
@@ -96,14 +76,12 @@ struct SearchPopupView: View {
             Spacer()
         }
         .basicBackground(shadowRadius: 0, background: .secondaryBackground.opacity(0.5))
-        .onChange(of: mealGroups) { _, updatedGroups in
-            viewModel.refreshSearch(with: updatedGroups)
-        }
     }
 }
 
 #Preview {
-    SearchPopupView(mealGroups: MockData.mealGroupList, allowEditing: true) {
+    let viewModel = NutriToolFoodViewModel(repository: MockFoodRepository())
+    SearchPopupView(foodViewModel: viewModel, allowEditing: true) {
         
     } itemTapAction: { potentialMealGroup, foodItem in
         
