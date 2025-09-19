@@ -133,12 +133,6 @@ struct FoodItemBody: View {
             if !foodItem.nutritionList.isEmpty {
                 FoodItemNutrientShowcase(foodItem: foodItem,
                                          isExpanded: isExpanded)
-                
-                if !isExpanded {
-                    Spacer()
-                    
-                    MinimizedFoodItemControlRow(isExpanded: $isExpanded)
-                }
             }
             
             if isExpanded && !foodItem.ingredientList.isEmpty {
@@ -147,6 +141,10 @@ struct FoodItemBody: View {
             
             if isExpanded {
                 ExpandedFoodItemControlRow(foodItem: foodItem, editingAllowed: editingAllowed, isExpanded: $isExpanded, showRecipeEditor: $showFoodEditor)
+            } else {
+                Spacer()
+                
+                MinimizedFoodItemControlRow(isExpanded: $isExpanded)
             }
         }
         .transition(.asymmetric(
