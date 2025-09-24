@@ -56,7 +56,7 @@ struct RecipeCreatorView: View {
         self._draftFoodItem = State(initialValue: foodItem)
         self._selectedMealGroup = State(initialValue:
             viewModel.mealGroups.first { group in
-                group.foodIDs.contains(foodItem.id)
+                group.foodIDs.contains(foodItem.foodItemID)
             } ?? viewModel.mealGroups.first
         )
         self._selectedMode = State(initialValue: .builder)

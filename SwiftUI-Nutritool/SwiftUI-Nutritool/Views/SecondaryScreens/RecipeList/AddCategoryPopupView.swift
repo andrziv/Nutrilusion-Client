@@ -59,7 +59,7 @@ struct MealGroupPreviewView: View {
             MealGroupView(viewModel: viewModel,
                           group: MealGroup(id: UUID(),
                                            name: searchString,
-                                           foodIDs: [MockData.sampleFoodItem.id],
+                                           foodIDs: [MockData.sampleFoodItem.foodItemID],
                                            colour: colourPicked.toHex()!))
             .id(searchString + (colourPicked.toHex() ?? ""))
             .padding(.vertical)

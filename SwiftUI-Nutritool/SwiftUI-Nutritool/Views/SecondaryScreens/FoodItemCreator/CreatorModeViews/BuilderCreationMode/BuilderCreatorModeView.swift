@@ -102,7 +102,7 @@ private struct IngredientListEditorialView: View {
                     deleteIngredient(ingredient)
                 } content: {
                     FoodItemView(
-                        foodItemID: ingredient.id,
+                        foodItem: ingredient,
                         viewModel: viewModel,
                         showGroupInfo: false,
                         editingAllowed: false

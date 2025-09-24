@@ -53,7 +53,7 @@ struct SearchPopupView: View {
                     } label: {
                         ZStack {
                             FoodItemView(
-                                foodItemID: foodItem.id,
+                                foodItem: foodItem,
                                 viewModel: foodViewModel,
                                 showGroupInfo: true,
                                 editingAllowed: allowEditing

@@ -49,11 +49,29 @@ enum NutrientUnit: String, Codable, CustomStringConvertible, CaseIterable, Ident
 }
 
 struct NutrientItem: Identifiable, Equatable {
-    var id: UUID = UUID()
+    var id: String
+    let nutrientID: UUID
+    var version: Int
     var name: String
-    var amount: Double = 0
-    var unit: NutrientUnit = .grams
-    var childNutrients: [NutrientItem] = []
+    var amount: Double
+    var unit: NutrientUnit
+    var childNutrients: [NutrientItem]
+    
+    init(compositeID: String? = nil, id: UUID = UUID(), version: Int = 0,
+         name: String, amount: Double = 0, unit: NutrientUnit = .grams,
+         childNutrients: [NutrientItem] = []) {
+        if let compositeID = compositeID {
+            self.id = compositeID
+        } else {
+            self.id = compositeId(id, version: version)
+        }
+        self.nutrientID = id
+        self.version = version
+        self.name = name
+        self.amount = amount
+        self.unit = unit
+        self.childNutrients = childNutrients
+    }
     
     func getChildNutrientValue(_ nutrientType: String) -> NutrientItem? {
         if let direct = childNutrients.first(where: { $0.name == nutrientType }) {
@@ -252,6 +270,11 @@ struct NutrientItem: Identifiable, Equatable {
         _ = recalculateFromChildren(optimizeUnit: optimizeUnit)
     }
     
+    mutating func withVersion(_ version: Int) {
+        self.version = version
+        self.id = compositeId(self.nutrientID, version: version)
+    }
+    
     /// Recalculate this node’s value based on its children.
     /// Returns true if recalculation was performed.
     @discardableResult
@@ -359,5 +382,14 @@ struct NutrientItem: Identifiable, Equatable {
                 }
             }
         }
+    }
+    
+    func createNewUniqueCopy() -> NutrientItem {
+        var childNutrientCopy = childNutrients
+        for (i, child) in childNutrients.enumerated() {
+            childNutrientCopy[i] = child.createNewUniqueCopy()
+        }
+        var copy = NutrientItem(name: name, amount: amount, unit: unit, childNutrients: childNutrientCopy)
+        return copy
     }
 }

@@ -88,7 +88,7 @@ struct MealGroupBody: View {
                 Button {
                     foodTapAction(meal)
                 } label: {
-                    FoodItemView(foodItemID: meal.id, viewModel: viewModel, editingAllowed: editingAllowed)
+                    FoodItemView(foodItem: meal, viewModel: viewModel, editingAllowed: editingAllowed)
                 }
                 .buttonStyle(.plain)
             }

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct FoodItemView: View {
-    let foodItemID: UUID
+    let foodItem: FoodItem
     @ObservedObject var viewModel: NutriToolFoodViewModel
     
     var showGroupInfo: Bool = false
@@ -22,17 +22,12 @@ struct FoodItemView: View {
     
     let editingAction: ((MealGroup, FoodItem) -> Void)? = nil
     
-    private var foodItem: FoodItem? {
-        viewModel.foodByID[foodItemID]
-    }
-    
     private var associatedGroups: [MealGroup] {
-        viewModel.mealGroups.filter { $0.foodIDs.contains(foodItemID) }
+        viewModel.mealGroups.filter { $0.foodIDs.contains(foodItem.foodItemID) }
     }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            if let foodItem = foodItem {
                 VStack(alignment: .leading, spacing: 8) {
                     FoodItemHeader(foodItem: foodItem, mealGroup: associatedGroups.first, showGroupInfo: showGroupInfo, isExpanded: isExpanded)
                     
@@ -65,11 +60,10 @@ struct FoodItemView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 12))
                 .animation(.easeInOut(duration: 0.25), value: isExpanded)
             }
-        }
     }
 }
 
-struct FoodItemHeader: View {
+private struct FoodItemHeader: View {
     let foodItem: FoodItem
     let mealGroup: MealGroup?
     let showGroupInfo: Bool
@@ -94,6 +88,8 @@ struct FoodItemHeader: View {
                 }
             }
             
+            Text("V\(foodItem.version)")
+            
             if !isExpanded {
                 Spacer()
                 
@@ -112,7 +108,7 @@ struct FoodItemHeader: View {
     }
 }
 
-struct FoodItemBody: View {
+private struct FoodItemBody: View {
     var foodItem: FoodItem
     let editingAllowed: Bool
     @Binding var isExpanded: Bool
@@ -155,7 +151,7 @@ struct FoodItemBody: View {
     }
 }
 
-struct FoodItemNutrientShowcase: View {
+private struct FoodItemNutrientShowcase: View {
     let foodItem: FoodItem
     var isExpanded: Bool
     
@@ -191,7 +187,7 @@ struct FoodItemNutrientShowcase: View {
     }
 }
 
-struct ChildNutrientRecursionView: View {
+private struct ChildNutrientRecursionView: View {
     let nutrient: NutrientItem
     private(set) var isOrigin: Bool = true
     
@@ -212,7 +208,7 @@ struct ChildNutrientRecursionView: View {
     }
 }
 
-struct FoodItemIngredientShowcase: View {
+private struct FoodItemIngredientShowcase: View {
     let foodItem: FoodItem
     
     var body: some View {
@@ -238,7 +234,7 @@ struct FoodItemIngredientShowcase: View {
     }
 }
 
-struct MinimizedFoodItemControlRow: View {
+private struct MinimizedFoodItemControlRow: View {
     @Binding var isExpanded: Bool
     
     var body: some View {
@@ -259,7 +255,7 @@ struct MinimizedFoodItemControlRow: View {
     }
 }
 
-struct ExpandedFoodItemControlRow: View {
+private struct ExpandedFoodItemControlRow: View {
     var foodItem: FoodItem
     let editingAllowed: Bool
     @Binding var isExpanded: Bool
@@ -297,8 +293,8 @@ struct ExpandedFoodItemControlRow: View {
 }
 
 #Preview {
-    let foodItemID = MockData.foodItemList[0].id
+    let foodItemID = MockData.foodItemList[0].foodItemID
     let viewModel = NutriToolFoodViewModel(repository: MockFoodRepository())
-    FoodItemView(foodItemID: foodItemID, viewModel: viewModel, showGroupInfo: false, backgroundColor: .backgroundColour)
-    FoodItemView(foodItemID: foodItemID, viewModel: viewModel, showGroupInfo: true, editingAllowed: true, isExpanded: true, backgroundColor: .backgroundColour)
+    FoodItemView(foodItem: viewModel.foodByID[foodItemID]!, viewModel: viewModel, showGroupInfo: false, backgroundColor: .backgroundColour)
+    FoodItemView(foodItem: viewModel.foodByID[foodItemID]!, viewModel: viewModel, showGroupInfo: true, editingAllowed: true, isExpanded: true, backgroundColor: .backgroundColour)
 }

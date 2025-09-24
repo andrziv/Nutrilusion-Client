@@ -9,7 +9,9 @@ import Foundation
 
 // Used for both Recipes and Ingredients
 struct FoodItem: Identifiable, Equatable {
-    let id: UUID
+    var id: String
+    let foodItemID: UUID
+    var version: Int
     var name: String
     var calories: Int
     var nutritionList: [NutrientItem]
@@ -18,10 +20,17 @@ struct FoodItem: Identifiable, Equatable {
     var servingUnit: String
     var servingUnitMultiple: String
     
-    init(id: UUID = UUID(), name: String, calories: Int = 0,
+    init(compositeID: String? = nil, id: UUID = UUID(), version: Int = 0,
+         name: String, calories: Int = 0,
          nutritionList: [NutrientItem] = [], ingredientList: [FoodItem] = [],
          servingAmount: Double = 1.0, servingUnit: String = "x", servingUnitMultiple: String = "x") {
-        self.id = id
+        if let compositeID = compositeID {
+            self.id = compositeID
+        } else {
+            self.id = compositeId(id, version: version)
+        }
+        self.foodItemID = id
+        self.version = version
         self.name = name
         self.calories = calories
         self.nutritionList = nutritionList
@@ -214,7 +223,7 @@ struct FoodItem: Identifiable, Equatable {
                 if let index = nutritionList.firstIndex(where: { $0.name == nutrient.name }) {
                     nutritionList[index].add(nutrient)
                 } else {
-                    nutritionList.append(nutrient)
+                    nutritionList.append(nutrient.createNewUniqueCopy())
                 }
             }
         }
@@ -258,6 +267,11 @@ struct FoodItem: Identifiable, Equatable {
         }
         
         return false
+    }
+    
+    mutating func withVersion(_ version: Int) {
+        self.version = version
+        self.id = compositeId(self.foodItemID, version: version)
     }
     
     // just creates a chain of nutrient items corresponding to a given nutrient name array
