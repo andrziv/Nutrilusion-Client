@@ -106,7 +106,6 @@ class CoreDataFoodRepository: NutriToolFoodRepositoryProtocol {
                 let output = resolveNutrientUpdates(for: inPlaceModel, latest: foodItem, insitu: true, in: background)
                 inPlaceModel = output.0
                 let updateOutput = foodItem.update(from: inPlaceModel, in: background)
-                
                 resolveDeletionScenario(foodItemID: inPlaceModel.foodItemID,
                                         currentVersion: inPlaceModel.version,
                                         foodItems: updateOutput.0,
@@ -253,21 +252,49 @@ class CoreDataFoodRepository: NutriToolFoodRepositoryProtocol {
         
         return (updatedNutrient, remaining)
     }
-
+    
     private func resolveDeletionScenario(foodItemID: UUID,
                                          currentVersion: Int,
                                          foodItems: [FoodItemVersionEntity],
                                          nutrientItems: [NutrientItemEntity],
                                          in context: NSManagedObjectContext) {
+        removeUnreferencedNutrientItems(nutrientItems, foodItemID: foodItemID, currentVersion: currentVersion, in: context)
+        removeUnreferencedFoodItems(foodItems, in: context)
+    }
+    
+    private func removeUnreferencedFoodItems(_ foodItems: [FoodItemVersionEntity], in context: NSManagedObjectContext) {
+        var foodCandidates = Set(foodItems)
+
         for food in foodItems {
-            if !food.isReferencedUpstream(in: context) {
-                context.delete(food)
-            }
+            collectRecursively(from: food, into: &foodCandidates)
         }
 
+        for food in foodCandidates {
+            if !food.isReferencedUpstream(in: context) {
+                context.delete(food)
+
+                if let nutrients = food.nutrients as? Set<NutrientItemEntity> {
+                    let foodItemID = food.parentItem!.id!
+                    let currentVersion = Int(food.version)
+                    removeUnreferencedNutrientItems(Array(nutrients), foodItemID: foodItemID, currentVersion: currentVersion, in: context)
+                }
+            }
+        }
+    }
+    
+    private func removeUnreferencedNutrientItems(_ nutrientItems: [NutrientItemEntity], foodItemID: UUID, currentVersion: Int, in context: NSManagedObjectContext) {
         for nutrient in nutrientItems {
             if !nutrient.isReferencedElsewhere(foodItemID: foodItemID, olderThan: currentVersion, in: context) {
                 context.delete(nutrient)
+            }
+        }
+    }
+    
+    private func collectRecursively(from food: FoodItemVersionEntity, into foodCandidates: inout Set<FoodItemVersionEntity>) {
+        if let ingredients = food.ingredients as? Set<FoodItemVersionEntity> {
+            for ingredient in ingredients where !foodCandidates.contains(ingredient) {
+                foodCandidates.insert(ingredient)
+                collectRecursively(from: ingredient, into: &foodCandidates)
             }
         }
     }
