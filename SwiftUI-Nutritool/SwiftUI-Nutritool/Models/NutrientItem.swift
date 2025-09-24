@@ -389,7 +389,7 @@ struct NutrientItem: Identifiable, Equatable {
         for (i, child) in childNutrients.enumerated() {
             childNutrientCopy[i] = child.createNewUniqueCopy()
         }
-        var copy = NutrientItem(name: name, amount: amount, unit: unit, childNutrients: childNutrientCopy)
+        let copy = NutrientItem(name: name, amount: amount, unit: unit, childNutrients: childNutrientCopy)
         return copy
     }
 }
