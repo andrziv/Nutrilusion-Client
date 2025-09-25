@@ -99,7 +99,7 @@ struct FoodItem: Identifiable, Equatable {
         }
         
         for i in nutritionList.indices {
-            let result = nutritionList[i].add(nutrientToAdd, adjustAmounts: propagateAmounts, directInsert: false)
+            let result = nutritionList[i].add(nutrientToAdd, propagateChanges: propagateAmounts, directInsert: false)
             if result {
                 return false
             }
@@ -221,7 +221,7 @@ struct FoodItem: Identifiable, Equatable {
         if addNutrients {
             for nutrient in ingredient.nutritionList {
                 if let index = nutritionList.firstIndex(where: { $0.name == nutrient.name }) {
-                    nutritionList[index].add(nutrient, mergeChildren: true)
+                    nutritionList[index].add(nutrient, propagateChanges: false, mergeChildren: true)
                 } else {
                     nutritionList.append(nutrient.createNewUniqueCopy())
                 }
