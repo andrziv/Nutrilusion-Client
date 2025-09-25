@@ -221,7 +221,7 @@ struct FoodItem: Identifiable, Equatable {
         if addNutrients {
             for nutrient in ingredient.nutritionList {
                 if let index = nutritionList.firstIndex(where: { $0.name == nutrient.name }) {
-                    nutritionList[index].add(nutrient)
+                    nutritionList[index].add(nutrient, mergeChildren: true)
                 } else {
                     nutritionList.append(nutrient.createNewUniqueCopy())
                 }

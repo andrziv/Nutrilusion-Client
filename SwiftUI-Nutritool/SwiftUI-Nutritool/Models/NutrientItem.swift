@@ -135,6 +135,7 @@ struct NutrientItem: Identifiable, Equatable {
     
     /**
      Adds nutrition value to the caller. If the nutrient doesn't exist at the expected location, it will be added. If the target nutrient is a child of this nutrient, the changes will propagate from the target to the caller.
+        Note that this will NOT add child nutrients from `other` into `this` caller nutrient's child nutrients, if they have the same children.
      - Parameters:
          - other: The target nutrient whose values should be added to the tree. Nutrients are searched by name.
          - adjustAmounts: Set this to add values. Set this to false if you just want to add children to be automatically placed without affecting parent values.
@@ -143,10 +144,11 @@ struct NutrientItem: Identifiable, Equatable {
              - 0.001< value in grams < 1: unit is set to milligrams
              - else: value is set to grams
          - directInsert: Ignores the proper nutrient hierarchy and adds nutrient as a direct child.
+         - mergeChildren: Setting this to true results in this function adding child nutrients from `other` into `this` caller nutrient's child nutrients, if `other`'s children are part of `this` nutrient's proper hierarchy.
      - Returns: Whether or not the addition was successful.
      */
     @discardableResult
-    mutating func add(_ other: NutrientItem, adjustAmounts: Bool = true, optimizeUnit: Bool = true, directInsert: Bool = false) -> Bool {
+    mutating func add(_ other: NutrientItem, adjustAmounts: Bool = true, optimizeUnit: Bool = true, directInsert: Bool = false, mergeChildren: Bool = false) -> Bool {
         if directInsert {
             addChild(other, adjustAmounts: adjustAmounts, optimizeUnit: optimizeUnit)
             return true
@@ -160,30 +162,36 @@ struct NutrientItem: Identifiable, Equatable {
         let parents = NutrientTree.shared.getParents(of: other.name, ignoringGenerics: true)
         let path = parents + [other.name]
         
-        let result = insertAlongPath(path: path, child: other, adjustAmounts: adjustAmounts, optimizeUnit: optimizeUnit)
+        let result = insertAlongPath(path: path, other: other, adjustAmounts: adjustAmounts, optimizeUnit: optimizeUnit)
+        
+        if mergeChildren {
+            for child in other.childNutrients {
+                add(child, adjustAmounts: false, optimizeUnit: optimizeUnit, directInsert: false, mergeChildren: mergeChildren)
+            }
+        }
+        
         return result
     }
     
     /// Insert along a resolved hierarchy path
     @discardableResult
-    private mutating func insertAlongPath(path: [String], child: NutrientItem, adjustAmounts: Bool, optimizeUnit: Bool) -> Bool {
+    private mutating func insertAlongPath(path: [String], other: NutrientItem, adjustAmounts: Bool, optimizeUnit: Bool) -> Bool {
         guard let first = path.first else { return false }
         
         if first == name {
             if adjustAmounts {
-                let childGrams = child.unit.convertTo(child.amount, to: .grams)
+                let otherGrams = other.unit.convertTo(other.amount, to: .grams)
                 let selfGrams = unit.convertTo(amount, to: .grams)
-                let totalGrams = selfGrams + childGrams
+                let totalGrams = selfGrams + otherGrams
                 applyModification(newValue: unit.convertFrom(totalGrams), optimizeUnit: optimizeUnit)
             }
             
             let rest = Array(path.dropFirst())
             if let next = rest.first {
                 if let index = childNutrients.firstIndex(where: { $0.name == next }) { // further down the existing chain
-                    childNutrients[index].insertAlongPath(path: rest, child: child, adjustAmounts: adjustAmounts, optimizeUnit: optimizeUnit)
+                    childNutrients[index].insertAlongPath(path: rest, other: other, adjustAmounts: adjustAmounts, optimizeUnit: optimizeUnit)
                 } else {
-                    var newNode = NutrientItem(name: next, amount: child.amount, unit: child.unit) // create new nodes chain
-                    newNode.insertAlongPath(path: rest, child: child, adjustAmounts: adjustAmounts, optimizeUnit: optimizeUnit)
+                    let newNode = NutrientItem(name: next, amount: other.amount, unit: other.unit)
                     childNutrients.append(newNode)
                 }
             }
@@ -336,12 +344,7 @@ struct NutrientItem: Identifiable, Equatable {
         if let idx = childNutrients.firstIndex(where: { $0.name == other.name }) {
             childNutrients[idx].add(other, adjustAmounts: adjustAmounts, optimizeUnit: optimizeUnit, directInsert: true)
         } else {
-            let order = NutrientTree.shared.getChildOrder(of: name, ignoringGenerics: true)
-            if !order.isEmpty, let targetIndex = findInsertIndex(for: other.name, order: order) {
-                childNutrients.insert(other, at: targetIndex)
-            } else {
-                childNutrients.append(other) // no config order
-            }
+            insertOrderedChild(other)
         }
         
         if adjustAmounts {
@@ -350,6 +353,16 @@ struct NutrientItem: Identifiable, Equatable {
         }
     }
 
+    private mutating func insertOrderedChild(_ newChild: NutrientItem) {
+        let order = NutrientTree.shared.getChildOrder(of: name, ignoringGenerics: true)
+        
+        if !order.isEmpty, let idx = findInsertIndex(for: newChild.name, order: order) {
+            childNutrients.insert(newChild, at: idx)
+        } else {
+            childNutrients.append(newChild) // no configured order
+        }
+    }
+    
     /// find index to insert child based on config order
     private func findInsertIndex(for childName: String, order: [String]) -> Int? {
         guard let desiredIndex = order.firstIndex(of: childName) else { return nil }
@@ -361,27 +374,6 @@ struct NutrientItem: Identifiable, Equatable {
         }
         
         return nil 
-    }
-    
-    /// add helper (uses raw path)
-    private mutating func add(_ value: Double, unit: NutrientUnit, path: [String], optimizeUnit: Bool = true) {
-        guard let first = path.first else { return }
-        
-        if first == name {
-            let deltaGrams = unit.convertTo(value, to: .grams)
-            applyDelta(deltaGrams, optimizeUnit: optimizeUnit)
-            
-            let rest = Array(path.dropFirst())
-            if let next = rest.first {
-                if let index = childNutrients.firstIndex(where: { $0.name == next }) {
-                    childNutrients[index].add(value, unit: unit, path: rest, optimizeUnit: optimizeUnit)
-                } else {
-                    var newNode = NutrientItem(name: next, amount: 0, unit: unit)
-                    newNode.add(value, unit: unit, path: rest, optimizeUnit: optimizeUnit)
-                    childNutrients.append(newNode)
-                }
-            }
-        }
     }
     
     func createNewUniqueCopy() -> NutrientItem {
