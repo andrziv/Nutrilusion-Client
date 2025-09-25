@@ -54,12 +54,16 @@ struct BuilderCreatorModeView: View {
                 draftFoodItem.addIngredient(newIngredient)
                 self.showIngredientList = false
             } isItemDisabled: { candidate in
-                candidate.id == draftFoodItem.id || candidate.containsIngredient(draftFoodItem)
+                candidate.foodItemID == draftFoodItem.foodItemID ||
+                candidate.containsIngredient(draftFoodItem) ||
+                !candidate.ingredientList.filter({ $0.foodItemID == draftFoodItem.foodItemID }).isEmpty
             } overlayProvider: { candidate in
-                if candidate.id == draftFoodItem.id {
+                if candidate.foodItemID == draftFoodItem.foodItemID {
                     return AnyView(BlockedOverlay(label: "Item Being Edited", colour: .red))
                 } else if candidate.containsIngredient(draftFoodItem) {
                     return AnyView(BlockedOverlay(label: "Contains Current Item", colour: .orange))
+                } else if !candidate.ingredientList.filter({ $0.foodItemID == draftFoodItem.foodItemID }).isEmpty {
+                    return AnyView(BlockedOverlay(label: "Contains Version of Current Item", colour: .orange))
                 }
                 return AnyView(EmptyView())
             }

@@ -270,7 +270,7 @@ class CoreDataFoodRepository: NutriToolFoodRepositoryProtocol {
         }
 
         for food in foodCandidates {
-            if !food.isReferencedUpstream(in: context) {
+            if !food.isReferenced(in: context) {
                 context.delete(food)
 
                 if let nutrients = food.nutrients as? Set<NutrientItemEntity> {
