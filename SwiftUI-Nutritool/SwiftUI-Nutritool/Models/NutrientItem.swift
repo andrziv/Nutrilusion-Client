@@ -180,28 +180,34 @@ struct NutrientItem: Identifiable, Equatable {
     private mutating func insertAlongPath(path: [String], other: NutrientItem, propagateChanges: Bool, adjustAmounts: Bool, optimizeUnit: Bool) -> Bool {
         guard let first = path.first else { return false }
         
-        if first == name {
-            if propagateChanges || (adjustAmounts && self.name == other.name) {
-                let otherGrams = other.unit.convertTo(other.amount, to: .grams)
-                let selfGrams = unit.convertTo(amount, to: .grams)
-                let totalGrams = selfGrams + otherGrams
-                applyModification(newValue: unit.convertFrom(totalGrams), optimizeUnit: optimizeUnit)
-            }
-            
-            let rest = Array(path.dropFirst())
-            if let next = rest.first {
-                if let index = childNutrients.firstIndex(where: { $0.name == next }) { // further down the existing chain
-                    childNutrients[index].insertAlongPath(path: rest, other: other, propagateChanges: propagateChanges, adjustAmounts: adjustAmounts, optimizeUnit: optimizeUnit)
-                } else {
-                    var newNode = NutrientItem(name: next, amount: other.amount, unit: other.unit)
-                    newNode.insertAlongPath(path: rest, other: other, propagateChanges: propagateChanges, adjustAmounts: adjustAmounts, optimizeUnit: optimizeUnit)
-                    childNutrients.append(newNode)
-                }
-            }
-            return true
+        guard first == name else { return false }
+        
+        if propagateChanges || (adjustAmounts && self.name == other.name) {
+            let otherGrams = other.unit.convertTo(other.amount, to: .grams)
+            let selfGrams = unit.convertTo(amount, to: .grams)
+            let totalGrams = selfGrams + otherGrams
+            applyModification(newValue: unit.convertFrom(totalGrams), optimizeUnit: optimizeUnit)
         }
         
-        return false
+        let rest = Array(path.dropFirst())
+        
+        guard let next = rest.first else { return false }
+        
+        if let index = childNutrients.firstIndex(where: { $0.name == next }) { // further down the existing chain
+            childNutrients[index].insertAlongPath(path: rest, other: other, propagateChanges: propagateChanges, adjustAmounts: adjustAmounts, optimizeUnit: optimizeUnit)
+        } else {
+            var newNode = NutrientItem(name: next, amount: other.amount, unit: other.unit)
+            let upcomingPath = Array(path.dropFirst())
+            if let upcomingNode = upcomingPath.first {
+                let nextIsNotOther = upcomingNode != other.name
+                let propagateNext = propagateChanges && nextIsNotOther
+                let adjustNext = adjustAmounts && nextIsNotOther
+                newNode.insertAlongPath(path: rest, other: other, propagateChanges: propagateNext, adjustAmounts: adjustNext, optimizeUnit: optimizeUnit)
+            }
+            childNutrients.append(newNode)
+        }
+        
+        return true
     }
     
     /**
