@@ -31,7 +31,7 @@ struct FoodItemView: View {
             VStack(alignment: .leading, spacing: 8) {
                 FoodItemHeader(foodItem: foodItem,
                                mealGroup: associatedGroups.first,
-                               isMostCurrent: viewModel.currentVersionOf(foodItemID: foodItem.foodItemID) == foodItem.version,
+                               mostCurrentVersion: viewModel.currentVersionOf(foodItemID: foodItem.foodItemID),
                                showGroupInfo: showGroupInfo,
                                isExpanded: isExpanded)
                 
@@ -70,7 +70,7 @@ struct FoodItemView: View {
 private struct FoodItemHeader: View {
     let foodItem: FoodItem
     let mealGroup: MealGroup?
-    let isMostCurrent: Bool
+    let mostCurrentVersion: Int
     let showGroupInfo: Bool
     var isExpanded: Bool = false
     var textColour: Color = .primaryText
@@ -95,8 +95,10 @@ private struct FoodItemHeader: View {
                         }
                     }
                     
-                    if !isMostCurrent {
-                        Text("Outdated Version")
+                    if mostCurrentVersion > foodItem.version {
+                        let versionDifference = mostCurrentVersion - foodItem.version
+                        let versionUnit = versionDifference > 1 ? "s" : ""
+                        Text("\(versionDifference) Version\(versionUnit) Behind")
                             .foregroundStyle(.primaryText)
                             .padding(.horizontal, 5)
                             .font(.footnote)
