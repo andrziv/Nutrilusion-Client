@@ -121,7 +121,8 @@ extension FoodItemVersionEntity {
         for ingredient in model.ingredientList {
             if let existing = oldIngredients.first(where: { $0.compositeID == ingredient.id }) {
                 oldIngredients.remove(existing)
-                continue // TODO: come back to this
+                self.addToIngredients(existing)
+                continue
             }
             
             if let entity = fetchFoodVersionEntity(by: ingredient.id, in: context) {
@@ -158,7 +159,15 @@ extension FoodItemVersionEntity {
             self.addToNutrients(newEntity)
         }
         
-        unusedNutrients.append(contentsOf: NutrientItemEntity.collectAllDescendants(from: Array(oldNutrients)))
+        for unusedIngredient in oldIngredients {
+            self.removeFromIngredients(unusedIngredient)
+        }
+        
+        for unusedNutrient in oldNutrients {
+            self.removeFromNutrients(unusedNutrient)
+        }
+        
+        unusedNutrients.append(contentsOf: NutrientItemEntity.collectAllDescendants(from: Array(oldNutrients), onlyDescendants: false))
         return (Array(oldIngredients), unusedNutrients)
     }
     
@@ -302,57 +311,76 @@ extension NutrientItemEntity {
     }
     
     private func updateChildren(from model: NutrientItem, latestOwner: FoodItemVersionEntity, in context: NSManagedObjectContext) -> [NutrientItemEntity] {
+        guard let parentID = latestOwner.parentItem?.id else {
+            print("updateChildren called with FoodItemVersionEntity missing parentItem")
+            return []
+        }
+        
         let existingChildren = (self.childNutrients as? Set<NutrientItemEntity>) ?? []
-        var remainingChildren: [UUID: NutrientItemEntity] = [:]
-        for n in existingChildren {
-            if let base = n.id {
-                remainingChildren[base] = n
+        var existingByID: [UUID: NutrientItemEntity] = [:]
+        for child in existingChildren {
+            if let id = child.id {
+                existingByID[id] = child
             }
         }
         
-        var unusedChildren: [NutrientItemEntity] = []
+        var toKeep: [NutrientItemEntity] = []
+        var toAdd: [NutrientItemEntity] = []
+        var toRemove: [NutrientItemEntity] = []
+        var childrenToReattach: [NutrientItemEntity] = []
+        
+        for childModel in model.childNutrients {
+            if let existing = existingByID[childModel.nutrientID] {
+                existingByID.removeValue(forKey: childModel.nutrientID)
 
-        for child in model.childNutrients {
-            if let existingChild = remainingChildren[child.nutrientID] {
-                remainingChildren.removeValue(forKey: child.nutrientID)
-                if existingChild.isEquivalent(to: child) {
-                    continue
+                if existing.isEquivalent(to: childModel) {
+                    toKeep.append(existing)
+                    childrenToReattach.append(contentsOf: NutrientItemEntity.collectAllDescendants(from: [existing], onlyDescendants: true))
+                } else {
+                    let importantElsewhere = existing.isReferencedElsewhere(foodItemID: parentID, currentVersion: Int(latestOwner.version), in: context)
+
+                    if !importantElsewhere {
+                        let unused = existing.update(from: childModel, latestOwner: latestOwner, in: context)
+                        toKeep.append(existing)
+                        toRemove.append(contentsOf: unused)
+                    } else {
+                        let newChild = NutrientItemEntity(context: context)
+                        let unused = newChild.update(from: childModel, latestOwner: latestOwner, in: context)
+                        toAdd.append(newChild)
+                        toRemove.append(contentsOf: unused)
+                    }
                 }
-                
-                let isChildImportantElsewhere = existingChild.isReferencedElsewhere(foodItemID: latestOwner.parentItem!.id!, olderThan: Int(latestOwner.version), in: context)
-                if !isChildImportantElsewhere {
-                    existingChild.nutrientOf = NSSet(array: [latestOwner])
-                    let output = existingChild.update(from: child, latestOwner: latestOwner, in: context)
-                    unusedChildren.append(contentsOf: output)
-                    continue
+            } else if let fetched = fetchNutrientEntity(by: childModel.id, in: context) {
+                if !fetched.isReferenced(in: context) && !fetched.isEquivalent(to: childModel) {
+                    let unused = fetched.update(from: childModel, latestOwner: latestOwner, in: context)
+                    toRemove.append(contentsOf: unused)
                 }
-                
-                let newChildEntity = NutrientItemEntity(context: context)
-                let output = newChildEntity.update(from: child, latestOwner: latestOwner, in: context)
-                unusedChildren.append(contentsOf: output)
-                
-                self.removeFromChildNutrients(existingChild)
-                self.addToChildNutrients(newChildEntity)
-                newChildEntity.addToNutrientOf(latestOwner)
-                continue
-            } else if let entity = fetchNutrientEntity(by: child.id, in: context) {
-                if !entity.isReferenced(in: context) && !entity.isEquivalent(to: child) {
-                    let output = entity.update(from: child, latestOwner: latestOwner, in: context)
-                    unusedChildren.append(contentsOf: output)
-                }
-                self.addToChildNutrients(entity)
-                entity.addToNutrientOf(latestOwner)
-                continue
+                toKeep.append(fetched)
+                childrenToReattach.append(contentsOf: NutrientItemEntity.collectAllDescendants(from: [fetched], onlyDescendants: true))
+            } else {
+                let newChild = NutrientItemEntity(context: context)
+                _ = newChild.update(from: childModel, latestOwner: latestOwner, in: context)
+                toAdd.append(newChild)
             }
-            
-            let newChildEntity = NutrientItemEntity(context: context)
-            _ = newChildEntity.update(from: child, latestOwner: latestOwner, in: context)
-            self.addToChildNutrients(newChildEntity)
-            newChildEntity.addToNutrientOf(latestOwner)
         }
-        
-        unusedChildren.append(contentsOf: NutrientItemEntity.collectAllDescendants(from: Array(remainingChildren.values)))
-        return unusedChildren
+
+        let abandoned = Array(existingByID.values)
+        toRemove.append(contentsOf: NutrientItemEntity.collectAllDescendants(from: abandoned, onlyDescendants: false))
+
+        for child in toRemove {
+            self.removeFromChildNutrients(child)
+        }
+
+        for child in toAdd + toKeep {
+            self.addToChildNutrients(child)
+            child.addToNutrientOf(latestOwner)
+        }
+
+        for recursiveChild in childrenToReattach {
+            recursiveChild.addToNutrientOf(latestOwner)
+        }
+
+        return toRemove
     }
     
     func isEquivalent(to model: NutrientItem) -> Bool {
@@ -406,9 +434,9 @@ extension NutrientItemEntity {
         }
     }
     
-    func isReferencedElsewhere(foodItemID: UUID, olderThan version: Int, in context: NSManagedObjectContext) -> Bool {
+    func isReferencedElsewhere(foodItemID: UUID, currentVersion version: Int, in context: NSManagedObjectContext) -> Bool {
         do {
-            if try isReferencedByOlderFoodItems(foodItemID: foodItemID, olderThan: version, in: context) {
+            if try isReferencedByOtherFoodItems(foodItemID: foodItemID, currentVersion: version, in: context) {
                 return true
             }
             
@@ -431,9 +459,9 @@ extension NutrientItemEntity {
         return try context.fetch(foodReq).count >= numberOfFoods
     }
     
-    private func isReferencedByOlderFoodItems(foodItemID: UUID, olderThan version: Int, in context: NSManagedObjectContext) throws -> Bool {
+    private func isReferencedByOtherFoodItems(foodItemID: UUID, currentVersion version: Int, in context: NSManagedObjectContext) throws -> Bool {
         let foodReq: NSFetchRequest<FoodItemVersionEntity> = FoodItemVersionEntity.fetchRequest()
-        foodReq.predicate = NSPredicate(format: "ANY nutrients == %@ AND parentItem.id == %@ AND version < %d", self, foodItemID as CVarArg, version)
+        foodReq.predicate = NSPredicate(format: "ANY nutrients == %@ AND parentItem.id == %@ AND version != %d", self, foodItemID as CVarArg, version)
         foodReq.fetchLimit = 1
     
         return !(try context.fetch(foodReq).isEmpty)
@@ -463,13 +491,15 @@ extension NutrientItemEntity {
         return try !context.fetch(parentReq).isEmpty
     }
 
-    static func collectAllDescendants(from entityList: [NutrientItemEntity]) -> [NutrientItemEntity] {
+    static func collectAllDescendants(from entityList: [NutrientItemEntity], onlyDescendants: Bool) -> [NutrientItemEntity] {
         var result: [NutrientItemEntity] = []
 
         for nutrientEntity in entityList {
-            result.append(nutrientEntity)
+            if !onlyDescendants {
+                result.append(nutrientEntity)
+            }
             let childNutrients = (nutrientEntity.childNutrients as? Set<NutrientItemEntity>) ?? []
-            result.append(contentsOf: collectAllDescendants(from: Array(childNutrients)))
+            result.append(contentsOf: collectAllDescendants(from: Array(childNutrients), onlyDescendants: false))
         }
 
         return result

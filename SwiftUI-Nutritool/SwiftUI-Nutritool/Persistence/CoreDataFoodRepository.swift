@@ -124,13 +124,14 @@ class CoreDataFoodRepository: NutriToolFoodRepositoryProtocol {
             updatedModel = output.0
             
             let newEntity = FoodItemVersionEntity(context: background)
+            foodItem.swapCurrentVersion(to: newEntity, in: background)
             let updateOutput = newEntity.update(from: updatedModel, in: background)
             resolveDeletionScenario(foodItemID: updatedModel.foodItemID,
                                     currentVersion: updatedModel.version,
                                     foodItems: updateOutput.0,
                                     nutrientItems: updateOutput.1,
                                     in: background)
-            foodItem.swapCurrentVersion(to: newEntity, in: background)
+            
             
             if let groupEntity = foodItem.mealGroup {
                 groupEntity.removeFromFoodItems(foodItem)
@@ -244,7 +245,7 @@ class CoreDataFoodRepository: NutriToolFoodRepositoryProtocol {
             
             let currentVersion = Int(entity.currentVersion?.version ?? 0)
             let newestPlannedVersion = insitu ? currentVersion : currentVersion + 1
-            if !existing.isEquivalent(to: nutrientItem) && existing.isReferencedElsewhere(foodItemID: entity.id!, olderThan: newestPlannedVersion, in: context) {
+            if !existing.isEquivalent(to: nutrientItem) && existing.isReferencedElsewhere(foodItemID: entity.id!, currentVersion: newestPlannedVersion, in: context) {
                 updatedNutrient.withVersion(updatedNutrient.version + 1)
             }
             remaining.removeValue(forKey: nutrientItem.nutrientID)
@@ -272,7 +273,8 @@ class CoreDataFoodRepository: NutriToolFoodRepositoryProtocol {
         for food in foodCandidates {
             if !food.isReferenced(in: context) {
                 context.delete(food)
-
+                print("Deleted existing FoodItem \(food.name ?? "(nil)") (id: \(food.parentItem!.id!), version \(food.version)).")
+                
                 if let nutrients = food.nutrients as? Set<NutrientItemEntity> {
                     let foodItemID = food.parentItem!.id!
                     let currentVersion = Int(food.version)
@@ -284,7 +286,7 @@ class CoreDataFoodRepository: NutriToolFoodRepositoryProtocol {
     
     private func removeUnreferencedNutrientItems(_ nutrientItems: [NutrientItemEntity], foodItemID: UUID, currentVersion: Int, in context: NSManagedObjectContext) {
         for nutrient in nutrientItems {
-            if !nutrient.isReferencedElsewhere(foodItemID: foodItemID, olderThan: currentVersion, in: context) {
+            if !nutrient.isReferencedElsewhere(foodItemID: foodItemID, currentVersion: currentVersion, in: context) {
                 context.delete(nutrient)
             }
         }
@@ -333,7 +335,7 @@ class CoreDataFoodRepository: NutriToolFoodRepositoryProtocol {
         do {
             let nutrients = try context.fetch(fetch)
             for nutrient in nutrients {
-                if !nutrient.isReferencedElsewhere(foodItemID: foodItemID, olderThan: Int(Int32.max), in: context) {
+                if !nutrient.isReferencedElsewhere(foodItemID: foodItemID, currentVersion: Int(Int32.max), in: context) {
                     context.delete(nutrient)
                 }
             }

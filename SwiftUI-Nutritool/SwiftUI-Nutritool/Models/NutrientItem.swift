@@ -193,7 +193,8 @@ struct NutrientItem: Identifiable, Equatable {
                 if let index = childNutrients.firstIndex(where: { $0.name == next }) { // further down the existing chain
                     childNutrients[index].insertAlongPath(path: rest, other: other, propagateChanges: propagateChanges, adjustAmounts: adjustAmounts, optimizeUnit: optimizeUnit)
                 } else {
-                    let newNode = NutrientItem(name: next, amount: other.amount, unit: other.unit)
+                    var newNode = NutrientItem(name: next, amount: other.amount, unit: other.unit)
+                    newNode.insertAlongPath(path: rest, other: other, propagateChanges: propagateChanges, adjustAmounts: adjustAmounts, optimizeUnit: optimizeUnit)
                     childNutrients.append(newNode)
                 }
             }
