@@ -73,5 +73,9 @@ final class NutriToolFoodViewModel: ObservableObject {
     func moveFood(_ food: FoodItem, from oldGroup: MealGroup, to newGroup: MealGroup) {
         repository.moveFood(food, from: oldGroup, to: newGroup)
     }
+    
+    func currentVersionOf(foodItemID: UUID) -> Int {
+        return foodByID[foodItemID]?.version ?? 0
+    }
 }
 

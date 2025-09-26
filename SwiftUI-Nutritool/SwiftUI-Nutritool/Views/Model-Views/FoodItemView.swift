@@ -28,44 +28,49 @@ struct FoodItemView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-                VStack(alignment: .leading, spacing: 8) {
-                    FoodItemHeader(foodItem: foodItem, mealGroup: associatedGroups.first, showGroupInfo: showGroupInfo, isExpanded: isExpanded)
-                    
-                    if !isExpanded {
-                        Line()
-                            .frame(height: 0.5)
-                            .background(.secondaryText)
-                            .opacity(0.5)
-                    }
-                    
-                    FoodItemBody(foodItem: foodItem, editingAllowed: editingAllowed, isExpanded: $isExpanded, showFoodEditor: $showFoodEditor)
+            VStack(alignment: .leading, spacing: 8) {
+                FoodItemHeader(foodItem: foodItem,
+                               mealGroup: associatedGroups.first,
+                               isMostCurrent: viewModel.currentVersionOf(foodItemID: foodItem.foodItemID) == foodItem.version,
+                               showGroupInfo: showGroupInfo,
+                               isExpanded: isExpanded)
+                
+                if !isExpanded {
+                    Line()
+                        .frame(height: 0.5)
+                        .background(.secondaryText)
+                        .opacity(0.5)
                 }
-                .sheet(isPresented: $showFoodEditor) {
-                    RecipeCreatorView(foodItem: foodItem, viewModel: viewModel, onExitAction: { showFoodEditor = false }) { potentialNewGroup, editedFoodItem in
-                        showFoodEditor = false
-                        
-                        if let editingAction = editingAction, let newGroup = potentialNewGroup {
-                            editingAction(newGroup, editedFoodItem)
-                        } else if let newGroup = potentialNewGroup {
-                            let currentGroup = associatedGroups.first
-                            if let currentGroup = currentGroup, currentGroup.id != newGroup.id {
-                                viewModel.moveFood(editedFoodItem, from: currentGroup, to: newGroup)
-                            }
-                            viewModel.updateFood(editedFoodItem)
-                        }
-                    }
-                }
-                .padding()
-                .background(.regularMaterial)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-                .animation(.easeInOut(duration: 0.25), value: isExpanded)
+                
+                FoodItemBody(foodItem: foodItem, editingAllowed: editingAllowed, isExpanded: $isExpanded, showFoodEditor: $showFoodEditor)
             }
+            .sheet(isPresented: $showFoodEditor) {
+                RecipeCreatorView(foodItem: foodItem, viewModel: viewModel, onExitAction: { showFoodEditor = false }) { potentialNewGroup, editedFoodItem in
+                    showFoodEditor = false
+                    
+                    if let editingAction = editingAction, let newGroup = potentialNewGroup {
+                        editingAction(newGroup, editedFoodItem)
+                    } else if let newGroup = potentialNewGroup {
+                        let currentGroup = associatedGroups.first
+                        if let currentGroup = currentGroup, currentGroup.id != newGroup.id {
+                            viewModel.moveFood(editedFoodItem, from: currentGroup, to: newGroup)
+                        }
+                        viewModel.updateFood(editedFoodItem)
+                    }
+                }
+            }
+            .padding()
+            .background(.regularMaterial)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .animation(.easeInOut(duration: 0.25), value: isExpanded)
+        }
     }
 }
 
 private struct FoodItemHeader: View {
     let foodItem: FoodItem
     let mealGroup: MealGroup?
+    let isMostCurrent: Bool
     let showGroupInfo: Bool
     var isExpanded: Bool = false
     var textColour: Color = .primaryText
@@ -80,15 +85,27 @@ private struct FoodItemHeader: View {
                     .fontWeight(.bold)
                     .foregroundStyle(textColour)
                 
-                if !isExpanded, let mealGroup = mealGroup, showGroupInfo {
-                    Text(mealGroup.name)
-                        .font(.footnote)
-                        .fontWeight(.semibold)
-                        .foregroundStyle(Color(hex: mealGroup.colour))
+                HStack {
+                    if !isExpanded {
+                        if let mealGroup = mealGroup, showGroupInfo {
+                            Text(mealGroup.name)
+                                .font(.footnote)
+                                .fontWeight(.semibold)
+                                .foregroundStyle(Color(hex: mealGroup.colour))
+                        }
+                    }
+                    
+                    if !isMostCurrent {
+                        Text("Outdated Version")
+                            .foregroundStyle(.primaryText)
+                            .padding(.horizontal, 5)
+                            .font(.footnote)
+                            .fontWeight(.semibold)
+                            .background(Capsule().fill(.orange))
+                    }
                 }
             }
             
-            Text("V\(foodItem.version)")
             
             if !isExpanded {
                 Spacer()
@@ -293,8 +310,8 @@ private struct ExpandedFoodItemControlRow: View {
 }
 
 #Preview {
-    let foodItemID = MockData.foodItemList[0].foodItemID
+    let foodItem = MockData.sampleFoodItem
     let viewModel = NutriToolFoodViewModel(repository: MockFoodRepository())
-    FoodItemView(foodItem: viewModel.foodByID[foodItemID]!, viewModel: viewModel, showGroupInfo: false, backgroundColor: .backgroundColour)
-    FoodItemView(foodItem: viewModel.foodByID[foodItemID]!, viewModel: viewModel, showGroupInfo: true, editingAllowed: true, isExpanded: true, backgroundColor: .backgroundColour)
+    FoodItemView(foodItem: foodItem, viewModel: viewModel, showGroupInfo: false, backgroundColor: .backgroundColour)
+    FoodItemView(foodItem: foodItem, viewModel: viewModel, showGroupInfo: true, editingAllowed: true, isExpanded: true, backgroundColor: .backgroundColour)
 }
