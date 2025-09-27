@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-fileprivate enum TabbedItems: Int, CaseIterable {
+private enum TabbedItems: Int, CaseIterable {
     case logger = 0
     case tracker
     case settings
@@ -40,8 +40,6 @@ struct NutriMainTabView: View {
     
     var body: some View {
         ZStack(alignment: .bottom) {
-            //  BackgroundView()
-            
             VStack() {
                 // kludge around TabView because getting around the fixed-window of the main screens is too complicated.
                 ZStack {
@@ -73,7 +71,7 @@ struct NutriMainTabView: View {
                 .padding(.horizontal, 7)
                 .frame(maxWidth: .infinity, maxHeight: 50)
                 .background(.thinMaterial)
-                .clipShape(RoundedRectangle(cornerRadius: 20))
+                .clipShape(RoundedRectangle(cornerRadius: 10))
                 .padding(.horizontal)
             }
         }
@@ -92,15 +90,7 @@ private func contentView(for tab: TabbedItems) -> some View {
     }
 }
 
-struct BackgroundView: View {
-    var body: some View {
-        LocationAwareBackground()
-            .overlay(.ultraThinMaterial)
-            .ignoresSafeArea(edges: .all)
-    }
-}
-
-extension NutriMainTabView {
+private extension NutriMainTabView {
     func CustomTabItem(imageName: String, title: String, isActive: Bool) -> some View{
         Label(title, systemImage: imageName)
             .fontWeight(isActive ? .semibold : .regular)
@@ -108,7 +98,7 @@ extension NutriMainTabView {
             .font(.system(size: 14))
             .padding(10)
             .background(isActive ? .blue.opacity(0.4) : .clear)
-            .clipShape(RoundedRectangle(cornerRadius: 15))
+            .clipShape(RoundedRectangle(cornerRadius: 7))
     }
 }
 

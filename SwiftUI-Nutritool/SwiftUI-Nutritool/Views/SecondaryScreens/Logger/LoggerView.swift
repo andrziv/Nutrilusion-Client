@@ -64,14 +64,14 @@ struct LoggerView: View {
                         TimelineLogView(selectedDate: selectedDay.date, loggedMealItems: .constant(filteredSortedMeals), isHidden: $isShowingRecipesMenu)
                     }
                     .background(.thinMaterial)
-                    .clipShape(RoundedRectangle(cornerSize: .init(width: 20, height: 20)))
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
                 }
             }
             
             HStack {
                 DailyStatProgressView(mealItems: filteredSortedMeals)
                     .padding(12)
-                    .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12))
+                    .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 10))
                 
                 Button {
                     isShowingRecipesMenu = true
@@ -122,12 +122,13 @@ struct WeekDayButtonSet: View {
                                          mainText: day.shortform,
                                          position: positionType(index),
                                          isSelected: selectedDayIndex - 1 == index,
+                                         cornerRadius: 10,
                                          background: .thinMaterial)
                 }
             }
         }
         .background(.clear)
-        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 }
 
@@ -213,7 +214,7 @@ struct LogCurrentTimeButton: View {
             .foregroundStyle(.primaryText)
             .frame(maxHeight: 50)
             .background(.thinMaterial,
-                        in: RoundedRectangle(cornerRadius: 12))
+                        in: RoundedRectangle(cornerRadius: 10))
             .fixedSize(horizontal: true, vertical: false)
             .onReceive(timer) { _ in
                 currentTime = Date()
