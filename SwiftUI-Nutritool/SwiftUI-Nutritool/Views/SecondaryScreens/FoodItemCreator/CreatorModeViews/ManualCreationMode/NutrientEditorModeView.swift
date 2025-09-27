@@ -19,7 +19,7 @@ struct NutrientEditorModeView: View {
                 .fontWeight(.heavy)
             
             NutrientTreeEditorialView(foodItem: $foodItem)
-
+            
             Button {
                 showNutritionList = true
             } label: {
@@ -31,8 +31,6 @@ struct NutrientEditorModeView: View {
         }
     }
 }
-
-
 
 private struct EditorialCalorieBlockEntry: View {
     @Binding var foodItem: FoodItem

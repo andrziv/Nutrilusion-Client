@@ -8,16 +8,16 @@
 import SwiftUI
 
 fileprivate enum RecipeEditorMode: Int, CaseIterable {
-    case nutrient = 0
-    case ingredient
     case camera
+    case nutrient
+    case ingredient
     
     var title: String {
         switch self {
         case .nutrient:
-            return "Nutrient"
+            return "Nutrients"
         case .ingredient:
-            return "Ingredient"
+            return "Ingredients"
         case .camera:
             return "Camera"
         }
@@ -26,11 +26,22 @@ fileprivate enum RecipeEditorMode: Int, CaseIterable {
     var position: Position {
         switch self {
         case .nutrient:
-            return Position.topmid
+            return Position.left
         case .ingredient:
-            return Position.mid
+            return Position.right
         case .camera:
-            return Position.botmid
+            return Position.isolated
+        }
+    }
+    
+    var rightPadding: CGFloat {
+        switch self {
+        case .nutrient:
+            return 0
+        case .ingredient:
+            return 0
+        case .camera:
+            return 7.5
         }
     }
 }
@@ -55,47 +66,42 @@ struct RecipeEditorView: View {
         
         self._draftFoodItem = State(initialValue: foodItem)
         self._selectedMealGroup = State(initialValue:
-            viewModel.mealGroups.first { group in
-                group.foodIDs.contains(foodItem.foodItemID)
-            } ?? viewModel.mealGroups.first
+                                            viewModel.mealGroups.first { group in
+            group.foodIDs.contains(foodItem.foodItemID)
+        } ?? viewModel.mealGroups.first
         )
         self._selectedMode = State(initialValue: .ingredient)
     }
     
     var body: some View {
+        let bgColourHex = selectedMealGroup?.colour ?? Color("backgroundColour").mix(with: .primaryText, by: 0.3).toHex()!
+        let backgroundColour = Color(hex: bgColourHex).opacity(0.3)
         VStack {
             HStack {
-                let bgColourHex = selectedMealGroup?.colour ?? Color("backgroundColour").mix(with: .primaryText, by: 0.3).toHex()!
-                let backgroundColour = Color(hex: bgColourHex)
-                FoodItemBasicInfoEditors(titleInput: $draftFoodItem.name,
-                                         unitSingularInput: $draftFoodItem.servingUnit,
-                                         unitPluralInput: $draftFoodItem.servingUnitMultiple,
-                                         selectedGroup: $selectedMealGroup,
-                                         availableMealGroups: viewModel.mealGroups)
-                .padding(5)
-                .background(Rectangle().fill(backgroundColour).blur(radius: 200))
-                .clipShape(
-                    RoundedRectangle(cornerRadius: 10)
-                )
+                GroupInfoEditor(selectedGroup: $selectedMealGroup, availableMealGroups: viewModel.mealGroups)
                 
-                ModeSwitcherView(selectedMode: $selectedMode)
-                    .frame(maxWidth: 80)
-            }
-            
-            ContentView(foodItem: $draftFoodItem, viewModel: viewModel, mode: selectedMode)
-                .padding(10)
-                .background(RoundedRectangle(cornerRadius: 10).fill(.secondaryBackground))
-            
-            HStack {
-                ImagedButton(title: "Exit", icon: "xmark", circleColour: .clear, cornerRadius: 10, iconPlacement: .trailing, action: onExitAction)
+                ImagedButton(title: nil, icon: "xmark", circleColour: .clear, cornerRadius: 10, iconPlacement: .trailing, action: onExitAction)
                 
-                ImagedButton(title: "Save & Exit", icon: "tray.and.arrow.down.fill", circleColour: .clear, cornerRadius: 10, maxWidth: .infinity, iconPlacement: .leading,
+                ImagedButton(title: nil, icon: "tray.and.arrow.down.fill", imageFont: .system(size: 10), circleColour: .clear, cornerRadius: 10, iconPlacement: .leading,
                              item: (selectedMealGroup, draftFoodItem), action: onSaveAction)
             }
             
+            FoodItemBasicInfoEditors(titleInput: $draftFoodItem.name,
+                                     unitSingularInput: $draftFoodItem.servingUnit,
+                                     unitPluralInput: $draftFoodItem.servingUnitMultiple)
+            .padding(10)
+            .background(RoundedRectangle(cornerRadius: 10).fill(.secondaryBackground))
+            
+            ContentView(foodItem: $draftFoodItem, viewModel: viewModel, mode: selectedMode)
+                .background(RoundedRectangle(cornerRadius: 10).fill(.secondaryBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+            
+            ModeSwitcherView(selectedMode: $selectedMode)
+            
             Spacer()
         }
-        .basicBackground()
+        .basicBackground(shadowRadius: 0,
+                         background: LinearGradient(colors: [backgroundColour, .backgroundColour, .backgroundColour, .backgroundColour], startPoint: .top, endPoint: .bottom))
     }
 }
 
@@ -103,38 +109,44 @@ private struct FoodItemBasicInfoEditors: View {
     @Binding var titleInput: String
     @Binding var unitSingularInput: String
     @Binding var unitPluralInput: String
-    @Binding var selectedGroup: MealGroup?
-    var availableMealGroups: [MealGroup]
     
     var body: some View {
-        VStack(spacing: 5) {
-            let emptyInputColour: Color = .red.mix(with: .secondaryBackground, by: 0.8)
+        VStack {
+            let emptyInputColour: Color = .red.mix(with: .secondaryBackground, by: 0.7)
             
             BasicTextField("Name of the Recipe", text: $titleInput,
-                           cornerRadius: 7, outlineWidth: 0,
-                           background: unitSingularInput.isEmpty ? emptyInputColour : .secondaryBackground.opacity(0.45),
-                           horizontalPadding: 8,
-                           verticalPadding: 4)
-            .disableAutocorrection(true)
+                           cornerRadius: 4, outline: .secondaryText, outlineWidth: 0.2,
+                           background: titleInput.isEmpty ? emptyInputColour : .clear,
+                           horizontalPadding: 6,
+                           verticalPadding: 3)
             
             HStack(spacing: 5) {
                 BasicTextField("Unit Name", text: $unitSingularInput,
-                               cornerRadius: 7, outlineWidth: 0,
-                               background: unitSingularInput.isEmpty ? emptyInputColour : .secondaryBackground.opacity(0.45),
-                               horizontalPadding: 8,
-                               verticalPadding: 5)
+                               cornerRadius: 4, outline: .secondaryText, outlineWidth: 0.2,
+                               background: unitSingularInput.isEmpty ? emptyInputColour : .clear,
+                               horizontalPadding: 6,
+                               verticalPadding: 3)
                 .disableAutocorrection(true)
                 .textInputAutocapitalization(.never)
                 
                 BasicTextField("Plural Unit", text: $unitPluralInput,
-                               cornerRadius: 7, outlineWidth: 0,
-                               background: unitPluralInput.isEmpty ? emptyInputColour : .secondaryBackground.opacity(0.45),
-                               horizontalPadding: 8,
-                               verticalPadding: 5)
+                               cornerRadius: 4, outline: .secondaryText, outlineWidth: 0.2,
+                               background: unitPluralInput.isEmpty ? emptyInputColour : .clear,
+                               horizontalPadding: 6,
+                               verticalPadding: 3)
                 .disableAutocorrection(true)
                 .textInputAutocapitalization(.never)
             }
-            
+        }
+    }
+}
+
+private struct GroupInfoEditor: View {
+    @Binding var selectedGroup: MealGroup?
+    var availableMealGroups: [MealGroup]
+    
+    var body: some View {
+        Group {
             if let selectionBinding = Binding<MealGroup>($selectedGroup), !availableMealGroups.isEmpty {
                 FoodGroupPicker(mealgroups: availableMealGroups, selectedGroup: selectionBinding)
             } else {
@@ -145,19 +157,18 @@ private struct FoodItemBasicInfoEditors: View {
                     
                     Spacer()
                 }
-                .foregroundStyle(.primaryText)
-                .padding(.horizontal, 8)
-                .padding(.vertical, 5)
-                .background(
-                    RoundedRectangle(cornerRadius: 7)
-                        .fill(.secondaryBackground.opacity(0.45))
-                )
             }
         }
+        .foregroundStyle(.primaryText)
+        .padding(9)
+        .background(
+            RoundedRectangle(cornerRadius: 10)
+                .fill(.secondaryBackground)
+        )
     }
 }
 
-struct FoodGroupPicker: View {
+private struct FoodGroupPicker: View {
     let mealgroups: [MealGroup]
     @Binding var selectedGroup: MealGroup
     
@@ -184,13 +195,6 @@ struct FoodGroupPicker: View {
                 
                 Spacer()
             }
-            .foregroundStyle(.primaryText)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 5)
-            .background(
-                RoundedRectangle(cornerRadius: 7)
-                    .fill(.secondaryBackground.opacity(0.45))
-            )
         }
     }
 }
@@ -200,7 +204,7 @@ private struct ModeSwitcherView: View {
     @Binding var selectedMode: RecipeEditorMode
     
     var body: some View {
-        VStack(spacing: 0) {
+        HStack(spacing: 0) {
             ForEach(RecipeEditorMode.allCases, id: \.self) { item in
                 Button {
                     withAnimation(.snappy) {
@@ -214,6 +218,7 @@ private struct ModeSwitcherView: View {
                                          background: .secondaryBackground,
                                          mainFontWeight: .medium,
                                          mainFontWeightSelected: .bold)
+                    .padding(.trailing, item.rightPadding)
                 }
             }
         }
@@ -229,8 +234,10 @@ private struct ContentView: View {
         switch mode {
         case .nutrient:
             NutrientEditorModeView(foodItem: $foodItem)
+                .padding(10)
         case .ingredient:
             IngredientEditorModeView(draftFoodItem: $foodItem, viewModel: viewModel)
+                .padding(10)
         case .camera:
             CameraImporterModeView(foodItem: $foodItem)
         }

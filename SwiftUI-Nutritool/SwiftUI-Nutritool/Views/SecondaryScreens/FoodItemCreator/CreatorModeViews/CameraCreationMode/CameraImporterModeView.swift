@@ -21,8 +21,9 @@ struct CameraImporterModeView: View {
         VStack {
             if intermediateResult != nil {
                 NutrientEditorModeView(foodItem: $foodItem)
+                    .padding(10)
             } else {
-                NutritionLiveScannerView(foodItem: $intermediateResult)
+                NutritionScannerView(foodItem: $intermediateResult)
             }
         }
         .onChange(of: intermediateResult) { _, newValue in

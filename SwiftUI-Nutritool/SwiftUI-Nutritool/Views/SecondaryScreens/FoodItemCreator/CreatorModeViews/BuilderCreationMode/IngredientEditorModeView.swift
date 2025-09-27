@@ -8,44 +8,14 @@
 
 import SwiftUI
 
-fileprivate enum IngredientEditorMode: Int, CaseIterable {
-    case ingredients = 0
-    case details
-    
-    var title: String {
-        switch self {
-        case .ingredients:
-            return "Ingredient Details"
-        case .details:
-            return "Nutrient Details"
-        }
-    }
-    
-    var position: Position {
-        switch self {
-        case .ingredients:
-            return Position.left
-        case .details:
-            return Position.right
-        }
-    }
-}
-
 struct IngredientEditorModeView: View {
     @Binding var draftFoodItem: FoodItem
     @ObservedObject var viewModel: NutriToolFoodViewModel
-    @State private var selectedMode: IngredientEditorMode = .ingredients
     @State private var showIngredientList: Bool = false
     
     var body: some View {
         VStack {
-            BuilderModeSwitcherView(selectedMode: $selectedMode)
-            
-            if selectedMode == .ingredients {
-                IngredientEditorialView(draftFoodItem: $draftFoodItem, viewModel: viewModel, showIngredientList: $showIngredientList)
-            } else if selectedMode == .details {
-                NutrientEditorModeView(foodItem: $draftFoodItem)
-            }
+            IngredientEditorialView(draftFoodItem: $draftFoodItem, viewModel: viewModel, showIngredientList: $showIngredientList)
         }
         .fullScreenCover(isPresented: $showIngredientList) {
             SearchPopupView(foodViewModel: viewModel, allowEditing: false) {
@@ -81,6 +51,7 @@ struct IngredientEditorialView: View {
             ScrollView {
                 IngredientListEditorialView(draftFoodItem: $draftFoodItem, viewModel: viewModel)
             }
+            .clipShape(RoundedRectangle(cornerRadius: 10))
             
             Button {
                 showIngredientList = true
@@ -111,30 +82,6 @@ private struct IngredientListEditorialView: View {
                         showGroupInfo: false,
                         editingAllowed: false
                     )
-                }
-            }
-        }
-    }
-}
-
-private struct BuilderModeSwitcherView: View {
-    @Binding var selectedMode: IngredientEditorMode
-    
-    var body: some View {
-        HStack(spacing: 0) {
-            ForEach(IngredientEditorMode.allCases, id: \.self) { item in
-                Button {
-                    withAnimation(.snappy) {
-                        selectedMode = item
-                    }
-                } label: {
-                    PositionalButtonView(mainText: item.title,
-                                         position: item.position,
-                                         isSelected: selectedMode == item,
-                                         cornerRadius: 10,
-                                         background: .secondaryBackground.mix(with: .primaryText, by: 0.05),
-                                         mainFontWeight: .medium,
-                                         mainFontWeightSelected: .bold)
                 }
             }
         }

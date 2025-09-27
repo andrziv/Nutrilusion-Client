@@ -8,7 +8,7 @@
 import SwiftUI
 
 fileprivate enum PositionKind {
-    case topmid, botmid, left, mid, right
+    case topmid, botmid, left, mid, right, isolated
 }
 
 struct Position {
@@ -43,16 +43,19 @@ struct Position {
             )
         case .mid:
             return AnyShape(Rectangle())
+        case .isolated:
+            return AnyShape(RoundedRectangle(cornerRadius: cornerRadius))
         }
     }
 }
 
 extension Position {
-    static let topmid = Position(kind: .topmid, cornerRadius: 20)
-    static let botmid = Position(kind: .botmid, cornerRadius: 20)
-    static let left   = Position(kind: .left,   cornerRadius: 20)
-    static let right  = Position(kind: .right,  cornerRadius: 20)
-    static let mid    = Position(kind: .mid,    cornerRadius: 0)
+    static let topmid       = Position(kind: .topmid, cornerRadius: 20)
+    static let botmid       = Position(kind: .botmid, cornerRadius: 20)
+    static let left         = Position(kind: .left,   cornerRadius: 20)
+    static let right        = Position(kind: .right,  cornerRadius: 20)
+    static let mid          = Position(kind: .mid,    cornerRadius: 0)
+    static let isolated   = Position(kind: .isolated,  cornerRadius: 20)
 }
 
 struct PositionalButtonView<S: ShapeStyle>: View {
@@ -60,7 +63,7 @@ struct PositionalButtonView<S: ShapeStyle>: View {
     var mainText: String
     var position: Position
     var isSelected: Bool = false
-
+    
     // Configurable styles
     var cornerRadius: CGFloat = 20
     var background: S
@@ -69,7 +72,7 @@ struct PositionalButtonView<S: ShapeStyle>: View {
     var borderColor: Color = .blue
     var borderWidth: CGFloat = 2
     var selectedBackground: AnyShapeStyle = AnyShapeStyle(Color.blue.opacity(0.2))
-
+    
     // Font settings
     var topFontSize: CGFloat = 10
     var topFontSizeSelected: CGFloat = 12
@@ -79,11 +82,11 @@ struct PositionalButtonView<S: ShapeStyle>: View {
     var topFontWeightSelected: Font.Weight = .medium
     var mainFontWeight: Font.Weight = .light
     var mainFontWeightSelected: Font.Weight = .medium
-
+    
     // Padding
     var verticalPadding: CGFloat = 10
     var verticalPaddingSelected: CGFloat = 8
-
+    
     var body: some View {
         let customPosition = Position(kind: position.kind, cornerRadius: cornerRadius)
         VStack {

@@ -8,18 +8,16 @@
 import SwiftUI
 import AVFoundation
 
-struct NutritionLiveScannerView: View {
+struct NutritionScannerView: View {
     @Binding var foodItem: FoodItem?
     @StateObject private var scanner = LiveTextScanner()
     
     var body: some View {
-        ZStack {
+        ZStack(alignment: .bottom) {
             LiveCameraView(session: scanner.getSession())
                 .ignoresSafeArea()
-
+            
             VStack {
-                Spacer()
-                
                 if scanner.capturedFood == nil {
                     if scanner.captureInProgress {
                         ProgressView()
@@ -38,7 +36,7 @@ struct NutritionLiveScannerView: View {
         .onDisappear { scanner.stop() }
         .onChange(of: scanner.capturedFood) { _, newFood in
             if let food = newFood {
-                foodItem = food 
+                foodItem = food
             }
         }
     }
@@ -46,31 +44,38 @@ struct NutritionLiveScannerView: View {
 
 // UIView subclass that keeps the preview layer sized correctly
 private class PreviewView: UIView {
-    private var previewLayer: AVCaptureVideoPreviewLayer?
-
-    func setSession(_ session: AVCaptureSession) {
-        let layer = AVCaptureVideoPreviewLayer(session: session)
-        layer.videoGravity = .resizeAspectFill
-        self.layer.sublayers?.forEach { $0.removeFromSuperlayer() }
-        self.layer.addSublayer(layer)
-        self.previewLayer = layer
-        setNeedsLayout()
+    private let previewLayer = AVCaptureVideoPreviewLayer()
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        previewLayer.videoGravity = .resizeAspectFill
+        layer.addSublayer(previewLayer)
     }
-
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    func setSession(_ session: AVCaptureSession) {
+        previewLayer.session = session
+    }
+    
     override func layoutSubviews() {
         super.layoutSubviews()
-        previewLayer?.frame = bounds
+        previewLayer.frame = bounds
     }
 }
 
 private struct LiveCameraView: UIViewRepresentable {
     var session: AVCaptureSession
-
+    
     func makeUIView(context: Context) -> PreviewView {
-        let v = PreviewView()
-        v.setSession(session)
-        return v
+        let view = PreviewView()
+        view.setSession(session)
+        return view
     }
-
-    func updateUIView(_ uiView: PreviewView, context: Context) {}
+    
+    func updateUIView(_ uiView: PreviewView, context: Context) {
+        uiView.setSession(session)
+    }
 }
