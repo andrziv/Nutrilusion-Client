@@ -45,7 +45,7 @@ struct FoodItemView: View {
                 FoodItemBody(foodItem: foodItem, editingAllowed: editingAllowed, isExpanded: $isExpanded, showFoodEditor: $showFoodEditor)
             }
             .sheet(isPresented: $showFoodEditor) {
-                RecipeCreatorView(foodItem: foodItem, viewModel: viewModel, onExitAction: { showFoodEditor = false }) { potentialNewGroup, editedFoodItem in
+                RecipeEditorView(foodItem: foodItem, viewModel: viewModel, onExitAction: { showFoodEditor = false }) { potentialNewGroup, editedFoodItem in
                     showFoodEditor = false
                     
                     if let editingAction = editingAction, let newGroup = potentialNewGroup {

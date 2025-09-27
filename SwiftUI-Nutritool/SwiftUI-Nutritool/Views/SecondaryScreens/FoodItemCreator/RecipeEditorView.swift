@@ -1,5 +1,5 @@
 //
-//  RecipeCreatorView.swift
+//  RecipeEditorView.swift
 //  SwiftUI-Nutritool
 //
 //  Created by Andrej Zivkovic on 2025-07-25.
@@ -7,17 +7,17 @@
 
 import SwiftUI
 
-fileprivate enum RecipeCreatorMode: Int, CaseIterable {
-    case manual = 0
-    case builder
+fileprivate enum RecipeEditorMode: Int, CaseIterable {
+    case nutrient = 0
+    case ingredient
     case camera
     
     var title: String {
         switch self {
-        case .manual:
-            return "Manual"
-        case .builder:
-            return "Builder"
+        case .nutrient:
+            return "Nutrient"
+        case .ingredient:
+            return "Ingredient"
         case .camera:
             return "Camera"
         }
@@ -25,9 +25,9 @@ fileprivate enum RecipeCreatorMode: Int, CaseIterable {
     
     var position: Position {
         switch self {
-        case .manual:
+        case .nutrient:
             return Position.topmid
-        case .builder:
+        case .ingredient:
             return Position.mid
         case .camera:
             return Position.botmid
@@ -35,7 +35,7 @@ fileprivate enum RecipeCreatorMode: Int, CaseIterable {
     }
 }
 
-struct RecipeCreatorView: View {
+struct RecipeEditorView: View {
     let foodItem: FoodItem
     @ObservedObject var viewModel: NutriToolFoodViewModel
     
@@ -44,7 +44,7 @@ struct RecipeCreatorView: View {
     
     @State private var draftFoodItem: FoodItem
     @State private var selectedMealGroup: MealGroup?
-    @State private var selectedMode: RecipeCreatorMode
+    @State private var selectedMode: RecipeEditorMode
     
     init(foodItem: FoodItem, viewModel: NutriToolFoodViewModel,
          onExitAction: @escaping () -> Void, onSaveAction: @escaping (MealGroup?, FoodItem) -> Void) {
@@ -59,7 +59,7 @@ struct RecipeCreatorView: View {
                 group.foodIDs.contains(foodItem.foodItemID)
             } ?? viewModel.mealGroups.first
         )
-        self._selectedMode = State(initialValue: .builder)
+        self._selectedMode = State(initialValue: .ingredient)
     }
     
     var body: some View {
@@ -197,11 +197,11 @@ struct FoodGroupPicker: View {
 
 
 private struct ModeSwitcherView: View {
-    @Binding var selectedMode: RecipeCreatorMode
+    @Binding var selectedMode: RecipeEditorMode
     
     var body: some View {
         VStack(spacing: 0) {
-            ForEach(RecipeCreatorMode.allCases, id: \.self) { item in
+            ForEach(RecipeEditorMode.allCases, id: \.self) { item in
                 Button {
                     withAnimation(.snappy) {
                         selectedMode = item
@@ -223,23 +223,23 @@ private struct ModeSwitcherView: View {
 private struct ContentView: View {
     @Binding var foodItem: FoodItem
     let viewModel: NutriToolFoodViewModel
-    var mode: RecipeCreatorMode
+    var mode: RecipeEditorMode
     
     var body: some View {
         switch mode {
-        case .manual:
-            ManualCreatorModeView(foodItem: $foodItem)
-        case .builder:
-            BuilderCreatorModeView(draftFoodItem: $foodItem, viewModel: viewModel)
+        case .nutrient:
+            NutrientEditorModeView(foodItem: $foodItem)
+        case .ingredient:
+            IngredientEditorModeView(draftFoodItem: $foodItem, viewModel: viewModel)
         case .camera:
-            CameraCreatorModeView(foodItem: $foodItem)
+            CameraImporterModeView(foodItem: $foodItem)
         }
     }
 }
 
 #Preview {
     let viewModel = NutriToolFoodViewModel(repository: MockFoodRepository())
-    RecipeCreatorView(foodItem: MockData.sampleFoodItem, viewModel: viewModel) {
+    RecipeEditorView(foodItem: MockData.sampleFoodItem, viewModel: viewModel) {
         
     } onSaveAction: { selectedGroup, foodItem in
         

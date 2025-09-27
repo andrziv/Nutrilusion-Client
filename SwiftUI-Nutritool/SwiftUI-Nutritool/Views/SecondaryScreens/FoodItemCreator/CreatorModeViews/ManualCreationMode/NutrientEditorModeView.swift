@@ -1,5 +1,5 @@
 //
-//  ManualCreatorModeView.swift
+//  NutrientEditorModeView.swift
 //  SwiftUI-Nutritool
 //
 //  Created by Andrej Zivkovic on 2025-08-24.
@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-struct ManualCreatorModeView: View {
+struct NutrientEditorModeView: View {
     @Binding var foodItem: FoodItem
     @State private var showNutritionList: Bool = false
     
@@ -43,5 +43,5 @@ private struct EditorialCalorieBlockEntry: View {
 }
 
 #Preview {
-    ManualCreatorModeView(foodItem: .constant(MockData.sampleFoodItem))
+    NutrientEditorModeView(foodItem: .constant(MockData.sampleFoodItem))
 }

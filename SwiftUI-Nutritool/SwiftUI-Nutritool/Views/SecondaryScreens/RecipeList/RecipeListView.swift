@@ -78,7 +78,7 @@ struct RecipeListView: View {
                 }
                 
             case .addRecipe:
-                RecipeCreatorView(foodItem: FoodItem(name: ""), viewModel: viewModel) {
+                RecipeEditorView(foodItem: FoodItem(name: ""), viewModel: viewModel) {
                     self.mode = nil
                 } onSaveAction: { selectedGroup, editedFoodItem in
                     if let selectedGroup = selectedGroup {

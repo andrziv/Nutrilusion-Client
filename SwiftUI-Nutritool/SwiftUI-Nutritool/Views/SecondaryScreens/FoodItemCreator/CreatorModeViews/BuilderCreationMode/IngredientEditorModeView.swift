@@ -1,5 +1,5 @@
 //
-//  BuilderCreatorModeView.swift
+//  IngredientEditorModeView.swift
 //  SwiftUI-Nutritool
 //
 //  Created by Andrej Zivkovic on 2025-08-24.
@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-fileprivate enum BuilderRecipeCreatorMode: Int, CaseIterable {
+fileprivate enum IngredientEditorMode: Int, CaseIterable {
     case ingredients = 0
     case details
     
@@ -31,10 +31,10 @@ fileprivate enum BuilderRecipeCreatorMode: Int, CaseIterable {
     }
 }
 
-struct BuilderCreatorModeView: View {
+struct IngredientEditorModeView: View {
     @Binding var draftFoodItem: FoodItem
     @ObservedObject var viewModel: NutriToolFoodViewModel
-    @State private var selectedMode: BuilderRecipeCreatorMode = .ingredients
+    @State private var selectedMode: IngredientEditorMode = .ingredients
     @State private var showIngredientList: Bool = false
     
     var body: some View {
@@ -44,7 +44,7 @@ struct BuilderCreatorModeView: View {
             if selectedMode == .ingredients {
                 IngredientEditorialView(draftFoodItem: $draftFoodItem, viewModel: viewModel, showIngredientList: $showIngredientList)
             } else if selectedMode == .details {
-                ManualCreatorModeView(foodItem: $draftFoodItem)
+                NutrientEditorModeView(foodItem: $draftFoodItem)
             }
         }
         .fullScreenCover(isPresented: $showIngredientList) {
@@ -118,11 +118,11 @@ private struct IngredientListEditorialView: View {
 }
 
 private struct BuilderModeSwitcherView: View {
-    @Binding var selectedMode: BuilderRecipeCreatorMode
+    @Binding var selectedMode: IngredientEditorMode
     
     var body: some View {
         HStack(spacing: 0) {
-            ForEach(BuilderRecipeCreatorMode.allCases, id: \.self) { item in
+            ForEach(IngredientEditorMode.allCases, id: \.self) { item in
                 Button {
                     withAnimation(.snappy) {
                         selectedMode = item
@@ -164,5 +164,5 @@ private struct BlockedOverlay: View {
 
 #Preview {
     let viewModel = NutriToolFoodViewModel(repository: MockFoodRepository())
-    BuilderCreatorModeView(draftFoodItem: .constant(MockData.sampleFoodItem), viewModel: viewModel)
+    IngredientEditorModeView(draftFoodItem: .constant(MockData.sampleFoodItem), viewModel: viewModel)
 }

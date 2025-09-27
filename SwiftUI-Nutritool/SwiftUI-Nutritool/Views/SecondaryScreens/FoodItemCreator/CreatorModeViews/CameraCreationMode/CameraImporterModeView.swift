@@ -1,5 +1,5 @@
 //
-//  CameraCreatorModeView.swift
+//  CameraImporterModeView.swift
 //  SwiftUI-Nutritool
 //
 //  Created by Andrej Zivkovic on 2025-08-24.
@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-struct CameraCreatorModeView: View {
+struct CameraImporterModeView: View {
     @Binding var foodItem: FoodItem
     @State private var intermediateResult: FoodItem?
     
@@ -20,7 +20,7 @@ struct CameraCreatorModeView: View {
     var body: some View {
         VStack {
             if intermediateResult != nil {
-                ManualCreatorModeView(foodItem: $foodItem)
+                NutrientEditorModeView(foodItem: $foodItem)
             } else {
                 NutritionLiveScannerView(foodItem: $intermediateResult)
             }
@@ -34,5 +34,5 @@ struct CameraCreatorModeView: View {
 }
 
 #Preview {
-    CameraCreatorModeView(foodItem: .constant(MockData.sampleFoodItem))
+    CameraImporterModeView(foodItem: .constant(MockData.sampleFoodItem))
 }
