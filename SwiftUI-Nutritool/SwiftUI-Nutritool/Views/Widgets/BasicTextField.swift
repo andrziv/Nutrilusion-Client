@@ -15,6 +15,7 @@ struct BasicTextField<Value>: View {
     private var horizontalPadding: CGFloat
     private var verticalPadding: CGFloat
     
+    @FocusState private var isFocused: Bool
     private let _body: AnyView
     
     init(
@@ -64,6 +65,7 @@ struct BasicTextField<Value>: View {
     
     var body: some View {
         _body
+            .focused($isFocused)
             .font(.headline)
             .padding(.vertical, verticalPadding)
             .padding(.horizontal, horizontalPadding)
@@ -72,6 +74,9 @@ struct BasicTextField<Value>: View {
                     .stroke(outline, lineWidth: outlineWidth)
                     .fill(background)
             )
+            .onTapGesture {
+                isFocused = true
+            }
     }
 }
 
