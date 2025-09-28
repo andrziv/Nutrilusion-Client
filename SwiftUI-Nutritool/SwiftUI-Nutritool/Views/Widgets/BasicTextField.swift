@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct BasicTextField<Value>: View {
+    private var font: Font
+    private var fontWeight: Font.Weight
     private var cornerRadius: CGFloat
     private var outline: Color
     private var outlineWidth: CGFloat
@@ -21,6 +23,8 @@ struct BasicTextField<Value>: View {
     init(
         _ placeholder: String,
         text: Binding<String>,
+        font: Font = .headline,
+        fontWeight: Font.Weight = .regular,
         cornerRadius: CGFloat = 10,
         outline: Color = .gray,
         outlineWidth: CGFloat = 0.5,
@@ -28,6 +32,8 @@ struct BasicTextField<Value>: View {
         horizontalPadding: CGFloat = 15.5,
         verticalPadding: CGFloat = 15.5
     ) where Value == String {
+        self.font = font
+        self.fontWeight = fontWeight
         self.cornerRadius = cornerRadius
         self.outline = outline
         self.outlineWidth = outlineWidth
@@ -44,6 +50,8 @@ struct BasicTextField<Value>: View {
         _ placeholder: String,
         value: Binding<Value>,
         format: F,
+        font: Font = .headline,
+        fontWeight: Font.Weight = .regular,
         cornerRadius: CGFloat = 10,
         outline: Color = .gray,
         outlineWidth: CGFloat = 0.5,
@@ -51,6 +59,8 @@ struct BasicTextField<Value>: View {
         horizontalPadding: CGFloat = 15.5,
         verticalPadding: CGFloat = 15.5
     ) where F: ParseableFormatStyle, F.FormatInput == Value, F.FormatOutput == String {
+        self.font = font
+        self.fontWeight = fontWeight
         self.cornerRadius = cornerRadius
         self.outline = outline
         self.outlineWidth = outlineWidth
@@ -66,7 +76,8 @@ struct BasicTextField<Value>: View {
     var body: some View {
         _body
             .focused($isFocused)
-            .font(.headline)
+            .font(font)
+            .fontWeight(fontWeight)
             .padding(.vertical, verticalPadding)
             .padding(.horizontal, horizontalPadding)
             .background(

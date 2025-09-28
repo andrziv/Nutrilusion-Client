@@ -111,33 +111,42 @@ private struct FoodItemBasicInfoEditors: View {
     @Binding var unitPluralInput: String
     
     var body: some View {
-        VStack {
+        VStack(spacing: 5) {
             let emptyInputColour: Color = .red.mix(with: .secondaryBackground, by: 0.7)
             
-            BasicTextField("Name of the Recipe", text: $titleInput,
-                           cornerRadius: 4, outline: .secondaryText, outlineWidth: 0.2,
-                           background: titleInput.isEmpty ? emptyInputColour : .clear,
-                           horizontalPadding: 6,
-                           verticalPadding: 3)
+            BasicInfoEditorView(placeholder: "Name of the Recipe", text: $titleInput, font: .title3, emptyColour: emptyInputColour)
+                .disableAutocorrection(true)
             
             HStack(spacing: 5) {
-                BasicTextField("Unit Name", text: $unitSingularInput,
-                               cornerRadius: 4, outline: .secondaryText, outlineWidth: 0.2,
-                               background: unitSingularInput.isEmpty ? emptyInputColour : .clear,
-                               horizontalPadding: 6,
-                               verticalPadding: 3)
-                .disableAutocorrection(true)
-                .textInputAutocapitalization(.never)
+                BasicInfoEditorView(placeholder: "Unit Name", text: $unitSingularInput, font: .headline, emptyColour: emptyInputColour)
+                    .disableAutocorrection(true)
+                    .textInputAutocapitalization(.never)
                 
-                BasicTextField("Plural Unit", text: $unitPluralInput,
-                               cornerRadius: 4, outline: .secondaryText, outlineWidth: 0.2,
-                               background: unitPluralInput.isEmpty ? emptyInputColour : .clear,
-                               horizontalPadding: 6,
-                               verticalPadding: 3)
-                .disableAutocorrection(true)
-                .textInputAutocapitalization(.never)
+                Image(systemName: "arrow.left.and.right")
+                
+                BasicInfoEditorView(placeholder: "Plural Unit", text: $unitPluralInput, font: .headline, emptyColour: emptyInputColour)
+                    .disableAutocorrection(true)
+                    .textInputAutocapitalization(.never)
             }
         }
+        
+    }
+}
+
+private struct BasicInfoEditorView: View {
+    let placeholder: String
+    @Binding var text: String
+    let font: Font
+    let emptyColour: Color
+    
+    var body: some View {
+        BasicTextField(placeholder, text: $text,
+                       font: font, fontWeight: .semibold,
+                       cornerRadius: 4, outline: .secondaryText, outlineWidth: 0,
+                       background: text.isEmpty ? emptyColour : .clear,
+                       horizontalPadding: 6,
+                       verticalPadding: 3)
+        .multilineTextAlignment(.center)
     }
 }
 
