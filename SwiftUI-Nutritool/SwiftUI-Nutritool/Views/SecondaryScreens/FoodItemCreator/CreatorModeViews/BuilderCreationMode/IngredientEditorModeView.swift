@@ -18,7 +18,7 @@ struct IngredientEditorModeView: View {
             IngredientEditorialView(draftFoodItem: $draftFoodItem, viewModel: viewModel, showIngredientList: $showIngredientList)
         }
         .fullScreenCover(isPresented: $showIngredientList) {
-            SearchPopupView(foodViewModel: viewModel, allowEditing: false) {
+            SearchFoodItemView(foodViewModel: viewModel, allowEditing: false) {
                 self.showIngredientList = false
             } itemTapAction: { _, newIngredient in
                 draftFoodItem.addIngredient(newIngredient)

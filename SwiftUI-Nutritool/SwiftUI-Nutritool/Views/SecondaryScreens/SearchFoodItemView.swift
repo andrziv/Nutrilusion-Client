@@ -1,5 +1,5 @@
 //
-//  SearchPopupView.swift
+//  SearchFoodItemView.swift
 //  SwiftUI-Nutritool
 //
 //  Created by Andrej Zivkovic on 2025-08-09.
@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-struct SearchPopupView: View {
+struct SearchFoodItemView: View {
     @ObservedObject var foodViewModel: NutriToolFoodViewModel
     let exitAction: () -> Void
     let itemTapAction: (MealGroup?, FoodItem) -> Void
@@ -81,7 +81,7 @@ struct SearchPopupView: View {
 
 #Preview {
     let viewModel = NutriToolFoodViewModel(repository: MockFoodRepository())
-    SearchPopupView(foodViewModel: viewModel, allowEditing: true) {
+    SearchFoodItemView(foodViewModel: viewModel, allowEditing: true) {
         
     } itemTapAction: { potentialMealGroup, foodItem in
         

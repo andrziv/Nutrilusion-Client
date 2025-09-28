@@ -65,7 +65,7 @@ struct RecipeListView: View {
         .fullScreenCover(item: $mode) { mode in
             switch mode {
             case .search:
-                SearchPopupView(foodViewModel: viewModel, allowEditing: true) {
+                SearchFoodItemView(foodViewModel: viewModel, allowEditing: true) {
                     self.mode = nil
                 } itemTapAction: { _, foodItem in
                     foodTapAction(foodItem)
