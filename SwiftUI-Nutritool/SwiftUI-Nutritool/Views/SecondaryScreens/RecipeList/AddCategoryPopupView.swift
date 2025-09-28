@@ -14,23 +14,19 @@ struct AddCategoryPopupView: View {
     
     let creationAction: (MealGroup) -> Void
     
-    @State private var searchString: String = ""
+    @State private var titleString: String = ""
     @State private var colourPicked: Color = .blue
     
     var body: some View {
         VStack(spacing: 5) {
-            MealGroupPreviewView(viewModel: viewModel, searchString: $searchString, colourPicked: $colourPicked)
+            MealGroupPreviewView(titleString: $titleString, colourPicked: $colourPicked)
                 .background(RoundedRectangle(cornerRadius: 10).fill(.backgroundColour))
             
-            Spacer()
-            
             HStack {
-                BasicTextField("Group name... eg: Breakfast", text: $searchString, outline: colourPicked)
+                BasicTextField("Group name... eg: Breakfast", text: $titleString, outline: colourPicked)
                 
                 SquareColourPickerView(selection: $colourPicked)
             }
-            
-            Spacer()
             
             HStack {
                 ImagedButton(title: "Exit", icon: "xmark", circleColour: .clear, cornerRadius: 10, iconPlacement: .trailing) {
@@ -38,7 +34,7 @@ struct AddCategoryPopupView: View {
                 }
                 
                 ImagedButton(title: "Create Category", icon: "plus", circleColour: .clear, cornerRadius: 10, maxWidth: .infinity, iconPlacement: .leading) {
-                    creationAction(MealGroup(id: UUID(), name: searchString, foodIDs: [], colour: colourPicked.toHex()!))
+                    creationAction(MealGroup(id: UUID(), name: titleString, foodIDs: [], colour: colourPicked.toHex()!))
                     screenMode = nil
                 }
             }
@@ -50,18 +46,16 @@ struct AddCategoryPopupView: View {
 }
 
 struct MealGroupPreviewView: View {
-    @ObservedObject var viewModel: NutriToolFoodViewModel
-    @Binding var searchString: String
+    @Binding var titleString: String
     @Binding var colourPicked: Color
     
     var body: some View {
         ZStack(alignment: .top) {
-            MealGroupView(viewModel: viewModel,
-                          group: MealGroup(id: UUID(),
-                                           name: searchString,
-                                           foodIDs: [MockData.sampleFoodItem.foodItemID],
-                                           colour: colourPicked.toHex()!))
-            .id(searchString + (colourPicked.toHex() ?? ""))
+            let previewFoodItem = MockData.sampleFoodItem
+            let previewGroup = MealGroup(id: UUID(), name: titleString, foodIDs: [previewFoodItem.foodItemID], colour: colourPicked.toHex()!)
+            MealGroupView(viewModel: NutriToolFoodViewModel(repository: MockFoodRepository(foods: [previewFoodItem], mealGroups: [previewGroup])),
+                          group: previewGroup)
+            .id(titleString + (colourPicked.toHex() ?? ""))
             .padding(.vertical)
             
             BottomTrailing {
