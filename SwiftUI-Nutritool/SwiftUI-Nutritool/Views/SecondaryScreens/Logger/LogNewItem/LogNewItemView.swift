@@ -19,7 +19,6 @@ private enum LogItemViewMode: Identifiable {
 }
 
 struct LogNewItemView: View {
-    
     @ObservedObject var viewModel: NutriToolFoodViewModel
     @State var logDate: Date
     @State private var chosenFoodItem: FoodItem? = nil
@@ -53,59 +52,27 @@ struct LogNewItemView: View {
                 .frame(maxHeight: 125)
                 
                 HStack {
-                    ImagedButton(title: "Choose Recipes", icon: "text.badge.plus",
-                                 textFont: .callout.weight(.regular),
-                                 circleColour: .clear,
-                                 cornerRadius: 7,
-                                 verticalPadding: 6,
-                                 horizontalPadding: 6,
-                                 maxWidth: .infinity,
-                                 iconPlacement: .top) {
-                        mode = .showingRecipesView
-                    }
-                    
-                    ImagedButton(title: "Create Transient", icon: "plus.circle.dashed",
-                                 textFont: .callout.weight(.regular),
-                                 circleColour: .clear,
-                                 cornerRadius: 7,
-                                 verticalPadding: 6,
-                                 horizontalPadding: 6,
-                                 maxWidth: .infinity,
-                                 iconPlacement: .top) {
-                        mode = .creatingTransientRecipe
-                    }
+                    FoodItemSelectionButtonSet(mode: $mode)
                     
                     SquareColourPickerView(selection: $colour)
                 }
-
-                VStack {
-                    Group {
-                        let actionBackground = chosenFoodItem == nil ? .clear : Color.secondaryText.mix(with: .primaryComplement, by: 0.85)
-                        if !choosingNutrients {
-                            Group {
-                                DateChooseView(selectedDate: $logDate)
-                                
-                                ServingSizeChangeView(servingSize: $servingsLogged, background: actionBackground)
-                            }
-                            .transition(.opacity.combined(with: .scale(scale: 0.95, anchor: .top)))
-                        }
-                        
-                        ImportantNutrientChooseView(availableNutrients: chosenFoodItem?.nutritionList ?? [], selectedNutrients: $importantNutrients, isChoosingActive: $choosingNutrients, background: actionBackground)
-                    }
-                    .overlay(RoundedRectangle(cornerRadius: 7).fill(chosenFoodItem == nil ? .gray.opacity(0.08) : .clear))
-                    .disabled(chosenFoodItem == nil)
-                }
+                
+                LoggedFoodItemBuilderView(logDate: $logDate,
+                                          chosenFoodItem: $chosenFoodItem,
+                                          importantNutrients: $importantNutrients,
+                                          servingsLogged: $servingsLogged,
+                                          colour: $colour,
+                                          choosingNutrients: $choosingNutrients)
             }
             .basicBackground(shadowRadius: 0, background: .secondaryComplement)
             
-            HStack {
-                ImagedButton(title: "Discard", icon: "xmark.circle.fill", cornerRadius: 7, maxWidth: .infinity, backgroundColour: .secondaryComplement, action: exitWithoutComplete)
-
-                if let chosenFoodItem = chosenFoodItem {
-                    ImagedButton(title: "Log", icon: "checkmark.circle.fill", cornerRadius: 7, maxWidth: .infinity, backgroundColour: .secondaryComplement,
-                                 item: LoggedMealItem(date: logDate, meal: chosenFoodItem, servingMultiple: servingsLogged, importantNutrients: importantNutrients, emblemColour: colour), action: finalizeCreation)
-                }
-            }
+            LoggerActionButtonSet(logDate: $logDate,
+                                  chosenFoodItem: $chosenFoodItem,
+                                  importantNutrients: $importantNutrients,
+                                  servingsLogged: $servingsLogged,
+                                  colour: $colour,
+                                  exitWithoutComplete: exitWithoutComplete,
+                                  finalizeCreation: finalizeCreation)
         }
         .sheet(item: $mode) { mode in
             switch mode {
@@ -168,6 +135,96 @@ private struct LoggedMealPreviewView: View {
     }
 }
 
+private struct FoodItemSelectionButtonSet: View {
+    @Binding var mode: LogItemViewMode?
+    
+    var body: some View {
+        ImagedButton(title: "Choose Recipes", icon: "text.badge.plus",
+                     textFont: .callout.weight(.regular),
+                     circleColour: .clear,
+                     cornerRadius: 7,
+                     verticalPadding: 6,
+                     horizontalPadding: 6,
+                     maxWidth: .infinity,
+                     iconPlacement: .top) {
+            mode = .showingRecipesView
+        }
+        
+        ImagedButton(title: "Create Transient", icon: "plus.circle.dashed",
+                     textFont: .callout.weight(.regular),
+                     circleColour: .clear,
+                     cornerRadius: 7,
+                     verticalPadding: 6,
+                     horizontalPadding: 6,
+                     maxWidth: .infinity,
+                     iconPlacement: .top) {
+            mode = .creatingTransientRecipe
+        }
+    }
+}
+
+private struct LoggedFoodItemBuilderView: View {
+    @Binding var logDate: Date
+    @Binding var chosenFoodItem: FoodItem?
+    @Binding var importantNutrients: [NutrientItem]
+    @Binding var servingsLogged: Double
+    @Binding var colour: Color
+    
+    @Binding var choosingNutrients: Bool
+    
+    var body: some View {
+        Group {
+            let actionBackground = chosenFoodItem == nil ? .clear : Color.secondaryText.mix(with: .primaryComplement, by: 0.85)
+            if !choosingNutrients {
+                Group {
+                    DateChooseView(selectedDate: $logDate)
+                    
+                    ServingSizeChangeView(servingSize: $servingsLogged, background: actionBackground)
+                }
+                .transition(.opacity.combined(with: .scale(scale: 0.95, anchor: .top)))
+            }
+            
+            ImportantNutrientChooseView(availableNutrients: chosenFoodItem?.nutritionList ?? [], selectedNutrients: $importantNutrients, isChoosingActive: $choosingNutrients, background: actionBackground)
+        }
+        .overlay(RoundedRectangle(cornerRadius: 7).fill(chosenFoodItem == nil ? .gray.opacity(0.08) : .clear))
+        .disabled(chosenFoodItem == nil)
+    }
+}
+
+private struct LoggerActionButtonSet: View {
+    @Binding var logDate: Date
+    @Binding var chosenFoodItem: FoodItem?
+    @Binding var importantNutrients: [NutrientItem]
+    @Binding var servingsLogged: Double
+    @Binding var colour: Color
+    
+    let exitWithoutComplete: () -> Void
+    let finalizeCreation: (LoggedMealItem) -> Void
+    
+    var body: some View {
+        HStack {
+            ImagedButton(title: "Discard", icon: "xmark.circle.fill",
+                         cornerRadius: 7,
+                         maxWidth: .infinity,
+                         backgroundColour: .secondaryComplement,
+                         action: exitWithoutComplete)
+            
+            if let chosenFoodItem = chosenFoodItem {
+                ImagedButton(title: "Log", icon: "checkmark.circle.fill",
+                             cornerRadius: 7,
+                             maxWidth: .infinity,
+                             backgroundColour: .secondaryComplement,
+                             item: LoggedMealItem(date: logDate,
+                                                  meal: chosenFoodItem,
+                                                  servingMultiple: servingsLogged,
+                                                  importantNutrients: importantNutrients,
+                                                  emblemColour: colour),
+                             action: finalizeCreation)
+            }
+        }
+    }
+}
+
 private struct DateChooseView: View {
     @Binding var selectedDate: Date
     
@@ -199,19 +256,6 @@ private struct ImportantNutrientChooseView: View {
     
     @State private var isAtCapSelections: Bool = false
     
-    private func extraInformation() -> (String, Color) {
-        if availableNutrients.count == selectedNutrients.count {
-            return ("", .clear)
-        }
-        if selectedNutrients.isEmpty {
-            return ("Empty! Add Some Nutrients.", .secondaryComplement)
-        } else if selectedNutrients.count < 3 {
-            return ("Still Space Left", .secondaryComplement)
-        }
-        
-        return ("", .clear)
-    }
-    
     var body: some View {
         ZStack(alignment: .topTrailing) {
             Text("Max 3")
@@ -229,19 +273,8 @@ private struct ImportantNutrientChooseView: View {
                         .scrollIndicators(.hidden)
                         .transition(.opacity.combined(with: .scale(scale: 0.95, anchor: .bottom)).animation(.easeInOut(duration: 0.15)))
                 } else {
-                    NutrientChipView(selectedNutrients: $selectedNutrients)
+                    SelectedImportantNutrientView(availableNutrients: availableNutrients, selectedNutrients: $selectedNutrients)
                         .transition(.opacity.animation(.easeInOut(duration: 0.1)))
-                    
-                    let extraInfo = extraInformation()
-                    
-                    Rectangle()
-                        .fill(.clear)
-                        .overlay{
-                            RoundedRectangle(cornerRadius: 7)
-                                .stroke(style: StrokeStyle(lineWidth: 1, dash: [8]))
-                                .foregroundStyle(extraInfo.1)
-                                .overlay(Text(extraInfo.0).foregroundStyle(extraInfo.1))
-                        }
                 }
                 
                 ImagedButton(title: isChoosingActive ? "Close" : "Choose Nutrients", icon: isChoosingActive ? "x.circle" : "plus.circle", imageFont: .subheadline.weight(.regular), textFont: .subheadline.weight(.regular), circleColour: .clear, cornerRadius: 6, verticalPadding: 6, horizontalPadding: 6, maxWidth: .infinity, backgroundColour: background,iconPlacement: .leading) {
@@ -257,23 +290,36 @@ private struct ImportantNutrientChooseView: View {
     }
 }
 
-private struct EditFieldView<Content: View>: View {
-    let title: String
-    let content: Content
+private struct SelectedImportantNutrientView: View {
+    let availableNutrients: [NutrientItem]
+    @Binding var selectedNutrients: [NutrientItem]
     
-    init(title: String, @ViewBuilder content: () -> Content) {
-        self.title = title
-        self.content = content()
+    private func extraInformation() -> (String, Color) {
+        if availableNutrients.count == selectedNutrients.count {
+            return ("", .clear)
+        }
+        if selectedNutrients.isEmpty {
+            return ("Empty! Add Some Nutrients.", .secondaryComplement)
+        } else if selectedNutrients.count < 3 {
+            return ("Still Space Left", .secondaryComplement)
+        }
+        
+        return ("", .clear)
     }
     
     var body: some View {
-        VStack(spacing: 8) {
-            Text(title).fontWeight(.semibold)
-            content
-        }
-        .frame(maxWidth: .infinity)
-        .padding(6)
-        .background(RoundedRectangle(cornerRadius: 7).fill(.primaryComplement))
+        NutrientChipView(selectedNutrients: $selectedNutrients)
+        
+        let extraInfo = extraInformation()
+        
+        Rectangle()
+            .fill(.clear)
+            .overlay{
+                RoundedRectangle(cornerRadius: 7)
+                    .stroke(style: StrokeStyle(lineWidth: 1, dash: [8]))
+                    .foregroundStyle(extraInfo.1)
+                    .overlay(Text(extraInfo.0).foregroundStyle(extraInfo.1))
+            }
     }
 }
 
@@ -337,6 +383,26 @@ private struct GranularValueTextField: View {
                 value += topChangeValue
             }
         }
+    }
+}
+
+private struct EditFieldView<Content: View>: View {
+    let title: String
+    let content: Content
+    
+    init(title: String, @ViewBuilder content: () -> Content) {
+        self.title = title
+        self.content = content()
+    }
+    
+    var body: some View {
+        VStack(spacing: 8) {
+            Text(title).fontWeight(.semibold)
+            content
+        }
+        .frame(maxWidth: .infinity)
+        .padding(6)
+        .background(RoundedRectangle(cornerRadius: 7).fill(.primaryComplement))
     }
 }
 

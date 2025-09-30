@@ -89,15 +89,12 @@ private struct NutrientRow: View {
 }
 
 struct CheckBoxStyle: ToggleStyle {
- //   let colour: Color
-    
     func makeBody(configuration: Configuration) -> some View {
         Button(action: {
             configuration.isOn.toggle()
         }, label: {
             HStack {
                 Image(systemName: configuration.isOn ? "checkmark.square.fill" : "square")
-                //    .foregroundStyle(colour)
                 
                 configuration.label
             }
