@@ -42,7 +42,7 @@ struct RecipeListView: View {
     @ObservedObject var viewModel: NutriToolFoodViewModel
     @State private var mode: RecipeListViewMode? = nil
     
-    let foodTapAction: (FoodItem) -> Void
+    let foodTapAction: (MealGroup, FoodItem) -> Void
     
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -51,7 +51,7 @@ struct RecipeListView: View {
                               group: mealGroup,
                               editingAllowed: true,
                               isExpanded: true) { foodItem in
-                    foodTapAction(foodItem)
+                    foodTapAction(mealGroup, foodItem)
                 }
                 .padding(.top)
                 .padding(.bottom, viewModel.mealGroups.last == mealGroup ? 65 : 0)
@@ -67,8 +67,8 @@ struct RecipeListView: View {
             case .search:
                 SearchFoodItemView(foodViewModel: viewModel, allowEditing: true) {
                     self.mode = nil
-                } itemTapAction: { _, foodItem in
-                    foodTapAction(foodItem)
+                } itemTapAction: { mealGroup, foodItem in
+                    foodTapAction(mealGroup, foodItem)
                     self.mode = nil
                 }
                 
@@ -90,7 +90,6 @@ struct RecipeListView: View {
         }
     }
 }
-
 
 private struct FloatingActionMenu: View {
     @Binding var mode: RecipeListViewMode?
@@ -146,7 +145,7 @@ private struct FloatingMenuButton: View {
 
 
 #Preview {
-    RecipeListView(viewModel: NutriToolFoodViewModel(repository: MockFoodRepository())) { foodItem in
+    RecipeListView(viewModel: NutriToolFoodViewModel(repository: MockFoodRepository())) { mealGroup, foodItem in
         
     }
 }

@@ -8,11 +8,11 @@
 import SwiftUI
 
 // MARK: - Model
-struct Nutrient: Codable, Identifiable {
+struct ConfigNutrient: Codable, Identifiable {
     let id = UUID()
     let name: String
     let ignoreGeneric: Bool
-    let children: [Nutrient]?
+    let children: [ConfigNutrient]?
     
     enum CodingKeys: String, CodingKey {
         case name
@@ -25,8 +25,8 @@ struct Nutrient: Codable, Identifiable {
 final class NutrientTree: ObservableObject {
     static let shared = NutrientTree()
     
-    @Published var root: Nutrient?
-    private var lookup: [String: Nutrient] = [:]
+    @Published private var root: ConfigNutrient?
+    private var lookup: [String: ConfigNutrient] = [:]
     private var parentMap: [String: String] = [:]  // childName → parentName
     
     private init() {
@@ -39,7 +39,7 @@ final class NutrientTree: ObservableObject {
         if let url = Bundle.main.url(forResource: "nutrients", withExtension: "json") {
             do {
                 let data = try Data(contentsOf: url)
-                root = try JSONDecoder().decode(Nutrient.self, from: data)
+                root = try JSONDecoder().decode(ConfigNutrient.self, from: data)
             } catch {
                 print("Error loading JSON: \(error)")
             }
@@ -49,7 +49,7 @@ final class NutrientTree: ObservableObject {
     // Build lookup + parent map
     private func buildLookup() {
         guard let root = root else { return }
-        func traverse(_ node: Nutrient, parent: Nutrient?) {
+        func traverse(_ node: ConfigNutrient, parent: ConfigNutrient?) {
             lookup[node.name.lowercased()] = node
             if let parent = parent {
                 parentMap[node.name.lowercased()] = parent.name
@@ -61,7 +61,7 @@ final class NutrientTree: ObservableObject {
     
     // MARK: - API
     /// Find a nutrient by name
-    func findNutrient(_ name: String) -> Nutrient? {
+    func findNutrient(_ name: String) -> ConfigNutrient? {
         return lookup[name.lowercased()]
     }
     
@@ -100,7 +100,7 @@ final class NutrientTree: ObservableObject {
         return childOrder(from: node, ignoringGenerics: ignoringGenerics)
     }
 
-    private func childOrder(from node: Nutrient, ignoringGenerics: Bool) -> [String] {
+    private func childOrder(from node: ConfigNutrient, ignoringGenerics: Bool) -> [String] {
         guard let kids = node.children else { return [] }
         var result: [String] = []
         for child in kids {

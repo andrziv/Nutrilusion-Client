@@ -37,7 +37,7 @@ struct MealGroupView: View {
         .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
         .background(
             RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .fill(.secondaryBackground)
+                .fill(.primaryComplement)
         )
         .padding(.horizontal)
         .animation(.spring(response: 0.5, dampingFraction: 0.75), value: isExpanded)

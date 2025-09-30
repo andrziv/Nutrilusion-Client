@@ -21,7 +21,7 @@ struct NutrientItemView: View {
     var body: some View {
         switch viewType {
         case .img:
-            Label(RoundingDouble(nutrientOfInterest.amount), systemImage: NutrientImageMapping.allCases[nutrientOfInterest.name] ?? "questionmark.diamond.fill")
+            Label(RoundingDouble(nutrientOfInterest.amount), systemImage: NutrientSymbolMapper.shared.symbol(for: nutrientOfInterest.name))
                 .foregroundStyle(primaryTextColor)
         case .txt:
             HStack {
@@ -47,7 +47,7 @@ struct MealNutrientItemView: View {
     var body: some View {
         switch viewType {
         case .img:
-            Label(RoundingDouble(mealItem.servingMultiple * nutrientOfInterest.amount), systemImage: NutrientImageMapping.allCases[nutrientOfInterest.name] ?? "questionmark.diamond.fill")
+            Label(RoundingDouble(mealItem.servingMultiple * nutrientOfInterest.amount), systemImage: NutrientSymbolMapper.shared.symbol(for: nutrientOfInterest.name))
                 .foregroundStyle(primaryTextColor)
         case .txt:
             HStack {
@@ -72,7 +72,7 @@ struct CalorieStatView: View {
     var body: some View {
         switch viewType {
         case .img:
-            Label(RoundingDouble(Double(foodItem.calories)), systemImage: NutrientImageMapping.allCases["Calories"] ?? "questionmark.diamond.fill")
+            Label(RoundingDouble(Double(foodItem.calories)), systemImage: NutrientSymbolMapper.shared.symbol(for: "Calories"))
                 .foregroundStyle(primaryTextColor)
         case .txt:
             HStack {
@@ -97,7 +97,7 @@ struct MealCalorieStatView: View {
     var body: some View {
         switch viewType {
         case .img:
-            Label(RoundingDouble(mealItem.servingMultiple * Double(mealItem.meal.calories)), systemImage: NutrientImageMapping.allCases["Calories"] ?? "questionmark.diamond.fill")
+            Label(RoundingDouble(mealItem.servingMultiple * Double(mealItem.meal.calories)), systemImage: NutrientSymbolMapper.shared.symbol(for: "Calories"))
                 .foregroundStyle(primaryTextColor)
         case .txt:
             HStack {

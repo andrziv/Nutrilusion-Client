@@ -49,7 +49,9 @@ class MockFoodRepository: NutriToolFoodRepositoryProtocol {
     
     func updateFood(_ food: FoodItem) {
         if let index = foods.firstIndex(where: { $0.id == food.id }) {
-            foods[index] = food
+            var updatedFood = food
+            updatedFood.withVersion(food.version + 1)
+            foods[index] = updatedFood
         }
         publish()
     }

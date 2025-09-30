@@ -72,7 +72,7 @@ struct NutriMainTabView: View {
                 .frame(maxWidth: .infinity, maxHeight: 50)
                 .background(.thinMaterial)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
-                .padding(.horizontal)
+                .padding(.horizontal, 8)
             }
         }
     }

@@ -360,6 +360,25 @@ struct MockData {
     static let foodItemList: [FoodItem] = {
         var items: [FoodItem] = [
             sampleFoodItem,
+            
+            
+            FoodItem(
+                id: UUID(uuidString: "00000000-0000-0000-0000-000000000099")!,
+                name: "Test",
+                calories: 150,
+                nutritionList: [
+                    NutrientItem(name: "Fat", amount: 1.0, unit: .grams,
+                                 childNutrients: [NutrientItem(name: "Polyunsaturated", amount: 500.0, unit: .milligrams),
+                                                  NutrientItem(name: "Monounsaturated", amount: 500.0, unit: .milligrams)]),
+                    NutrientItem(name: "Vitamins", amount: 500.0, unit: .milligrams,
+                                 childNutrients: [NutrientItem(name: "Pantothenic Acid", amount: 500.0, unit: .milligrams)])
+                ],
+                servingAmount: 1.0,
+                servingUnit: "cup",
+                servingUnitMultiple: "cups"
+            ),
+            
+            
             FoodItem(
                 id: UUID(uuidString: "00000000-0000-0000-0000-000000000012")!,
                 name: "Greek Yogurt",

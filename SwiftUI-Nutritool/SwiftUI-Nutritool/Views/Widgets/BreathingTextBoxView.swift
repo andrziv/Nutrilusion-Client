@@ -10,15 +10,18 @@ import SwiftUI
 
 struct BreathingTextBoxView: View {
     var text: String
+    var textColour: Color = .secondaryText
+    var colour: Color = .primaryComplement
+    var cornerRadius: CGFloat = 10
     
     var body: some View {
         Text(text)
             .font(.headline)
             .fontWeight(.bold)
-            .foregroundStyle(.secondaryText)
+            .foregroundStyle(textColour)
             .padding(4)
-            .background(RoundedRectangle(cornerRadius: 10)
-                .fill(.gray)
+            .background(RoundedRectangle(cornerRadius: cornerRadius)
+                .fill(colour)
                 .opacity(0.2))
             .padding(4)
             .phaseAnimator([1.0, 0]) { content, phase in

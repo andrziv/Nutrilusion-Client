@@ -11,7 +11,7 @@ import SwiftUI
 struct SearchFoodItemView: View {
     @ObservedObject var foodViewModel: NutriToolFoodViewModel
     let exitAction: () -> Void
-    let itemTapAction: (MealGroup?, FoodItem) -> Void
+    let itemTapAction: (MealGroup, FoodItem) -> Void
     let allowEditing: Bool
     
     let isItemDisabled: ((FoodItem) -> Bool)?
@@ -22,7 +22,7 @@ struct SearchFoodItemView: View {
     
     init(foodViewModel: NutriToolFoodViewModel,
          allowEditing: Bool,
-         exitAction: @escaping () -> Void, itemTapAction: @escaping (MealGroup?, FoodItem) -> Void,
+         exitAction: @escaping () -> Void, itemTapAction: @escaping (MealGroup, FoodItem) -> Void,
          isItemDisabled: ((FoodItem) -> Bool)? = nil, overlayProvider: ((FoodItem) -> AnyView)? = nil) {
         self.foodViewModel = foodViewModel
         self.allowEditing = allowEditing
@@ -35,7 +35,7 @@ struct SearchFoodItemView: View {
     
     var body: some View {
         VStack {
-            BasicTextField("Search for Recipe Names... eg: Lasagna", text: $searchViewModel.searchText, outlineWidth: 0, background: .secondaryBackground)
+            BasicTextField("Search for Recipe Names... eg: Lasagna", text: $searchViewModel.searchText, outlineWidth: 0, background: .primaryComplement)
                 .focused($searchFocus)
                 .onAppear {
                     withAnimation {
@@ -75,7 +75,7 @@ struct SearchFoodItemView: View {
             
             Spacer()
         }
-        .basicBackground(shadowRadius: 0, background: .secondaryBackground.opacity(0.5))
+        .basicBackground(shadowRadius: 0, background: .primaryComplement.opacity(0.5))
     }
 }
 
@@ -83,7 +83,7 @@ struct SearchFoodItemView: View {
     let viewModel = NutriToolFoodViewModel(repository: MockFoodRepository())
     SearchFoodItemView(foodViewModel: viewModel, allowEditing: true) {
         
-    } itemTapAction: { potentialMealGroup, foodItem in
+    } itemTapAction: { mealGroup, foodItem in
         
     }
 }

@@ -1,0 +1,182 @@
+[
+    {
+        "name": "Calories",
+        "symbol": "flame.fill"
+    },
+    {
+        "name": "Fats",
+        "symbol": "f.circle.fill"
+    },
+    {
+        "name": "Saturated Fat",
+        "symbol": "circle.grid.cross.fill"
+    },
+    {
+        "name": "Trans Fat",
+        "symbol": "xmark.octagon.fill"
+    },
+    {
+        "name": "Polyunsaturated",
+        "symbol": "circle.grid.3x3.fill"
+    },
+    {
+        "name": "Omega-6",
+        "symbol": "flame.fill"
+    },
+    {
+        "name": "Omega-3",
+        "symbol": "fish.fill"
+    },
+    {
+        "name": "Monounsaturated",
+        "symbol": "circle.hexagonpath.fill"
+    },
+    {
+        "name": "Carbohydrates",
+        "symbol": "c.circle.fill"
+    },
+    {
+        "name": "Fiber",
+        "symbol": "tree.fill"
+    },
+    {
+        "name": "Soluble fiber",
+        "symbol": "drop.fill"
+    },
+    {
+        "name": "Insoluble fiber",
+        "symbol": "cube.fill"
+    },
+    {
+        "name": "Sugars",
+        "symbol": "cube.transparent.fill"
+    },
+    {
+        "name": "Proteins",
+        "symbol": "p.circle.fill"
+    },
+    {
+        "name": "Cholesterol",
+        "symbol": "heart.slash.fill"
+    },
+    {
+        "name": "Sodium",
+        "symbol": "aqi.medium"
+    },
+    {
+        "name": "Vitamins",
+        "symbol": "questionmark.circle"
+    },
+    {
+        "name": "Vitamin D",
+        "symbol": "sun.max.fill"
+    },
+    {
+        "name": "Vitamin C",
+        "symbol": "sun.horizon.fill"
+    },
+    {
+        "name": "Vitamin A",
+        "symbol": "eye.fill"
+    },
+    {
+        "name": "Vitamin E",
+        "symbol": "sparkles"
+    },
+    {
+        "name": "Vitamin K",
+        "symbol": "leaf.arrow.circlepath"
+    },
+    {
+        "name": "Thiamin",
+        "symbol": "bolt.fill"
+    },
+    {
+        "name": "Riboflavin",
+        "symbol": "rays"
+    },
+    {
+        "name": "Niacin",
+        "symbol": "flame.circle.fill"
+    },
+    {
+        "name": "Vitamin B6",
+        "symbol": "b.circle.fill"
+    },
+    {
+        "name": "Folate",
+        "symbol": "book.fill"
+    },
+    {
+        "name": "Vitamin B12",
+        "symbol": "bandage.fill"
+    },
+    {
+        "name": "Pantothenic Acid",
+        "symbol": "pills.fill"
+    },
+    {
+        "name": "Biotin",
+        "symbol": "hare.fill"
+    },
+    {
+        "name": "Choline",
+        "symbol": "drop.circle.fill"
+    },
+    {
+        "name": "Minerals",
+        "symbol": "questionmark.circle"
+    },
+    {
+        "name": "Potassium",
+        "symbol": "bolt.circle.fill"
+    },
+    {
+        "name": "Calcium",
+        "symbol": "c.circle"
+    },
+    {
+        "name": "Iron",
+        "symbol": "hammer.fill"
+    },
+    {
+        "name": "Magnesium",
+        "symbol": "sparkle"
+    },
+    {
+        "name": "Zinc",
+        "symbol": "shield.fill"
+    },
+    {
+        "name": "Phosphorus",
+        "symbol": "p.circle"
+    },
+    {
+        "name": "Copper",
+        "symbol": "circlebadge"
+    },
+    {
+        "name": "Manganese",
+        "symbol": "leaf.fill"
+    },
+    {
+        "name": "Selenium",
+        "symbol": "sparkles.rectangle.stack"
+    },
+    {
+        "name": "Chromium",
+        "symbol": "hexagon.fill"
+    },
+    {
+        "name": "Molybdenum",
+        "symbol": "atom"
+    },
+    {
+        "name": "Chloride",
+        "symbol": "cloud.fill"
+    },
+    {
+        "name": "Iodine",
+        "symbol": "drop.triangle.fill"
+    }
+]

@@ -90,10 +90,10 @@ struct RecipeEditorView: View {
                                      unitSingularInput: $draftFoodItem.servingUnit,
                                      unitPluralInput: $draftFoodItem.servingUnitMultiple)
             .padding(10)
-            .background(RoundedRectangle(cornerRadius: 10).fill(.secondaryBackground))
+            .background(RoundedRectangle(cornerRadius: 10).fill(.primaryComplement))
             
             ContentView(foodItem: $draftFoodItem, viewModel: viewModel, mode: selectedMode)
-                .background(RoundedRectangle(cornerRadius: 10).fill(.secondaryBackground))
+                .background(RoundedRectangle(cornerRadius: 10).fill(.primaryComplement))
                 .clipShape(RoundedRectangle(cornerRadius: 10))
             
             ModeSwitcherView(selectedMode: $selectedMode)
@@ -112,7 +112,7 @@ private struct FoodItemBasicInfoEditors: View {
     
     var body: some View {
         VStack(spacing: 5) {
-            let emptyInputColour: Color = .red.mix(with: .secondaryBackground, by: 0.7)
+            let emptyInputColour: Color = .red.mix(with: .primaryComplement, by: 0.7)
             
             BasicInfoEditorView(placeholder: "Name of the Recipe", text: $titleInput, font: .title3, emptyColour: emptyInputColour)
                 .disableAutocorrection(true)
@@ -172,7 +172,7 @@ private struct GroupInfoEditor: View {
         .padding(9)
         .background(
             RoundedRectangle(cornerRadius: 10)
-                .fill(.secondaryBackground)
+                .fill(.primaryComplement)
         )
     }
 }
@@ -224,7 +224,7 @@ private struct ModeSwitcherView: View {
                                          position: item.position,
                                          isSelected: selectedMode == item,
                                          cornerRadius: 10,
-                                         background: .secondaryBackground,
+                                         background: .primaryComplement,
                                          mainFontWeight: .medium,
                                          mainFontWeightSelected: .bold)
                     .padding(.trailing, item.rightPadding)

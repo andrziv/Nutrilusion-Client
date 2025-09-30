@@ -32,7 +32,7 @@ struct TimelineLogView: View {
             whiteness, whiteness, whiteness, .clear,
             whiteness, whiteness, whiteness, .clear,
             whiteness, whiteness, whiteness, .clear
-        ], radius: 0, cornerRadius: 10, isActive: $isHidden)
+        ], radius: 0, cornerRadius: 7, isActive: $isHidden)
         
         VStack {
             ScrollViewReader { scrollProxy in
@@ -167,9 +167,9 @@ struct TotalNutrientStatView: View {
     
     var body: some View {
         if nutrientOfInterest == "Calories" {
-            Label(RoundingDouble(sumCalories(mealItems)), systemImage: NutrientImageMapping.allCases["Calories"] ?? "questionmark.diamond.fill")
+            Label(RoundingDouble(sumCalories(mealItems)), systemImage: NutrientSymbolMapper.shared.symbol(for: "Calories"))
         } else {
-            Label(RoundingDouble(sumNutrients(nutrientOfInterest, mealItems)), systemImage: NutrientImageMapping.allCases[nutrientOfInterest] ?? "questionmark.diamond.fill")
+            Label(RoundingDouble(sumNutrients(nutrientOfInterest, mealItems)), systemImage: NutrientSymbolMapper.shared.symbol(for: nutrientOfInterest))
         }
     }
 }

@@ -42,7 +42,7 @@ struct LoggerView: View {
         date: Date()
     )
     @State private var loggedMealItems: [LoggedMealItem] = MockData.loggedMeals
-    @State private var isShowingRecipesMenu: Bool = false
+    @State private var isShowingLoggingModal: Bool = false
     
     var body: some View {
         let filteredMeals = loggedMealItems.filter {
@@ -52,40 +52,50 @@ struct LoggerView: View {
         let filteredSortedMeals = filteredMeals.sorted { $0.date < $1.date }
         
         VStack {
-            VStack {
-                VStack {
-                    WeekDayButtonSet(selectedDay: $selectedDay)
-                        .frame(maxWidth: .infinity)
-
+            WeekDayButtonSet(selectedDay: $selectedDay)
+                .frame(maxWidth: .infinity)
+            
+            Group {
+                if isShowingLoggingModal {
+                    LogNewItemView(viewModel: foodViewModel, logDate: Date()) {
+                        withAnimation {
+                            isShowingLoggingModal = false
+                        }
+                    } finalizeCreation: { loggedItem in
+                        loggedMealItems.append(loggedItem)
+                        isShowingLoggingModal = false
+                        // TODO: add real coredata impl later
+                    }
+                } else {
                     VStack(spacing: 0) {
                         TimelineLogHeader(selectedDay: selectedDay)
                             .padding([.trailing, .leading], 15)
                         
-                        TimelineLogView(selectedDate: selectedDay.date, loggedMealItems: .constant(filteredSortedMeals), isHidden: $isShowingRecipesMenu)
+                        TimelineLogView(selectedDate: selectedDay.date, loggedMealItems: .constant(filteredSortedMeals), isHidden: $isShowingLoggingModal)
                     }
-                    .background(.thinMaterial)
+                    .background(.secondaryComplement)
                     .clipShape(RoundedRectangle(cornerRadius: 10))
                 }
             }
+            .transition(.asymmetric(
+                insertion: .opacity.combined(with: .move(edge: .trailing)),
+                removal: .opacity.combined(with: .move(edge: .leading))))
             
-            HStack {
+            SwappingVHStack(vSpacing: 8, hSpacing: 8, useHStack: !isShowingLoggingModal) {
                 DailyStatProgressView(mealItems: filteredSortedMeals)
                     .padding(12)
-                    .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 10))
+                    .background(.secondaryComplement, in: RoundedRectangle(cornerRadius: 7))
                 
-                Button {
-                    isShowingRecipesMenu = true
-                } label: {
-                    LogCurrentTimeButton()
+                if !isShowingLoggingModal {
+                    LogCurrentTimeButton() {
+                        withAnimation {
+                            isShowingLoggingModal.toggle()
+                        }
+                    }
                 }
             }
         }
-        .padding(.horizontal)
-        .sheet(isPresented: $isShowingRecipesMenu) {
-            RecipeListView(viewModel: foodViewModel) { foodItem in
-                // TODO: functionality for adding a foodItem to the logger view
-            }
-        }
+        .padding(.horizontal, 8)
     }
 }
 
@@ -188,19 +198,21 @@ struct ScaledTotalNutrientStatView: View {
     var body: some View {
         if nutrientOfInterest == "Calories" {
             Label(RoundingDouble(sumCalories(mealItems)),
-                  systemImage: NutrientImageMapping.allCases["Calories"] ?? "questionmark.diamond.fill")
+                  systemImage: NutrientSymbolMapper.shared.symbol(for: "Calories"))
             .labelStyle(CustomLabel(spacing: 3))
         } else {
             Label(RoundingDouble(sumNutrients(nutrientOfInterest, mealItems)),
-                  systemImage: NutrientImageMapping.allCases[nutrientOfInterest] ?? "questionmark.diamond.fill")
+                  systemImage: NutrientSymbolMapper.shared.symbol(for: nutrientOfInterest))
             .labelStyle(CustomLabel(spacing: 3))
         }
     }
 }
 
-struct LogCurrentTimeButton: View {
+private struct LogCurrentTimeButton: View {
     @State private var currentTime = Date()
-    let timer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
+    private let timer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
+    
+    let action: () -> Void
     
     private var timeString: String {
         let formatter = DateFormatter()
@@ -209,19 +221,20 @@ struct LogCurrentTimeButton: View {
     }
     
     var body: some View {
-        Label("@ " + timeString, systemImage: "plus.circle.fill")
-            .padding(12)
-            .foregroundStyle(.primaryText)
-            .frame(maxHeight: 50)
-            .background(.thinMaterial,
-                        in: RoundedRectangle(cornerRadius: 10))
-            .fixedSize(horizontal: true, vertical: false)
+        ImagedButton(title: "@ " + timeString, icon: "plus.circle.fill",
+                     circleColour: .clear,
+                     cornerRadius: 7,
+                     maxWidth: 110, maxHeight: 50,
+                     backgroundColour: .secondaryComplement,
+                     action: action)
             .onReceive(timer) { _ in
                 currentTime = Date()
             }
     }
 }
 
+
 #Preview {
     LoggerView()
+        .environmentObject(NutriToolFoodViewModel(repository: MockFoodRepository()))
 }

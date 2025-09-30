@@ -54,7 +54,8 @@ struct ImagedButton<Item>: View {
     var verticalPadding: CGFloat = 11.5
     var horizontalPadding: CGFloat = 12
     var maxWidth: CGFloat? = nil
-    var backgroundColour: Color = .secondaryBackground
+    var maxHeight: CGFloat? = nil
+    var backgroundColour: Color = .primaryComplement
     
     var iconPlacement: IconPlacement = .leading
     
@@ -70,7 +71,7 @@ struct ImagedButton<Item>: View {
                 .foregroundStyle(fontColour)
                 .padding(.vertical, verticalPadding)
                 .padding(.horizontal, horizontalPadding)
-                .frame(maxWidth: maxWidth)
+                .frame(maxWidth: maxWidth, maxHeight: maxHeight)
                 .background(
                     RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                         .fill(backgroundColour)
@@ -104,7 +105,8 @@ extension ImagedButton where Item == Void {
          verticalPadding: CGFloat = 11.5,
          horizontalPadding: CGFloat = 12,
          maxWidth: CGFloat? = nil,
-         backgroundColour: Color = .secondaryBackground,
+         maxHeight: CGFloat? = nil,
+         backgroundColour: Color = .primaryComplement,
          iconPlacement: IconPlacement = .leading,
          action: @escaping () -> Void) {
         self.title = title
@@ -119,6 +121,7 @@ extension ImagedButton where Item == Void {
         self.verticalPadding = verticalPadding
         self.horizontalPadding = horizontalPadding
         self.maxWidth = maxWidth
+        self.maxHeight = maxHeight
         self.backgroundColour = backgroundColour
         
         self.iconPlacement = iconPlacement

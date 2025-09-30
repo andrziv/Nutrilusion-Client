@@ -9,12 +9,12 @@
 import SwiftUI
 
 struct StaticNoiseBox: View {
+    var cornerRadius: CGFloat = 10
+    
     var body: some View {
-        RoundedRectangle(cornerRadius: 10)
+        RoundedRectangle(cornerRadius: cornerRadius)
             .fill(.white)
             .randomNoiseShader()
             .opacity(0.1)
-            .background(RoundedRectangle(cornerRadius: 10)
-                .stroke(.clear, lineWidth: 1))
     }
 }
