@@ -5,8 +5,6 @@
 //  Created by Andrej Zivkovic on 2025-09-29.
 //
 
-import Foundation
-
 import SwiftUI
 
 private struct Nutrient: Codable, Identifiable {

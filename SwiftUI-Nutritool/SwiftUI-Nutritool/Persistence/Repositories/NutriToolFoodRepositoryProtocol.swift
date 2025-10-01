@@ -5,7 +5,6 @@
 //  Created by Andrej Zivkovic on 2025-09-17.
 //
 
-import Foundation
 import Combine
 
 protocol NutriToolFoodRepositoryProtocol {
