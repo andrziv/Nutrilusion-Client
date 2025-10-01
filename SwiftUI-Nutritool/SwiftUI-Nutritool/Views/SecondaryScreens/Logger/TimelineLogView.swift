@@ -141,7 +141,7 @@ struct TimelineHourStatView: View {
                 .font(.caption)
                 .foregroundStyle(.secondaryText)
                 .padding(.horizontal, 5)
-                .background(.thinMaterial)
+                .background(.clear)
                 .clipShape(RoundedRectangle(cornerRadius: 15))
                 .layoutPriority(1)  // priority for no info squashing between lines
                 

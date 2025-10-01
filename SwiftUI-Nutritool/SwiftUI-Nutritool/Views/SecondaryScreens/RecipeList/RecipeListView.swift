@@ -46,14 +46,13 @@ struct RecipeListView: View {
     
     var body: some View {
         ZStack(alignment: .bottom) {
-            LazyVScroll(items: viewModel.mealGroups, spacing: 0) { mealGroup in
+            LazyVScroll(items: viewModel.mealGroups, spacing: 12) { mealGroup in
                 MealGroupView(viewModel: viewModel,
                               group: mealGroup,
                               editingAllowed: true,
                               isExpanded: true) { foodItem in
                     foodTapAction(mealGroup, foodItem)
                 }
-                .padding(.top)
                 .padding(.bottom, viewModel.mealGroups.last == mealGroup ? 65 : 0)
             }
             
@@ -61,6 +60,7 @@ struct RecipeListView: View {
                 .padding(.horizontal, 20)
                 .padding(.bottom, 20)
         }
+        .basicBackground(shadowRadius: 0, background: .backgroundColour)
         .ignoresSafeArea(.all, edges: .bottom)
         .fullScreenCover(item: $mode) { mode in
             switch mode {

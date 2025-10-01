@@ -40,6 +40,9 @@ struct NutriMainTabView: View {
     
     var body: some View {
         ZStack(alignment: .bottom) {
+            BackgroundView()
+                .ignoresSafeArea(.all)
+            
             VStack() {
                 // kludge around TabView because getting around the fixed-window of the main screens is too complicated.
                 ZStack {
@@ -70,11 +73,17 @@ struct NutriMainTabView: View {
                 }
                 .padding(.horizontal, 7)
                 .frame(maxWidth: .infinity, maxHeight: 50)
-                .background(.thinMaterial)
+                .background(.secondaryComplement)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
                 .padding(.horizontal, 8)
             }
         }
+    }
+}
+
+private struct BackgroundView: View {
+    var body: some View {
+        Color.backgroundColour
     }
 }
 

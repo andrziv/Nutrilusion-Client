@@ -39,7 +39,6 @@ struct MealGroupView: View {
             RoundedRectangle(cornerRadius: 10, style: .continuous)
                 .fill(.primaryComplement)
         )
-        .padding(.horizontal)
         .animation(.spring(response: 0.5, dampingFraction: 0.75), value: isExpanded)
     }
 }

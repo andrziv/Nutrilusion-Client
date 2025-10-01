@@ -132,7 +132,7 @@ struct WeekDayButtonSet: View {
                                          position: positionType(index),
                                          isSelected: selectedDayIndex - 1 == index,
                                          cornerRadius: 10,
-                                         background: .thinMaterial)
+                                         background: .secondaryComplement)
                 }
             }
         }

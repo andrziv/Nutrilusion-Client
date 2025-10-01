@@ -204,6 +204,7 @@ private struct LoggerActionButtonSet: View {
     var body: some View {
         HStack {
             ImagedButton(title: "Discard", icon: "xmark.circle.fill",
+                         circleColour: .clear,
                          cornerRadius: 7,
                          maxWidth: .infinity,
                          backgroundColour: .secondaryComplement,
@@ -211,6 +212,7 @@ private struct LoggerActionButtonSet: View {
             
             if let chosenFoodItem = chosenFoodItem {
                 ImagedButton(title: "Log", icon: "checkmark.circle.fill",
+                             circleColour: .clear,
                              cornerRadius: 7,
                              maxWidth: .infinity,
                              backgroundColour: .secondaryComplement,

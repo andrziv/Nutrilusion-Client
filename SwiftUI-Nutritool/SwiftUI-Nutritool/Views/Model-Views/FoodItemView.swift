@@ -60,7 +60,7 @@ struct FoodItemView: View {
                 }
             }
             .padding()
-            .background(.regularMaterial)
+            .background(.secondaryComplement)
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .animation(.easeInOut(duration: 0.25), value: isExpanded)
         }
