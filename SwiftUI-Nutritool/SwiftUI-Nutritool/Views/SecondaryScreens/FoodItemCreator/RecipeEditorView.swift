@@ -8,9 +8,9 @@
 import SwiftUI
 
 fileprivate enum RecipeEditorMode: Int, CaseIterable {
-    case camera
+    case ingredient = 0
     case nutrient
-    case ingredient
+    case camera
     
     var title: String {
         switch self {
@@ -26,15 +26,15 @@ fileprivate enum RecipeEditorMode: Int, CaseIterable {
     var position: Position {
         switch self {
         case .nutrient:
-            return Position.left
-        case .ingredient:
             return Position.right
+        case .ingredient:
+            return Position.left
         case .camera:
             return Position.isolated
         }
     }
     
-    var rightPadding: CGFloat {
+    var leftPadding: CGFloat {
         switch self {
         case .nutrient:
             return 0
@@ -227,7 +227,7 @@ private struct ModeSwitcherView: View {
                                          background: .primaryComplement,
                                          mainFontWeight: .medium,
                                          mainFontWeightSelected: .bold)
-                    .padding(.trailing, item.rightPadding)
+                    .padding(.leading, item.leftPadding)
                 }
             }
         }
