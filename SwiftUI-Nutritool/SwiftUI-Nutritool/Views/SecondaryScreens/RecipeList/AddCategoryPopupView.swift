@@ -56,7 +56,7 @@ struct MealGroupPreviewView: View {
             MealGroupView(viewModel: NutriToolFoodViewModel(repository: MockFoodRepository(foods: [previewFoodItem], mealGroups: [previewGroup])),
                           group: previewGroup)
             .id(titleString + (colourPicked.toHex()))
-            .padding(.vertical)
+            .padding()
             
             BottomTrailing {
                 BreathingTextBoxView(text: "Preview")
