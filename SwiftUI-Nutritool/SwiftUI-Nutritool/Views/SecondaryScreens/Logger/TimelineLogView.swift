@@ -134,8 +134,8 @@ struct TimelineHourStatView: View {
                 
                 HStack {
                     TotalNutrientStatView(nutrientOfInterest: "Calories", mealItems: mealItems)
-                    TotalNutrientStatView(nutrientOfInterest: "Protein", mealItems: mealItems)
-                    TotalNutrientStatView(nutrientOfInterest: "Fat", mealItems: mealItems)
+                    TotalNutrientStatView(nutrientOfInterest: "Proteins", mealItems: mealItems)
+                    TotalNutrientStatView(nutrientOfInterest: "Fats", mealItems: mealItems)
                     TotalNutrientStatView(nutrientOfInterest: "Carbohydrates", mealItems: mealItems)
                 }
                 .font(.caption)

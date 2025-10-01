@@ -41,7 +41,7 @@ struct LoggerView: View {
         day: WeekDayType.fullWeek[Calendar.current.component(.weekday, from: Date()) - 1],
         date: Date()
     )
-
+    
     @State private var isShowingLoggingModal: Bool = false
     
     var body: some View {
@@ -164,8 +164,8 @@ struct DailyStatProgressView: View {
     var body: some View {
         HStack {
             DailyNutrientProgressView(nutrientOfInterest: "Calories", mealItems: mealItems)
-            DailyNutrientProgressView(nutrientOfInterest: "Protein", mealItems: mealItems)
-            DailyNutrientProgressView(nutrientOfInterest: "Fat", mealItems: mealItems)
+            DailyNutrientProgressView(nutrientOfInterest: "Proteins", mealItems: mealItems)
+            DailyNutrientProgressView(nutrientOfInterest: "Fats", mealItems: mealItems)
             DailyNutrientProgressView(nutrientOfInterest: "Carbohydrates", mealItems: mealItems)
         }
         .frame(maxHeight: 25)
@@ -221,14 +221,17 @@ private struct LogCurrentTimeButton: View {
     
     var body: some View {
         ImagedButton(title: "@ " + timeString, icon: "plus.circle.fill",
+                     textFont: .callout.weight(.regular),
                      circleColour: .clear,
                      cornerRadius: 7,
                      maxWidth: 110, maxHeight: 50,
                      backgroundColour: .secondaryComplement,
                      action: action)
-            .onReceive(timer) { _ in
-                currentTime = Date()
-            }
+        .scaledToFit()
+        .minimumScaleFactor(0.4)
+        .onReceive(timer) { _ in
+            currentTime = Date()
+        }
     }
 }
 

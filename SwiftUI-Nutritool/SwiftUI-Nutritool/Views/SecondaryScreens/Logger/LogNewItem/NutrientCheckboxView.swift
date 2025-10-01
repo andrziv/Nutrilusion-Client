@@ -80,7 +80,8 @@ private struct NutrientRow: View {
                     primaryTextColor: currentColour,
                     secondaryTextColor: currentColour
                 )
-                .fontWeight(.regular)
+                .font(.callout)
+                .fontWeight(.light)
             }
         }
         .toggleStyle(CheckBoxStyle())
