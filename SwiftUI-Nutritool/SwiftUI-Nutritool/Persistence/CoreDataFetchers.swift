@@ -20,6 +20,19 @@ func fetchMealGroupEntity(by id: UUID, in context: NSManagedObjectContext) -> Me
     }
 }
 
+func fetchLoggedMealItemEntity(by id: UUID, in context: NSManagedObjectContext) -> LoggedMealItemEntity? {
+    let request: NSFetchRequest<LoggedMealItemEntity> = LoggedMealItemEntity.fetchRequest()
+    request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
+    request.fetchLimit = 1
+    
+    do {
+        return try context.fetch(request).first
+    } catch {
+        print("Failed to fetch LoggedMealItemEntity with id \(id): \(error)")
+        return nil
+    }
+}
+
 func fetchFoodVersionEntity(by compositeID: String, in context: NSManagedObjectContext) -> FoodItemVersionEntity? {
     let request: NSFetchRequest<FoodItemVersionEntity> = FoodItemVersionEntity.fetchRequest()
     request.predicate = NSPredicate(format: "compositeID == %@", compositeID)

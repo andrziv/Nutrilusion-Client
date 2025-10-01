@@ -7,10 +7,7 @@
 
 import Foundation
 import CoreData
-
-private enum MiniReferencer {
-    
-}
+import SwiftUICore
 
 extension MealGroupEntity {
     func toModel() -> MealGroup {
@@ -51,6 +48,63 @@ extension MealGroupEntity {
                 continue
             }
         }
+    }
+}
+
+extension LoggedMealItemEntity {
+    func toModel() -> LoggedMealItem {
+        return LoggedMealItem(
+            id: self.id!,
+            date: self.date!,
+            meal: self.meal!.toModel(),
+            servingMultiple: self.servingMultiple,
+            importantNutrients: (self.importantNutrients as? Set<NutrientItemEntity>)?.map({ $0.toModel() }) ?? [],
+            emblemColour: Color(hex: self.emblemColour!)
+        )
+    }
+    
+    func update(from model: LoggedMealItem, in context: NSManagedObjectContext) -> (FoodItemVersionEntity?, [NutrientItemEntity]) {
+        self.id = model.id
+        self.date = model.date
+        self.servingMultiple = model.servingMultiple
+        self.emblemColour = model.emblemColour.toHex()
+        
+        var unusedOldMeal: FoodItemVersionEntity? = nil
+        if let currentMeal = self.meal, !currentMeal.isEquivalent(to: model.meal) {
+            if let entity = fetchFoodVersionEntity(by: model.meal.id, in: context) {
+                unusedOldMeal = currentMeal
+                self.meal = entity
+            }
+        } else if self.meal == nil {
+            if let entity = fetchFoodVersionEntity(by: model.meal.id, in: context) {
+                self.meal = entity
+            }
+        }
+        
+        var oldNutrients = (self.importantNutrients as? Set<NutrientItemEntity> ?? [])
+        var unusedNutrients: [NutrientItemEntity] = []
+        for nutrientModel in model.importantNutrients {
+            if let existing = oldNutrients.first(where: { $0.id == nutrientModel.nutrientID }) {
+                if existing.version == nutrientModel.version {
+                    oldNutrients.remove(existing)
+                    continue
+                }
+                    
+                self.removeFromImportantNutrients(existing)
+            }
+            
+            if let entity = fetchNutrientEntity(by: nutrientModel.id, in: context) {
+                self.addToImportantNutrients(entity)
+                continue
+            }
+        }
+        
+        for unusedNutrient in oldNutrients {
+            self.removeFromImportantNutrients(unusedNutrient)
+        }
+        
+        unusedNutrients.append(contentsOf: NutrientItemEntity.collectAllDescendants(from: Array(oldNutrients), onlyDescendants: false))
+        return (unusedOldMeal, unusedNutrients)
     }
 }
 

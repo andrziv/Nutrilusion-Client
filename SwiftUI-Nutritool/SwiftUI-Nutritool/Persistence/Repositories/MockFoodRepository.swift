@@ -9,9 +9,14 @@ import Foundation
 import Combine
 
 class MockFoodRepository: NutriToolFoodRepositoryProtocol {
+    private let loggedItemsSubject = CurrentValueSubject<[LoggedMealItem], Never>([])
     private let foodsSubject = CurrentValueSubject<[FoodItem], Never>([])
     private let mealGroupsSubject = CurrentValueSubject<[MealGroup], Never>([])
 
+    var loggedItemsPublisher: AnyPublisher<[LoggedMealItem], Never> {
+        loggedItemsSubject.eraseToAnyPublisher()
+    }
+    
     var foodsPublisher: AnyPublisher<[FoodItem], Never> {
         foodsSubject.eraseToAnyPublisher()
     }
@@ -20,13 +25,34 @@ class MockFoodRepository: NutriToolFoodRepositoryProtocol {
         mealGroupsSubject.eraseToAnyPublisher()
     }
 
+    private var loggedItems: [LoggedMealItem] = []
     private var foods: [FoodItem] = []
     private var mealGroups: [MealGroup] = []
     
     init(foods: [FoodItem] = MockData.foodItemList,
+         loggedMealItems: [LoggedMealItem] = MockData.loggedMeals,
          mealGroups: [MealGroup] = MockData.mealGroupList) {
         self.foods = foods
+        self.loggedItems = loggedMealItems
         self.mealGroups = mealGroups
+        publish()
+    }
+    
+    // MARK: - LoggedMealItewms
+    func addLoggedItem(_ meal: LoggedMealItem) {
+        loggedItems.append(meal)
+        publish()
+    }
+    
+    func removeLoggedItem(_ meal: LoggedMealItem) {
+        loggedItems.removeAll { $0.id == meal.id }
+        publish()
+    }
+    
+    func updateLoggedItem(_ meal: LoggedMealItem) {
+        if let index = loggedItems.firstIndex(where: { $0.id == meal.id }) {
+            loggedItems[index] = meal
+        }
         publish()
     }
     
@@ -85,6 +111,7 @@ class MockFoodRepository: NutriToolFoodRepositoryProtocol {
     }
     
     private func publish() {
+        loggedItemsSubject.send(loggedItems)
         foodsSubject.send(foods)
         mealGroupsSubject.send(mealGroups)
     }

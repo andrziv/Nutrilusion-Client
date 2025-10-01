@@ -41,11 +41,11 @@ struct LoggerView: View {
         day: WeekDayType.fullWeek[Calendar.current.component(.weekday, from: Date()) - 1],
         date: Date()
     )
-    @State private var loggedMealItems: [LoggedMealItem] = MockData.loggedMeals
+
     @State private var isShowingLoggingModal: Bool = false
     
     var body: some View {
-        let filteredMeals = loggedMealItems.filter {
+        let filteredMeals = foodViewModel.loggedMeals.filter {
             let calendar = Calendar.current
             return calendar.isDate($0.date, inSameDayAs: selectedDay.date)
         }
@@ -62,9 +62,8 @@ struct LoggerView: View {
                             isShowingLoggingModal = false
                         }
                     } finalizeCreation: { loggedItem in
-                        loggedMealItems.append(loggedItem)
+                        foodViewModel.addLoggedMeal(loggedItem)
                         isShowingLoggingModal = false
-                        // TODO: add real coredata impl later
                     }
                 } else {
                     VStack(spacing: 0) {

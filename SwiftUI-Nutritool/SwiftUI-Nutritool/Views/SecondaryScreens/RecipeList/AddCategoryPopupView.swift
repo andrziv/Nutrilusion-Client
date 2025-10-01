@@ -34,7 +34,7 @@ struct AddCategoryPopupView: View {
                 }
                 
                 ImagedButton(title: "Create Category", icon: "plus", circleColour: .clear, cornerRadius: 10, maxWidth: .infinity, iconPlacement: .leading) {
-                    creationAction(MealGroup(id: UUID(), name: titleString, foodIDs: [], colour: colourPicked.toHex()!))
+                    creationAction(MealGroup(id: UUID(), name: titleString, foodIDs: [], colour: colourPicked.toHex()))
                     screenMode = nil
                 }
             }
@@ -52,10 +52,10 @@ struct MealGroupPreviewView: View {
     var body: some View {
         ZStack(alignment: .top) {
             let previewFoodItem = MockData.sampleFoodItem
-            let previewGroup = MealGroup(id: UUID(), name: titleString, foodIDs: [previewFoodItem.foodItemID], colour: colourPicked.toHex()!)
+            let previewGroup = MealGroup(id: UUID(), name: titleString, foodIDs: [previewFoodItem.foodItemID], colour: colourPicked.toHex())
             MealGroupView(viewModel: NutriToolFoodViewModel(repository: MockFoodRepository(foods: [previewFoodItem], mealGroups: [previewGroup])),
                           group: previewGroup)
-            .id(titleString + (colourPicked.toHex() ?? ""))
+            .id(titleString + (colourPicked.toHex()))
             .padding(.vertical)
             
             BottomTrailing {

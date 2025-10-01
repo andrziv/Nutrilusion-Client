@@ -74,7 +74,7 @@ struct RecipeEditorView: View {
     }
     
     var body: some View {
-        let bgColourHex = selectedMealGroup?.colour ?? Color("backgroundColour").mix(with: .primaryText, by: 0.3).toHex()!
+        let bgColourHex = selectedMealGroup?.colour ?? Color("backgroundColour").mix(with: .primaryText, by: 0.3).toHex()
         let backgroundColour = Color(hex: bgColourHex).opacity(0.3)
         VStack {
             HStack {

@@ -10,6 +10,7 @@ import Combine
 
 @MainActor
 final class NutriToolFoodViewModel: ObservableObject {
+    @Published private(set) var loggedMeals: [LoggedMealItem] = []
     @Published private(set) var foods: [FoodItem] = []
     @Published private(set) var mealGroups: [MealGroup] = []
     
@@ -26,6 +27,10 @@ final class NutriToolFoodViewModel: ObservableObject {
     }
     
     private func loadData() {
+        repository.loggedItemsPublisher
+            .receive(on: DispatchQueue.main)
+            .assign(to: &$loggedMeals)
+        
         repository.foodsPublisher
             .receive(on: DispatchQueue.main)
             .assign(to: &$foods)
@@ -67,6 +72,19 @@ final class NutriToolFoodViewModel: ObservableObject {
     
     func updateFood(_ food: FoodItem) {
         repository.updateFood(food)
+    }
+    
+    // MARK: - Logged Meal Item Operations
+    func addLoggedMeal(_ meal: LoggedMealItem) {
+        repository.addLoggedItem(meal)
+    }
+    
+    func removeLoggedMeal(_ meal: LoggedMealItem) {
+        repository.removeLoggedItem(meal)
+    }
+    
+    func updateLoggedMeal(_ meal: LoggedMealItem) {
+        repository.updateLoggedItem(meal)
     }
     
     // MARK: - Food Item Ownership Operations

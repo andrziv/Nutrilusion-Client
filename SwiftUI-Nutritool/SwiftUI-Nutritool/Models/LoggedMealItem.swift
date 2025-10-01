@@ -8,12 +8,12 @@
 import SwiftUI
 
 struct LoggedMealItem {
-    let id: UUID = UUID()
+    var id: UUID = UUID()
     var date: Date = Date()
     var meal: FoodItem
     var servingMultiple: Double = 1.0
     var importantNutrients: [NutrientItem] = []
-    var emblemColour: Color // TODO: needs to be tied into the food item groups later on
+    var emblemColour: Color
 }
 
 extension MockData {

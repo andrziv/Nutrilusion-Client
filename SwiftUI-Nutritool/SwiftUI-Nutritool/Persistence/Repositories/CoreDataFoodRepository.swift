@@ -9,16 +9,25 @@ import CoreData
 import Combine
 
 class CoreDataFoodRepository: NutriToolFoodRepositoryProtocol {
+    let loggedItemsPublisher: AnyPublisher<[LoggedMealItem], Never>
     let foodsPublisher: AnyPublisher<[FoodItem], Never>
     let mealGroupsPublisher: AnyPublisher<[MealGroup], Never>
     
     private let context: NSManagedObjectContext
     
+    private var mealItemsFetcher: FetchedResultsPublisher<LoggedMealItemEntity>!
     private var foodsFetcher: FetchedResultsPublisher<FoodItemEntity>!
     private var groupsFetcher: FetchedResultsPublisher<MealGroupEntity>!
     
     init(context: NSManagedObjectContext) {
         self.context = context
+        
+        let mealItemRequest: NSFetchRequest<LoggedMealItemEntity> = LoggedMealItemEntity.fetchRequest()
+        mealItemRequest.sortDescriptors = [NSSortDescriptor(key: "date", ascending: true)]
+        mealItemsFetcher = FetchedResultsPublisher(fetchRequest: mealItemRequest, context: context)
+        loggedItemsPublisher = mealItemsFetcher.publisher
+            .map { $0.map { $0.toModel() } }
+            .eraseToAnyPublisher()
         
         let foodRequest: NSFetchRequest<FoodItemEntity> = FoodItemEntity.fetchRequest()
         foodRequest.predicate = NSPredicate(format: "currentVersion != nil")
@@ -37,6 +46,72 @@ class CoreDataFoodRepository: NutriToolFoodRepositoryProtocol {
         mealGroupsPublisher = groupsFetcher.publisher
             .map { $0.map { $0.toModel() } }
             .eraseToAnyPublisher()
+    }
+    
+    // MARK: - Logged Meal Items
+    func addLoggedItem(_ meal: LoggedMealItem) {
+        context.performAndWait {
+            if let mealEntity = fetchLoggedMealItemEntity(by: meal.id, in: context) {
+                // if a LoggedMealItem already exists, we're ignoring the request.
+                //  doing this because it's a little strange to update thru adding. might change in the future.
+                print("Tried to re-add LoggedMealItem with meal name: \(meal.meal.name) (LoggedMealItem ID: \(meal.id)). Aborting.")
+                return
+            }
+            
+            guard let foodEntity = fetchFoodVersionEntity(by: meal.meal.id, in: context) else {
+                print("Tried to create a new LoggedMealItem with model containing non-existent meal: \(meal.meal.name), id: \(meal.meal.id). Aborting.")
+                return
+            }
+            
+            let newEntity = LoggedMealItemEntity(context: context)
+            _ = newEntity.update(from: meal, in: context)
+            print("Created new LoggedMealItem for meal: \(meal.meal.name) (id: \(meal.id).")
+            
+            _ = save()
+        }
+    }
+    
+    func removeLoggedItem(_ meal: LoggedMealItem) {
+        context.performAndWait {
+            guard let mealEntity = fetchLoggedMealItemEntity(by: meal.id, in: context) else {
+                print("Tried to remove non-existent LoggedMealItem with meal name: \(meal.meal.name) (LoggedMealItem ID: \(meal.id)). Aborting.")
+                return
+            }
+            
+            context.delete(mealEntity)
+            
+            removeUnreferencedFoodVersions(for: meal.meal.foodItemID, in: context)
+            removeUnreferencedNutrientVersions(for: meal.meal.foodItemID, in: context)
+            _ = save()
+        }
+    }
+    
+    func updateLoggedItem(_ meal: LoggedMealItem) {
+        let background = PersistenceController.shared.container.newBackgroundContext()
+        
+        background.perform { [self] in
+            guard let mealEntity = fetchLoggedMealItemEntity(by: meal.id, in: background) else {
+                print("Tried to update non-existent LoggedMealItem with meal name: \(meal.meal.name) (LoggedMealItem ID: \(meal.id)). Aborting.")
+                return
+            }
+            
+            guard let foodEntity = fetchFoodVersionEntity(by: meal.meal.id, in: background) else {
+                print("Tried to update LoggedMealItem with model containing non-existent meal: \(meal.meal.name), id: \(meal.meal.id). "
+                      + "Current LoggedMealItem ID: \(mealEntity.id!), current meal name: current meal ID: \(mealEntity.meal!.id). Aborting.")
+                return
+            }
+            
+            let updateOutput = mealEntity.update(from: meal, in: background)
+            if let unneededFoodItemVersion = updateOutput.0 {
+                resolveDeletionScenario(foodItemID: meal.meal.foodItemID,
+                                        currentVersion: meal.meal.version,
+                                        foodItems: [unneededFoodItemVersion],
+                                        nutrientItems: updateOutput.1,
+                                        in: background)
+            }
+            
+            _ = save(context: background)
+        }
     }
     
     // MARK: - Foods
