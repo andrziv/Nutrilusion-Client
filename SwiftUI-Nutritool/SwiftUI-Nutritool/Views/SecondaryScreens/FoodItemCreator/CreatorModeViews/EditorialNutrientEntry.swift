@@ -53,7 +53,7 @@ struct NutrientUnitPicker: View {
                 Button() {
                     action(unit)
                 } label: {
-                    Text("\(unit)")
+                    Text("\(unit.description)")
                     if unit == selectedUnit {
                         Image(systemName: "checkmark")
                     }
@@ -61,7 +61,7 @@ struct NutrientUnitPicker: View {
             }
         } label: {
             HStack(spacing: 4) {
-                Text("\(selectedUnit)")
+                Text("\(selectedUnit.description)")
                     .font(.caption.weight(.medium))
                 Image(systemName: "chevron.down")
                     .font(.caption2)

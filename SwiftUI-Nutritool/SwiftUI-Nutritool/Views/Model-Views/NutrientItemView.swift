@@ -30,7 +30,7 @@ struct NutrientItemView: View {
                 
                 Spacer()
                 
-                Text("\(RoundingDouble(nutrientOfInterest.amount)) \(nutrientOfInterest.unit)")
+                Text("\(RoundingDouble(nutrientOfInterest.amount)) \(nutrientOfInterest.unit.description)")
                     .foregroundStyle(secondaryTextColor)
             }
         }
@@ -56,7 +56,7 @@ struct MealNutrientItemView: View {
                 
                 Spacer()
                 
-                Text("\(RoundingDouble(mealItem.servingMultiple * nutrientOfInterest.amount)) \(nutrientOfInterest.unit)")
+                Text("\(RoundingDouble(mealItem.servingMultiple * nutrientOfInterest.amount)) \(nutrientOfInterest.unit.description)")
                     .foregroundStyle(secondaryTextColor)
             }
         }

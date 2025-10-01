@@ -7,7 +7,7 @@
 
 import Foundation
 import CoreData
-import SwiftUICore
+import SwiftUI
 
 extension MealGroupEntity {
     func toModel() -> MealGroup {

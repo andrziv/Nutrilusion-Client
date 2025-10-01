@@ -5,9 +5,8 @@
 //  Created by Andrej Zivkovic on 2025-09-02.
 //
 
-import Foundation
 import Combine
-import SwiftUICore
+import SwiftUI
 
 class FoodItemSearchViewModel: ObservableObject {
     @Published var searchText: String = ""
