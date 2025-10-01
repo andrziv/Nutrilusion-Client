@@ -58,7 +58,7 @@ class CoreDataFoodRepository: NutriToolFoodRepositoryProtocol {
                 return
             }
             
-            guard fetchFoodVersionEntity(by: meal.meal.id, in: context) == nil else {
+            if fetchFoodVersionEntity(by: meal.meal.id, in: context) == nil {
                 print("Tried to create a new LoggedMealItem with model containing non-existent meal: \(meal.meal.name), id: \(meal.meal.id). Aborting.")
                 return
             }
@@ -95,7 +95,7 @@ class CoreDataFoodRepository: NutriToolFoodRepositoryProtocol {
                 return
             }
             
-            guard fetchFoodVersionEntity(by: meal.meal.id, in: background) == nil else {
+            if fetchFoodVersionEntity(by: meal.meal.id, in: background) == nil {
                 let currentMealID = mealEntity.id?.description ?? "(nil)"
                 let currentFoodID = mealEntity.meal?.parentItem?.id?.description ?? "(nil)"
                 
