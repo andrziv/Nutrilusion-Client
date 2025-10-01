@@ -270,7 +270,8 @@ extension FoodItemVersionEntity {
     
     func isReferenced(in context: NSManagedObjectContext) -> Bool {
         do {
-            if isMostCurrent(in: context) {
+            let isReferencedByMealGroup = try isReferencedByMealGroup(in: context)
+            if isMostCurrent(in: context) && isReferencedByMealGroup {
                 return true
             }
             
@@ -319,6 +320,14 @@ extension FoodItemVersionEntity {
             print("Failed to check most current version for FoodItem \(parent.id?.uuidString ?? "(nil)"): \(error)")
             return false
         }
+    }
+    
+    private func isReferencedByMealGroup(in context: NSManagedObjectContext) throws -> Bool {
+        let groupReq: NSFetchRequest<MealGroupEntity> = MealGroupEntity.fetchRequest()
+        groupReq.predicate = NSPredicate(format: "ANY foodItems == %@", self)
+        groupReq.fetchLimit = 1
+        
+        return !(try context.fetch(groupReq).isEmpty)
     }
     
     private func isReferencedAsIngredient(in context: NSManagedObjectContext) throws -> Bool {

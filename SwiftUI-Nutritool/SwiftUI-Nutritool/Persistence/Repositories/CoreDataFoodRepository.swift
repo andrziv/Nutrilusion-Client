@@ -58,14 +58,17 @@ class CoreDataFoodRepository: NutriToolFoodRepositoryProtocol {
                 return
             }
             
-            if fetchFoodVersionEntity(by: meal.meal.id, in: context) == nil {
-                print("Tried to create a new LoggedMealItem with model containing non-existent meal: \(meal.meal.name), id: \(meal.meal.id). Aborting.")
-                return
+            var mealToUse = meal
+            if fetchFoodVersionEntity(by: mealToUse.meal.id, in: context) == nil {
+                addFood(mealToUse.meal)
+                var foodItemModel = mealToUse.meal
+                foodItemModel.withVersion(1)
+                mealToUse.meal = foodItemModel
             }
             
             let newEntity = LoggedMealItemEntity(context: context)
-            _ = newEntity.update(from: meal, in: context)
-            print("Created new LoggedMealItem for meal: \(meal.meal.name) (id: \(meal.id).")
+            _ = newEntity.update(from: mealToUse, in: context)
+            print("Created new LoggedMealItem for meal: \(mealToUse.meal.name) (LoggedMealItem id: \(mealToUse.id)).")
             
             _ = save()
         }
@@ -95,19 +98,18 @@ class CoreDataFoodRepository: NutriToolFoodRepositoryProtocol {
                 return
             }
             
-            if fetchFoodVersionEntity(by: meal.meal.id, in: background) == nil {
-                let currentMealID = mealEntity.id?.description ?? "(nil)"
-                let currentFoodID = mealEntity.meal?.parentItem?.id?.description ?? "(nil)"
-                
-                print("Tried to update LoggedMealItem with model containing non-existent meal: \(meal.meal.name), id: \(meal.meal.id). "
-                      + "Current LoggedMealItem ID: \(currentMealID), current meal name: current meal ID: \(currentFoodID). Aborting.")
-                return
+            var mealToUse = meal
+            if fetchFoodVersionEntity(by: mealToUse.meal.id, in: context) == nil {
+                addFood(mealToUse.meal)
+                var foodItemModel = mealToUse.meal
+                foodItemModel.withVersion(1)
+                mealToUse.meal = foodItemModel
             }
             
-            let updateOutput = mealEntity.update(from: meal, in: background)
+            let updateOutput = mealEntity.update(from: mealToUse, in: background)
             if let unneededFoodItemVersion = updateOutput.0 {
-                resolveDeletionScenario(foodItemID: meal.meal.foodItemID,
-                                        currentVersion: meal.meal.version,
+                resolveDeletionScenario(foodItemID: mealToUse.meal.foodItemID,
+                                        currentVersion: mealToUse.meal.version,
                                         foodItems: [unneededFoodItemVersion],
                                         nutrientItems: updateOutput.1,
                                         in: background)
@@ -139,6 +141,24 @@ class CoreDataFoodRepository: NutriToolFoodRepositoryProtocol {
                 groupEntity.addToFoodItems(newEntity)
                 print("Inserted new FoodItem \(newModel.name) (id: \(newModel.foodItemID), version: \(newModel.version)) into group \(group.name).")
             }
+            
+            _ = save()
+        }
+    }
+    
+    private func addFood(_ food: FoodItem) {
+        context.performAndWait {
+            if let existing = fetchLatestFoodEntity(by: food.foodItemID, in: context) {
+                print("Tried to add existing food without group association FoodItem ID: \(food.foodItemID) existing version: \(existing.currentVersion?.version ?? 0).")
+                return
+            }
+            
+            // Insert brand-new transient FoodItemEntity version 1
+            let newEntity = FoodItemEntity(context: context)
+            var newModel = food
+            newModel.withVersion(1)
+            _ = newEntity.update(from: newModel, in: context)
+            print("Created new transient FoodItem \(newModel.name) (id: \(newModel.foodItemID), version: \(newModel.version)).")
             
             _ = save()
         }
