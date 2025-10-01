@@ -51,14 +51,14 @@ class CoreDataFoodRepository: NutriToolFoodRepositoryProtocol {
     // MARK: - Logged Meal Items
     func addLoggedItem(_ meal: LoggedMealItem) {
         context.performAndWait {
-            if let mealEntity = fetchLoggedMealItemEntity(by: meal.id, in: context) {
+            if fetchLoggedMealItemEntity(by: meal.id, in: context) != nil {
                 // if a LoggedMealItem already exists, we're ignoring the request.
                 //  doing this because it's a little strange to update thru adding. might change in the future.
                 print("Tried to re-add LoggedMealItem with meal name: \(meal.meal.name) (LoggedMealItem ID: \(meal.id)). Aborting.")
                 return
             }
             
-            guard let foodEntity = fetchFoodVersionEntity(by: meal.meal.id, in: context) else {
+            guard fetchFoodVersionEntity(by: meal.meal.id, in: context) == nil else {
                 print("Tried to create a new LoggedMealItem with model containing non-existent meal: \(meal.meal.name), id: \(meal.meal.id). Aborting.")
                 return
             }
@@ -95,9 +95,12 @@ class CoreDataFoodRepository: NutriToolFoodRepositoryProtocol {
                 return
             }
             
-            guard let foodEntity = fetchFoodVersionEntity(by: meal.meal.id, in: background) else {
+            guard fetchFoodVersionEntity(by: meal.meal.id, in: background) == nil else {
+                let currentMealID = mealEntity.id?.description ?? "(nil)"
+                let currentFoodID = mealEntity.meal?.parentItem?.id?.description ?? "(nil)"
+                
                 print("Tried to update LoggedMealItem with model containing non-existent meal: \(meal.meal.name), id: \(meal.meal.id). "
-                      + "Current LoggedMealItem ID: \(mealEntity.id!), current meal name: current meal ID: \(mealEntity.meal!.id). Aborting.")
+                      + "Current LoggedMealItem ID: \(currentMealID), current meal name: current meal ID: \(currentFoodID). Aborting.")
                 return
             }
             
@@ -237,12 +240,12 @@ class CoreDataFoodRepository: NutriToolFoodRepositoryProtocol {
         if let currentGroup = (fetchMealGroupContainingFoodEntity(foodEntity, in: context)) {
             if currentGroup.id != newGroup.id {
                 currentGroup.removeFromFoodItems(foodEntity)
-                print("Unlinked existing FoodItem \(foodEntity.currentVersion?.name ?? "(nil)") (id: \(foodEntity.id!), version \(foodEntity.currentVersion?.version ?? -1)) from group \(currentGroup.name ?? "(nil)").")
+                print("Unlinked existing FoodItem \(foodEntity.currentVersion?.name ?? "(nil)") (id: \(foodEntity.id?.description ?? "(nil)"), version \(foodEntity.currentVersion?.version ?? -1)) from group \(currentGroup.name ?? "(nil)").")
             }
         }
         
         newGroup.addToFoodItems(foodEntity)
-        print("Linked existing FoodItem \(foodEntity.currentVersion?.name ?? "(nil)") (id: \(foodEntity.id!), version \(foodEntity.currentVersion?.version ?? -1)) from group \(newGroup.name ?? "(nil)").")
+        print("Linked existing FoodItem \(foodEntity.currentVersion?.name ?? "(nil)") (id: \(foodEntity.id?.description ?? "(nil)"), version \(foodEntity.currentVersion?.version ?? -1)) from group \(newGroup.name ?? "(nil)").")
     }
     
     // MARK: - Meal Groups
@@ -276,7 +279,7 @@ class CoreDataFoodRepository: NutriToolFoodRepositoryProtocol {
                                         latest entity: FoodItemEntity,
                                         insitu: Bool,
                                         in context: NSManagedObjectContext) -> (FoodItem, [NutrientItemEntity]) {
-        let existingNutrients = (entity.currentVersion!.nutrients as? Set<NutrientItemEntity>) ?? []
+        let existingNutrients = (entity.currentVersion?.nutrients as? Set<NutrientItemEntity>) ?? []
         var existingByBaseID: [UUID: NutrientItemEntity] = [:]
         for n in existingNutrients {
             if let base = n.id {
@@ -320,7 +323,12 @@ class CoreDataFoodRepository: NutriToolFoodRepositoryProtocol {
             
             let currentVersion = Int(entity.currentVersion?.version ?? 0)
             let newestPlannedVersion = insitu ? currentVersion : currentVersion + 1
-            if !existing.isEquivalent(to: nutrientItem) && existing.isReferencedElsewhere(foodItemID: entity.id!, currentVersion: newestPlannedVersion, in: context) {
+            
+            guard let entityNutrientID = entity.id else {
+                return (nutrientItem, [:])
+            }
+            
+            if !existing.isEquivalent(to: nutrientItem) && existing.isReferencedElsewhere(foodItemID: entityNutrientID, currentVersion: newestPlannedVersion, in: context) {
                 updatedNutrient.withVersion(updatedNutrient.version + 1)
             }
             remaining.removeValue(forKey: nutrientItem.nutrientID)

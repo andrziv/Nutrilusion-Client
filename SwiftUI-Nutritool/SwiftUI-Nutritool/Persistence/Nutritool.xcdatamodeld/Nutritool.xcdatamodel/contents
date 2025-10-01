@@ -25,6 +25,11 @@
         <relationship name="loggedBy" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="LoggedMealItemEntity" inverseName="meal" inverseEntity="LoggedMealItemEntity"/>
         <relationship name="nutrients" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="NutrientItemEntity" inverseName="nutrientOf" inverseEntity="NutrientItemEntity"/>
         <relationship name="parentItem" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FoodItemEntity" inverseName="versions" inverseEntity="FoodItemEntity"/>
+        <uniquenessConstraints>
+            <uniquenessConstraint>
+                <constraint value="compositeID"/>
+            </uniquenessConstraint>
+        </uniquenessConstraints>
     </entity>
     <entity name="LoggedMealItemEntity" representedClassName="LoggedMealItemEntity" syncable="YES" codeGenerationType="class">
         <attribute name="date" attributeType="Date" usesScalarValueType="NO"/>
@@ -33,6 +38,11 @@
         <attribute name="servingMultiple" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <relationship name="importantNutrients" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="NutrientItemEntity" inverseName="importantTo" inverseEntity="NutrientItemEntity"/>
         <relationship name="meal" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FoodItemVersionEntity" inverseName="loggedBy" inverseEntity="FoodItemVersionEntity"/>
+        <uniquenessConstraints>
+            <uniquenessConstraint>
+                <constraint value="id"/>
+            </uniquenessConstraint>
+        </uniquenessConstraints>
     </entity>
     <entity name="MealGroupEntity" representedClassName="MealGroupEntity" syncable="YES" codeGenerationType="class">
         <attribute name="colour" attributeType="String"/>
