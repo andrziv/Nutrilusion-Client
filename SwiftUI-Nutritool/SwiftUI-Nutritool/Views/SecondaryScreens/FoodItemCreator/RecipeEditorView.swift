@@ -80,9 +80,9 @@ struct RecipeEditorView: View {
             HStack {
                 GroupInfoEditor(selectedGroup: $selectedMealGroup, availableMealGroups: viewModel.mealGroups)
                 
-                ImagedButton(title: nil, icon: "xmark", circleColour: .clear, cornerRadius: 10, iconPlacement: .trailing, action: onExitAction)
+                ImagedButton(title: nil, icon: "xmark", circleColour: .clear, cornerRadius: 7, iconPlacement: .trailing, action: onExitAction)
                 
-                ImagedButton(title: nil, icon: "tray.and.arrow.down.fill", imageFont: .system(size: 10), circleColour: .clear, cornerRadius: 10, iconPlacement: .leading,
+                ImagedButton(title: nil, icon: "tray.and.arrow.down.fill", imageFont: .system(size: 10), circleColour: .clear, cornerRadius: 7, iconPlacement: .leading,
                              item: (selectedMealGroup, draftFoodItem), action: onSaveAction)
             }
             
@@ -90,11 +90,11 @@ struct RecipeEditorView: View {
                                      unitSingularInput: $draftFoodItem.servingUnit,
                                      unitPluralInput: $draftFoodItem.servingUnitMultiple)
             .padding(10)
-            .background(RoundedRectangle(cornerRadius: 10).fill(.primaryComplement))
+            .background(RoundedRectangle(cornerRadius: 7).fill(.primaryComplement))
             
             ContentView(foodItem: $draftFoodItem, viewModel: viewModel, mode: selectedMode)
-                .background(RoundedRectangle(cornerRadius: 10).fill(.primaryComplement))
-                .clipShape(RoundedRectangle(cornerRadius: 10))
+                .background(RoundedRectangle(cornerRadius: 7).fill(.primaryComplement))
+                .clipShape(RoundedRectangle(cornerRadius: 7))
             
             ModeSwitcherView(selectedMode: $selectedMode)
             
@@ -171,7 +171,7 @@ private struct GroupInfoEditor: View {
         .foregroundStyle(.primaryText)
         .padding(9)
         .background(
-            RoundedRectangle(cornerRadius: 10)
+            RoundedRectangle(cornerRadius: 7)
                 .fill(.primaryComplement)
         )
     }
@@ -223,7 +223,7 @@ private struct ModeSwitcherView: View {
                     PositionalButtonView(mainText: item.title,
                                          position: item.position,
                                          isSelected: selectedMode == item,
-                                         cornerRadius: 10,
+                                         cornerRadius: 7,
                                          background: .primaryComplement,
                                          mainFontWeight: .medium,
                                          mainFontWeightSelected: .bold)

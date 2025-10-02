@@ -51,7 +51,7 @@ struct IngredientEditorialView: View {
             ScrollView {
                 IngredientListEditorialView(draftFoodItem: $draftFoodItem, viewModel: viewModel)
             }
-            .clipShape(RoundedRectangle(cornerRadius: 10))
+            .clipShape(RoundedRectangle(cornerRadius: 7))
             
             Button {
                 showIngredientList = true

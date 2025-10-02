@@ -35,7 +35,7 @@ struct SearchFoodItemView: View {
     
     var body: some View {
         VStack {
-            BasicTextField("Search for Recipe Names... eg: Lasagna", text: $searchViewModel.searchText, outlineWidth: 0, background: .primaryComplement)
+            BasicTextField("Search for Recipe Names... eg: Lasagna", text: $searchViewModel.searchText, cornerRadius: 7, outlineWidth: 0, background: .primaryComplement)
                 .focused($searchFocus)
                 .onAppear {
                     withAnimation {
@@ -68,9 +68,9 @@ struct SearchFoodItemView: View {
                     .disabled(disabled)
                 }
             }
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .clipShape(RoundedRectangle(cornerRadius: 7))
             
-            ImagedButton(title: "Exit", icon: "xmark", circleColour: .clear, cornerRadius: 10, maxWidth: .infinity, action: exitAction)
+            ImagedButton(title: "Exit", icon: "xmark", circleColour: .clear, cornerRadius: 7, maxWidth: .infinity, action: exitAction)
                 .frame(maxWidth: .infinity)
             
             Spacer()

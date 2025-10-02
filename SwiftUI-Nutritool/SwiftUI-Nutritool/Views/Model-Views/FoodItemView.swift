@@ -61,7 +61,7 @@ struct FoodItemView: View {
             }
             .padding()
             .background(.secondaryComplement)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .clipShape(RoundedRectangle(cornerRadius: 7))
             .animation(.easeInOut(duration: 0.25), value: isExpanded)
         }
     }
@@ -266,7 +266,7 @@ private struct MinimizedFoodItemControlRow: View {
                 .padding(.horizontal)
                 .padding(.vertical, 4)
                 .overlay(content: {
-                    RoundedRectangle(cornerRadius: 100)
+                    Capsule()
                         .fill(.secondaryText)
                         .opacity(0.2)
                 })
@@ -301,7 +301,7 @@ private struct ExpandedFoodItemControlRow: View {
                         .padding(.horizontal)
                         .padding(.vertical, 4)
                         .overlay(content: {
-                            RoundedRectangle(cornerRadius: 100)
+                            Capsule()
                                 .fill(.secondaryText)
                                 .opacity(0.2)
                         })

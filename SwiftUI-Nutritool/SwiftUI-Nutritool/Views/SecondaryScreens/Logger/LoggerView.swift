@@ -73,7 +73,7 @@ struct LoggerView: View {
                         TimelineLogView(selectedDate: selectedDay.date, loggedMealItems: .constant(filteredSortedMeals), isHidden: $isShowingLoggingModal)
                     }
                     .background(.secondaryComplement)
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .clipShape(RoundedRectangle(cornerRadius: 7))
                 }
             }
             .transition(.asymmetric(
@@ -131,13 +131,13 @@ struct WeekDayButtonSet: View {
                                          mainText: day.shortform,
                                          position: positionType(index),
                                          isSelected: selectedDayIndex - 1 == index,
-                                         cornerRadius: 10,
+                                         cornerRadius: 7,
                                          background: .secondaryComplement)
                 }
             }
         }
         .background(.clear)
-        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .clipShape(RoundedRectangle(cornerRadius: 7))
     }
 }
 

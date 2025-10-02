@@ -34,9 +34,9 @@ struct MealGroupView: View {
                 removal: .opacity
             ))
         }
-        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
         .background(
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
+            RoundedRectangle(cornerRadius: 7, style: .continuous)
                 .fill(.primaryComplement)
         )
         .animation(.spring(response: 0.5, dampingFraction: 0.75), value: isExpanded)
@@ -91,7 +91,7 @@ struct MealGroupBody: View {
                 }
                 .buttonStyle(.plain)
             }
-            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
             .padding()
             .frame(maxHeight: 600)
         }

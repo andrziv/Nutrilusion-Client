@@ -20,20 +20,20 @@ struct AddCategoryPopupView: View {
     var body: some View {
         VStack(spacing: 5) {
             MealGroupPreviewView(titleString: $titleString, colourPicked: $colourPicked)
-                .background(RoundedRectangle(cornerRadius: 10).fill(.backgroundColour))
+                .background(RoundedRectangle(cornerRadius: 7).fill(.backgroundColour))
             
             HStack {
-                BasicTextField("Group name... eg: Breakfast", text: $titleString, outline: colourPicked)
+                BasicTextField("Group name... eg: Breakfast", text: $titleString, outline: colourPicked, background: .primaryComplement)
                 
                 SquareColourPickerView(selection: $colourPicked)
             }
             
             HStack {
-                ImagedButton(title: "Exit", icon: "xmark", circleColour: .clear, cornerRadius: 10, iconPlacement: .trailing) {
+                ImagedButton(title: "Exit", icon: "xmark", circleColour: .clear, cornerRadius: 7, iconPlacement: .trailing) {
                     screenMode = nil
                 }
                 
-                ImagedButton(title: "Create Category", icon: "plus", circleColour: .clear, cornerRadius: 10, maxWidth: .infinity, iconPlacement: .leading) {
+                ImagedButton(title: "Create Category", icon: "plus", circleColour: .clear, cornerRadius: 7, maxWidth: .infinity, iconPlacement: .leading) {
                     creationAction(MealGroup(id: UUID(), name: titleString, foodIDs: [], colour: colourPicked.toHex()))
                     screenMode = nil
                 }
@@ -41,7 +41,7 @@ struct AddCategoryPopupView: View {
             
             Spacer(minLength: 5)
         }
-        .basicBackground()
+        .basicBackground(background: .backgroundColour)
     }
 }
 
@@ -62,7 +62,7 @@ struct MealGroupPreviewView: View {
                 BreathingTextBoxView(text: "Preview")
             }
             
-            StaticNoiseBox()
+            StaticNoiseBox(cornerRadius: 7)
         }
     }
 }
