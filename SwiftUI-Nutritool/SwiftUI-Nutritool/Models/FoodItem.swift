@@ -15,14 +15,14 @@ struct FoodItem: Identifiable, Equatable {
     var name: String
     var calories: Int
     var nutritionList: [NutrientItem]
-    var ingredientList: [FoodItem]
+    var ingredientList: [IngredientEntry]
     var servingAmount: Double
     var servingUnit: String
     var servingUnitMultiple: String
     
     init(compositeID: String? = nil, id: UUID = UUID(), version: Int = 0,
          name: String, calories: Int = 0,
-         nutritionList: [NutrientItem] = [], ingredientList: [FoodItem] = [],
+         nutritionList: [NutrientItem] = [], ingredientList: [IngredientEntry] = [],
          servingAmount: Double = 1.0, servingUnit: String = "x", servingUnitMultiple: String = "x") {
         if let compositeID = compositeID {
             self.id = compositeID
@@ -215,7 +215,7 @@ struct FoodItem: Identifiable, Equatable {
     ///   - ingredient: The Fooditem ingredient to add.
     ///   - addNutrients: If set to `true`, the addition of the ingredient will result in the ingredient's nutrients being added to the caller's nutrition info. If a nutrient does not exist within the caller's nutrient tree, the nutrient will be added outright.
     mutating func addIngredient(_ ingredient: FoodItem, addNutrients: Bool = true) {
-        ingredientList.append(ingredient)
+        ingredientList.append(IngredientEntry(ingredient: ingredient, servingMultiplier: 1))
         calories += ingredient.calories
         
         if addNutrients {
@@ -234,7 +234,7 @@ struct FoodItem: Identifiable, Equatable {
     ///   - ingredient: The Fooditem ingredient to remove. Ingredients are compared by ID.
     ///   - subtractNutrients: If set to `true` and the ingredient is held by the caller, the removal of the ingredient will result in the ingredient's nutrients being subtracted from the caller's nutrition info. If a nutrient ends at zero value, the nutrient will not be automatically removed.
     mutating func removeIngredient(_ ingredient: FoodItem, subtractNutrients: Bool = true) {
-        if let existsAtIndex = ingredientList.firstIndex(where: { $0.id == ingredient.id }) {
+        if let existsAtIndex = ingredientList.firstIndex(where: { $0.ingredient.id == ingredient.id }) {
             ingredientList.remove(at: existsAtIndex)
             calories -= ingredient.calories
             
@@ -255,13 +255,13 @@ struct FoodItem: Identifiable, Equatable {
     /// - Returns: `true` if the ingredient is found anywhere within this FoodItem, `false` otherwise.
     func containsIngredient(_ ingredient: FoodItem) -> Bool {
         // direct match
-        if ingredientList.contains(where: { $0.id == ingredient.id }) {
+        if ingredientList.contains(where: { $0.ingredient.id == ingredient.id }) {
             return true
         }
         
         // recursive search
         for child in ingredientList {
-            if child.containsIngredient(ingredient) {
+            if child.ingredient.containsIngredient(ingredient) {
                 return true
             }
         }
@@ -349,8 +349,8 @@ struct MockData {
                                           NutrientItem(name: "Sugar", amount: 1.0, unit: .grams)])
         ],
         ingredientList: [
-            FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000111")!, name: "Bread Slice", calories: 120),
-            FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000112")!, name: "Peanut Butter", calories: 230)
+            IngredientEntry(ingredient: FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000111")!, name: "Bread Slice", calories: 120), servingMultiplier: 1),
+            IngredientEntry(ingredient: FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000112")!, name: "Peanut Butter", calories: 230), servingMultiplier: 1)
         ],
         servingAmount: 1.0,
         servingUnit: "sandwich",
@@ -403,11 +403,11 @@ struct MockData {
                                                   NutrientItem(name: "Sugar", amount: 1.0, unit: .grams)])
                 ],
                 ingredientList: [
-                    sampleFoodItem,
-                    FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000113")!, name: "Pasta Sheets", calories: 150),
-                    FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000114")!, name: "Ground Beef", calories: 200),
-                    FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000115")!, name: "Tomato Sauce", calories: 50),
-                    FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000116")!,name: "Cheese", calories: 50)
+                    IngredientEntry(ingredient: sampleFoodItem, servingMultiplier: 1),
+                                    IngredientEntry(ingredient: FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000113")!, name: "Pasta Sheets", calories: 150), servingMultiplier: 1),
+                                                    IngredientEntry(ingredient: FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000114")!, name: "Ground Beef", calories: 200), servingMultiplier: 1),
+                                                                    IngredientEntry(ingredient: FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000115")!, name: "Tomato Sauce", calories: 50), servingMultiplier: 1),
+                                                                                    IngredientEntry(ingredient: FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000116")!,name: "Cheese", calories: 50), servingMultiplier: 1)
                 ],
                 servingAmount: 1.0,
                 servingUnit: "slice",
@@ -427,9 +427,9 @@ struct MockData {
                                                   NutrientItem(name: "Sugar", amount: 1.0, unit: .grams)])
                 ],
                 ingredientList: [
-                    FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000117")!, name: "Grilled Chicken", calories: 180),
-                    FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000118")!, name: "Mixed Greens", calories: 30),
-                    FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000119")!, name: "Dressing", calories: 110)
+                    IngredientEntry(ingredient: FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000117")!, name: "Grilled Chicken", calories: 180), servingMultiplier: 1),
+                    IngredientEntry(ingredient: FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000118")!, name: "Mixed Greens", calories: 30), servingMultiplier: 1),
+                    IngredientEntry(ingredient: FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000119")!, name: "Dressing", calories: 110), servingMultiplier: 1)
                 ],
                 servingAmount: 1.0,
                 servingUnit: "bowl",
@@ -449,9 +449,9 @@ struct MockData {
                                                   NutrientItem(name: "Sugar", amount: 1.0, unit: .grams)])
                 ],
                 ingredientList: [
-                    FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000120")!, name: "Oats", calories: 150),
-                    FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000121")!, name: "Banana", calories: 90),
-                    FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000122")!, name: "Milk", calories: 30)
+                    IngredientEntry(ingredient: FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000120")!, name: "Oats", calories: 150), servingMultiplier: 1),
+                    IngredientEntry(ingredient: FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000121")!, name: "Banana", calories: 90), servingMultiplier: 1),
+                    IngredientEntry(ingredient: FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000122")!, name: "Milk", calories: 30), servingMultiplier: 1)
                 ],
                 servingAmount: 1.0,
                 servingUnit: "bowl",
@@ -471,10 +471,10 @@ struct MockData {
                                                   NutrientItem(name: "Sugar", amount: 1.0, unit: .grams)])
                 ],
                 ingredientList: [
-                    FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000123")!, name: "Beef Patty", calories: 220),
-                    FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000124")!, name: "Cheese Slice", calories: 80),
-                    FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000125")!, name: "Burger Bun", calories: 150),
-                    FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000126")!, name: "Lettuce & Tomato", calories: 50)
+                    IngredientEntry(ingredient: FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000123")!, name: "Beef Patty", calories: 220), servingMultiplier: 1),
+                                    IngredientEntry(ingredient: FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000124")!, name: "Cheese Slice", calories: 80), servingMultiplier: 1),
+                                                    IngredientEntry(ingredient: FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000125")!, name: "Burger Bun", calories: 150), servingMultiplier: 1),
+                                                                    IngredientEntry(ingredient: FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000126")!, name: "Lettuce & Tomato", calories: 50), servingMultiplier: 1)
                 ],
                 servingAmount: 1.0,
                 servingUnit: "burger",
@@ -491,10 +491,10 @@ struct MockData {
                                                   NutrientItem(name: "Sugar", amount: 1.0, unit: .grams)])
                 ],
                 ingredientList: [
-                    FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000127")!, name: "Strawberries", calories: 50),
-                    FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000128")!, name: "Blueberries", calories: 60),
-                    FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000129")!, name: "Banana", calories: 80),
-                    FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000130")!, name: "Almond Milk", calories: 10)
+                    IngredientEntry(ingredient: FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000127")!, name: "Strawberries", calories: 50), servingMultiplier: 1),
+                    IngredientEntry(ingredient: FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000128")!, name: "Blueberries", calories: 60), servingMultiplier: 1),
+                    IngredientEntry(ingredient: FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000129")!, name: "Banana", calories: 80), servingMultiplier: 1),
+                    IngredientEntry(ingredient: FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000130")!, name: "Almond Milk", calories: 10), servingMultiplier: 1)
                 ],
                 servingAmount: 350.0,
                 servingUnit: "mL",
@@ -514,9 +514,9 @@ struct MockData {
                                                   NutrientItem(name: "Sugar", amount: 1.0, unit: .grams)])
                 ],
                 ingredientList: [
-                    FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000131")!, name: "Spaghetti", calories: 200),
-                    FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000132")!, name: "Bolognese Sauce", calories: 250),
-                    FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000133")!, name: "Parmesan", calories: 100)
+                    IngredientEntry(ingredient: FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000131")!, name: "Spaghetti", calories: 200), servingMultiplier: 1),
+                    IngredientEntry(ingredient: FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000132")!, name: "Bolognese Sauce", calories: 250), servingMultiplier: 1),
+                    IngredientEntry(ingredient: FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000133")!, name: "Parmesan", calories: 100), servingMultiplier: 1)
                 ],
                 servingAmount: 1.0,
                 servingUnit: "plate",
@@ -536,9 +536,9 @@ struct MockData {
                                                   NutrientItem(name: "Sugar", amount: 1.0, unit: .grams)])
                 ],
                 ingredientList: [
-                    FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000134")!, name: "Tortilla", calories: 130),
-                    FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000135")!, name: "Grilled Vegetables", calories: 100),
-                    FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000136")!, name: "Hummus", calories: 50)
+                    IngredientEntry(ingredient: FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000134")!, name: "Tortilla", calories: 130), servingMultiplier: 1),
+                    IngredientEntry(ingredient: FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000135")!, name: "Grilled Vegetables", calories: 100), servingMultiplier: 1),
+                    IngredientEntry(ingredient: FoodItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000136")!, name: "Hummus", calories: 50), servingMultiplier: 1)
                 ],
                 servingAmount: 1.0,
                 servingUnit: "wrap",

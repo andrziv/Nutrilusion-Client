@@ -239,13 +239,13 @@ private struct FoodItemIngredientShowcase: View {
         
         ForEach(foodItem.ingredientList) { ingredient in
             HStack {
-                Text(ingredient.name)
+                Text(ingredient.ingredient.name)
                     .font(.footnote)
                     .foregroundStyle(.secondaryText)
                 
                 Spacer()
                 
-                Text(ServingSizeText(ingredient))
+                Text(ServingSizeText(ingredient.ingredient))
                     .font(.footnote)
                     .foregroundStyle(.secondaryText)
             }

@@ -118,14 +118,14 @@ extension FoodItemEntity {
             name: currentVersion.name ?? "",
             calories: Int(currentVersion.calories),
             nutritionList: (currentVersion.nutrients as? Set<NutrientItemEntity>)?.filter({ $0.parentNutrient == nil || $0.parentNutrient!.count == 0 }).map({ $0.toModel() }) ?? [],
-            ingredientList: (currentVersion.ingredients as? Set<FoodItemVersionEntity>)?.map { $0.toModel() } ?? [],
+            ingredientList: (currentVersion.ingredients as? Set<IngredientEntryEntity>)?.map { $0.toModel() } ?? [],
             servingAmount: currentVersion.servingAmount,
             servingUnit: currentVersion.servingUnit ?? "",
             servingUnitMultiple: currentVersion.servingUnitMultiple ?? ""
         )
     }
     
-    func update(from model: FoodItem, in context: NSManagedObjectContext) -> ([FoodItemVersionEntity], [NutrientItemEntity]) {
+    func update(from model: FoodItem, in context: NSManagedObjectContext) -> ([IngredientEntryEntity], [NutrientItemEntity]) {
         self.id = model.foodItemID
         
         if let currentVersion = self.currentVersion {
@@ -153,14 +153,14 @@ extension FoodItemVersionEntity {
             name: self.name ?? "",
             calories: Int(self.calories),
             nutritionList: (self.nutrients as? Set<NutrientItemEntity>)?.filter({ $0.parentNutrient == nil || $0.parentNutrient!.count == 0 }).map({ $0.toModel() }) ?? [],
-            ingredientList: (self.ingredients as? Set<FoodItemVersionEntity>)?.map { $0.parentItem!.toModel() } ?? [],
+            ingredientList: (self.ingredients as? Set<IngredientEntryEntity>)?.map { $0.toModel() } ?? [],
             servingAmount: self.servingAmount,
             servingUnit: self.servingUnit ?? "",
             servingUnitMultiple: self.servingUnitMultiple ?? ""
         )
     }
     
-    func update(from model: FoodItem, in context: NSManagedObjectContext) -> ([FoodItemVersionEntity], [NutrientItemEntity]) {
+    func update(from model: FoodItem, in context: NSManagedObjectContext) -> ([IngredientEntryEntity], [NutrientItemEntity]) {
         self.compositeID = model.id
         self.version = Int32(model.version)
         self.name = model.name
@@ -169,7 +169,7 @@ extension FoodItemVersionEntity {
         self.servingUnit = model.servingUnit
         self.servingUnitMultiple = model.servingUnitMultiple
         
-        var oldIngredients = self.ingredients as? Set<FoodItemVersionEntity> ?? []
+        var oldIngredients = self.ingredients as? Set<IngredientEntryEntity> ?? []
         self.ingredients = NSSet()
         for ingredient in model.ingredientList {
             if let existing = oldIngredients.first(where: { $0.compositeID == ingredient.id }) {
@@ -178,14 +178,14 @@ extension FoodItemVersionEntity {
                 continue
             }
             
-            if let entity = fetchFoodVersionEntity(by: ingredient.id, in: context) {
+            if let entity = fetchIngredientEntryEntity(by: ingredient.id, in: context) {
                 self.addToIngredients(entity)
                 continue
             }
             
-            let newEntity = FoodItemEntity(context: context)
+            let newEntity = IngredientEntryEntity(context: context)
             _ = newEntity.update(from: ingredient, in: context)
-            self.addToIngredients(newEntity.currentVersion!)
+            self.addToIngredients(newEntity)
         }
         
         var oldNutrients = (self.nutrients as? Set<NutrientItemEntity> ?? []).filter({ $0.parentNutrient == nil || $0.parentNutrient!.count == 0 })
@@ -233,7 +233,7 @@ extension FoodItemVersionEntity {
         if (self.servingUnitMultiple ?? "") != model.servingUnitMultiple { return false }
         
         // ingredient check
-        let currentIngredients = (self.ingredients as? Set<FoodItemVersionEntity>) ?? []
+        let currentIngredients = (self.ingredients as? Set<IngredientEntryEntity>) ?? []
         let entityIngredientIDs = Set(currentIngredients.compactMap { $0.compositeID })
         let modelIngredientIDs = Set(model.ingredientList.map { $0.id })
         if entityIngredientIDs != modelIngredientIDs {
@@ -331,8 +331,8 @@ extension FoodItemVersionEntity {
     }
     
     private func isReferencedAsIngredient(in context: NSManagedObjectContext) throws -> Bool {
-        let ingredientReq: NSFetchRequest<FoodItemVersionEntity> = FoodItemVersionEntity.fetchRequest()
-        ingredientReq.predicate = NSPredicate(format: "ANY ingredients == %@", self)
+        let ingredientReq: NSFetchRequest<IngredientEntryEntity> = IngredientEntryEntity.fetchRequest()
+        ingredientReq.predicate = NSPredicate(format: "ingredient == %@", self)
         ingredientReq.fetchLimit = 1
         
         return !(try context.fetch(ingredientReq).isEmpty)
@@ -347,6 +347,87 @@ extension FoodItemVersionEntity {
     }
 }
 
+extension IngredientEntryEntity {
+    func toModel() -> IngredientEntry {
+        IngredientEntry(
+            compositeID: self.compositeID,
+            id: self.id ?? UUID(),
+            version: Int(self.version),
+            ingredient: self.ingredient!.toModel(),
+            servingMultiplier: self.servingMultiplier)
+    }
+    
+    func update(from model: IngredientEntry, in context: NSManagedObjectContext) -> FoodItemVersionEntity? {
+        self.compositeID = model.id
+        self.id = model.ingredientID
+        self.version = Int32(model.version)
+        self.servingMultiplier = model.servingMultiplier
+        
+        // TODO: add FoodItemVersionEntity management...
+        var unusedFoodItemVersion: FoodItemVersionEntity? = nil
+        if let currentIngredient = self.ingredient, !currentIngredient.isEquivalent(to: model.ingredient) {
+            if let entity = fetchFoodVersionEntity(by: model.ingredient.id, in: context) {
+                unusedFoodItemVersion = currentIngredient
+                self.ingredient = entity
+            }
+        } else if self.ingredient == nil {
+            if let entity = fetchFoodVersionEntity(by: model.ingredient.id, in: context) {
+                self.ingredient = entity
+            }
+        }
+        
+        return unusedFoodItemVersion
+    }
+    
+    func isEquivalent(to model: IngredientEntry) -> Bool {
+        // basic fields
+        if self.servingMultiplier != model.servingMultiplier { return false }
+        
+        // ingredient check
+        if let currentIngredient = self.ingredient, !currentIngredient.isEquivalent(to: model.ingredient) {
+            return false
+        }
+        
+        return true
+    }
+    
+    func isReferenced(in context: NSManagedObjectContext) -> Bool {
+        do {
+            let isReferencedAsIngredient = try isReferencedAsIngredient(in: context)
+            if isMostCurrent(in: context) && isReferencedAsIngredient {
+                return true
+            }
+            
+            return false
+        } catch {
+            print("Failed to check references for FoodItemVersionEntity \(self.compositeID ?? "(nil)"): \(error)")
+            return true //assume referenced somewhere
+        }
+    }
+    
+    private func isMostCurrent(in context: NSManagedObjectContext) -> Bool {
+        let fetch: NSFetchRequest<NutrientItemEntity> = NutrientItemEntity.fetchRequest()
+        fetch.predicate = NSPredicate(format: "id == %@", self.id! as CVarArg)
+        fetch.sortDescriptors = [NSSortDescriptor(key: "version", ascending: false)]
+        fetch.fetchLimit = 1
+        
+        do {
+            let latest = try context.fetch(fetch).first
+            return latest == self
+        } catch {
+            print("Failed to check most current version for IngredientEntryEntity \(self.id?.uuidString ?? "(nil)"): \(error)")
+            return false
+        }
+    }
+    
+    private func isReferencedAsIngredient(in context: NSManagedObjectContext) throws -> Bool {
+        let ingredientReq: NSFetchRequest<FoodItemVersionEntity> = FoodItemVersionEntity.fetchRequest()
+        ingredientReq.predicate = NSPredicate(format: "ANY ingredients == %@", self)
+        ingredientReq.fetchLimit = 1
+        
+        return !(try context.fetch(ingredientReq).isEmpty)
+    }
+}
 
 extension NutrientItemEntity {
     func toModel() -> NutrientItem {

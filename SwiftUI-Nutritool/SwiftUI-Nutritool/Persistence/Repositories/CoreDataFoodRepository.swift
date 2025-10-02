@@ -206,8 +206,9 @@ class CoreDataFoodRepository: NutriToolFoodRepositoryProtocol {
                 let updateOutput = foodItem.update(from: inPlaceModel, in: background)
                 resolveDeletionScenario(foodItemID: inPlaceModel.foodItemID,
                                         currentVersion: inPlaceModel.version,
-                                        foodItems: updateOutput.0,
+                                        foodItems: [],
                                         nutrientItems: updateOutput.1,
+                                        ingredientEntries: updateOutput.0,
                                         in: background)
                 
                 _ = save(context: background)
@@ -226,8 +227,9 @@ class CoreDataFoodRepository: NutriToolFoodRepositoryProtocol {
             let updateOutput = newEntity.update(from: updatedModel, in: background)
             resolveDeletionScenario(foodItemID: updatedModel.foodItemID,
                                     currentVersion: updatedModel.version,
-                                    foodItems: updateOutput.0,
+                                    foodItems: [],
                                     nutrientItems: updateOutput.1,
+                                    ingredientEntries: updateOutput.0,
                                     in: background)
             
             
@@ -361,9 +363,24 @@ class CoreDataFoodRepository: NutriToolFoodRepositoryProtocol {
                                          currentVersion: Int,
                                          foodItems: [FoodItemVersionEntity],
                                          nutrientItems: [NutrientItemEntity],
+                                         ingredientEntries: [IngredientEntryEntity] = [],
                                          in context: NSManagedObjectContext) {
         removeUnreferencedNutrientItems(nutrientItems, foodItemID: foodItemID, currentVersion: currentVersion, in: context)
         removeUnreferencedFoodItems(foodItems, in: context)
+        removeUnreferencedIngredientEntries(ingredientEntries, in: context)
+    }
+    
+    private func removeUnreferencedIngredientEntries(_ ingredientEntries: [IngredientEntryEntity], in context: NSManagedObjectContext) {
+        for ingredient in ingredientEntries {
+            if !ingredient.isReferenced(in: context) {
+                context.delete(ingredient)
+                print("Deleted existing IngredientEntry \(ingredient.ingredient?.name ?? "(nil)") (id: \(ingredient.id!), version \(ingredient.version)).")
+                
+                if let foodItemIngredient = ingredient.ingredient {
+                    removeUnreferencedFoodItems([foodItemIngredient], in: context)
+                }
+            }
+        }
     }
     
     private func removeUnreferencedFoodItems(_ foodItems: [FoodItemVersionEntity], in context: NSManagedObjectContext) {

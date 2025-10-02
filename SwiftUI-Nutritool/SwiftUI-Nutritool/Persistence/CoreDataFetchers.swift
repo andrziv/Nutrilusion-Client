@@ -46,6 +46,19 @@ func fetchFoodVersionEntity(by compositeID: String, in context: NSManagedObjectC
     }
 }
 
+func fetchIngredientEntryEntity(by compositeID: String, in context: NSManagedObjectContext) -> IngredientEntryEntity? {
+    let request: NSFetchRequest<IngredientEntryEntity> = IngredientEntryEntity.fetchRequest()
+    request.predicate = NSPredicate(format: "compositeID == %@", compositeID)
+    request.fetchLimit = 1
+    
+    do {
+        return try context.fetch(request).first
+    } catch {
+        print("Failed to fetch IngredientEntryEntity with id + version (compositeID) \(compositeID): \(error)")
+        return nil
+    }
+}
+
 func fetchLatestFoodEntity(by id: UUID, in context: NSManagedObjectContext) -> FoodItemEntity? {
     let request: NSFetchRequest<FoodItemEntity> = FoodItemEntity.fetchRequest()
     request.predicate = NSPredicate(format: "id == %@", id as CVarArg)

@@ -26,13 +26,13 @@ struct IngredientEditorModeView: View {
             } isItemDisabled: { candidate in
                 candidate.foodItemID == draftFoodItem.foodItemID ||
                 candidate.containsIngredient(draftFoodItem) ||
-                !candidate.ingredientList.filter({ $0.foodItemID == draftFoodItem.foodItemID }).isEmpty
+                !candidate.ingredientList.filter({ $0.ingredient.foodItemID == draftFoodItem.foodItemID }).isEmpty
             } overlayProvider: { candidate in
                 if candidate.foodItemID == draftFoodItem.foodItemID {
                     return AnyView(BlockedOverlay(label: "Item Being Edited", colour: .red))
                 } else if candidate.containsIngredient(draftFoodItem) {
                     return AnyView(BlockedOverlay(label: "Contains Current Item", colour: .orange))
-                } else if !candidate.ingredientList.filter({ $0.foodItemID == draftFoodItem.foodItemID }).isEmpty {
+                } else if !candidate.ingredientList.filter({ $0.ingredient.foodItemID == draftFoodItem.foodItemID }).isEmpty {
                     return AnyView(BlockedOverlay(label: "Contains Version of Current Item", colour: .orange))
                 }
                 return AnyView(EmptyView())
@@ -74,10 +74,10 @@ private struct IngredientListEditorialView: View {
         VStack(spacing: 12) {
             ForEach(draftFoodItem.ingredientList) { ingredient in
                 SwipeableRow {
-                    deleteIngredient(ingredient)
+                    deleteIngredient(ingredient.ingredient)
                 } content: {
                     FoodItemView(
-                        foodItem: ingredient,
+                        foodItem: ingredient.ingredient,
                         viewModel: viewModel,
                         showGroupInfo: false,
                         editingAllowed: false

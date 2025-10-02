@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23788.4" systemVersion="25A354" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithSwiftData="YES" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="24299" systemVersion="25A362" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithSwiftData="YES" userDefinedModelVersionIdentifier="">
     <entity name="FoodItemEntity" representedClassName="FoodItemEntity" syncable="YES" codeGenerationType="class">
         <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
         <relationship name="currentVersion" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FoodItemVersionEntity" inverseName="isCurrentOf" inverseEntity="FoodItemVersionEntity"/>
@@ -19,12 +19,25 @@
         <attribute name="servingUnit" attributeType="String"/>
         <attribute name="servingUnitMultiple" attributeType="String"/>
         <attribute name="version" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
-        <relationship name="ingredientOf" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="FoodItemVersionEntity" inverseName="ingredients" inverseEntity="FoodItemVersionEntity"/>
-        <relationship name="ingredients" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="FoodItemVersionEntity" inverseName="ingredientOf" inverseEntity="FoodItemVersionEntity"/>
+        <relationship name="ingredients" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="IngredientEntryEntity" inverseName="ingredientOf" inverseEntity="IngredientEntryEntity"/>
+        <relationship name="ingredientTo" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="IngredientEntryEntity" inverseName="ingredient" inverseEntity="IngredientEntryEntity"/>
         <relationship name="isCurrentOf" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FoodItemEntity" inverseName="currentVersion" inverseEntity="FoodItemEntity"/>
         <relationship name="loggedBy" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="LoggedMealItemEntity" inverseName="meal" inverseEntity="LoggedMealItemEntity"/>
         <relationship name="nutrients" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="NutrientItemEntity" inverseName="nutrientOf" inverseEntity="NutrientItemEntity"/>
         <relationship name="parentItem" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FoodItemEntity" inverseName="versions" inverseEntity="FoodItemEntity"/>
+        <uniquenessConstraints>
+            <uniquenessConstraint>
+                <constraint value="compositeID"/>
+            </uniquenessConstraint>
+        </uniquenessConstraints>
+    </entity>
+    <entity name="IngredientEntryEntity" representedClassName="IngredientEntryEntity" syncable="YES" codeGenerationType="class">
+        <attribute name="compositeID" attributeType="String"/>
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="servingMultiplier" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="version" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="ingredient" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FoodItemVersionEntity" inverseName="ingredientTo" inverseEntity="FoodItemVersionEntity"/>
+        <relationship name="ingredientOf" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FoodItemVersionEntity" inverseName="ingredients" inverseEntity="FoodItemVersionEntity"/>
         <uniquenessConstraints>
             <uniquenessConstraint>
                 <constraint value="compositeID"/>
