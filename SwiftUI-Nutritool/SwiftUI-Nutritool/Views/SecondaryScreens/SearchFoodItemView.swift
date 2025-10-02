@@ -75,7 +75,7 @@ struct SearchFoodItemView: View {
             
             Spacer()
         }
-        .basicBackground(shadowRadius: 0, background: .primaryComplement.opacity(0.5))
+        .basicBackground(shadowRadius: 0, background: .backgroundColour)
     }
 }
 

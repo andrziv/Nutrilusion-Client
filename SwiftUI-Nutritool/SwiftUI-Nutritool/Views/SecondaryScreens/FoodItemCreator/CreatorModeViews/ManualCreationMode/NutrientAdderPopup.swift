@@ -15,11 +15,13 @@ struct NutrientAdderPopup: View {
         VStack {
             NutrientTreeButtonView(foodItem: $foodItem, isShowing: $isActive)
             
-            ImagedButton(title: "Exit", icon: "xmark", circleColour: .clear, cornerRadius: 10, maxWidth: .infinity) {
+            ImagedButton(title: "Exit", icon: "xmark", circleColour: .clear, cornerRadius: 7, maxWidth: .infinity) {
                 isActive = false
             }
+            
+            Spacer()
         }
-        .basicBackground()
+        .basicBackground(shadowRadius: 0, background: .backgroundColour)
     }
 }
 

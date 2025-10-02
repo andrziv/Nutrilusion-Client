@@ -66,17 +66,19 @@ struct NutrientTreeButtonView: View {
     var body: some View {
         ScrollViewReader { scrollProxy in
             VStack {
-                ScrollView {
-                    NutrientTreeButtonChildView(foodItem: $foodItem, nutrientName: "Nutrients", nutrientTree: nutrientTree, disabledList: createDisabledList(), isShowing: $isShowing)
-                }
-                
-                BasicTextField("Search for nutrient", text: $searchString)
+                BasicTextField("Search for nutrient", text: $searchString, cornerRadius: 7, outlineWidth: 0, background: .primaryComplement)
                     .disableAutocorrection(true)
                     .onSubmit {
                         withAnimation {
                             scrollProxy.scrollTo("nutrient-\(searchString)", anchor: .top)
                         }
                     }
+                
+                ScrollView {
+                    NutrientTreeButtonChildView(foodItem: $foodItem, nutrientName: "Nutrients", nutrientTree: nutrientTree, disabledList: createDisabledList(), isShowing: $isShowing)
+                }
+                .clipShape(RoundedRectangle(cornerRadius: 7))
+                .basicBackground(cornerRadius: 7, shadowRadius: 0, background: .primaryComplement)
             }
         }
     }
@@ -198,7 +200,6 @@ fileprivate struct NutrientTreeBlockEntryView<HeaderContent: View, BodyContent: 
             
             content
         }
-        .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 }
 
@@ -232,6 +233,9 @@ fileprivate struct NutrientTreeBlockEntryHeaderView<Content: View>: View {
                 }
                 
                 Text(text)
+                    .font(.subheadline)
+                    .scaledToFit()
+                    .minimumScaleFactor(0.4)
                     .fontWeight(blockMode == .noChildren ? .regular : .semibold)
                     .foregroundStyle(.primaryText)
                 
@@ -245,7 +249,7 @@ fileprivate struct NutrientTreeBlockEntryHeaderView<Content: View>: View {
             content
         }
         .padding()
-        .background(RoundedRectangle(cornerRadius: 10).fill(backgroundColour.mix(with: .backgroundColour, by: 0.5)))
+        .background(RoundedRectangle(cornerRadius: 7).fill(backgroundColour.mix(with: .backgroundColour, by: 0.5)))
     }
 }
 
