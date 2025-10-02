@@ -13,7 +13,8 @@ enum StatViewType {
 }
 
 struct NutrientItemView: View {
-    var nutrientOfInterest: NutrientItem
+    let nutrientOfInterest: NutrientItem
+    var multiplier: Double = 1
     var viewType : StatViewType = .img
     var primaryTextColor: Color = .primaryText
     var secondaryTextColor: Color = .secondaryText
@@ -21,7 +22,7 @@ struct NutrientItemView: View {
     var body: some View {
         switch viewType {
         case .img:
-            Label(RoundingDouble(nutrientOfInterest.amount), systemImage: NutrientSymbolMapper.shared.symbol(for: nutrientOfInterest.name))
+            Label(RoundingDouble(nutrientOfInterest.amount * multiplier), systemImage: NutrientSymbolMapper.shared.symbol(for: nutrientOfInterest.name))
                 .foregroundStyle(primaryTextColor)
         case .txt:
             HStack {
@@ -30,7 +31,7 @@ struct NutrientItemView: View {
                 
                 Spacer()
                 
-                Text("\(RoundingDouble(nutrientOfInterest.amount)) \(nutrientOfInterest.unit.description)")
+                Text("\(RoundingDouble(nutrientOfInterest.amount * multiplier)) \(nutrientOfInterest.unit.description)")
                     .foregroundStyle(secondaryTextColor)
             }
         }
@@ -38,7 +39,7 @@ struct NutrientItemView: View {
 }
 
 struct MealNutrientItemView: View {
-    var nutrientOfInterest: NutrientItem
+    let nutrientOfInterest: NutrientItem
     var mealItem: LoggedMealItem
     var viewType : StatViewType = .img
     var primaryTextColor: Color = .primaryText
@@ -64,7 +65,8 @@ struct MealNutrientItemView: View {
 }
 
 struct CalorieStatView: View {
-    var foodItem: FoodItem
+    let foodItem: FoodItem
+    var multiplier: Double = 1
     var viewType : StatViewType = .img
     var primaryTextColor: Color = .primaryText
     var secondaryTextColor: Color = .secondaryText
@@ -72,7 +74,7 @@ struct CalorieStatView: View {
     var body: some View {
         switch viewType {
         case .img:
-            Label(RoundingDouble(Double(foodItem.calories)), systemImage: NutrientSymbolMapper.shared.symbol(for: "Calories"))
+            Label(RoundingDouble(Double(foodItem.calories) * multiplier), systemImage: NutrientSymbolMapper.shared.symbol(for: "Calories"))
                 .foregroundStyle(primaryTextColor)
         case .txt:
             HStack {
@@ -81,7 +83,7 @@ struct CalorieStatView: View {
                 
                 Spacer()
                 
-                Text("\(RoundingDouble(Double(foodItem.calories))) kcal")
+                Text("\(RoundingDouble(Double(foodItem.calories) * multiplier)) kcal")
                     .foregroundStyle(secondaryTextColor)
             }
         }
@@ -89,7 +91,7 @@ struct CalorieStatView: View {
 }
 
 struct MealCalorieStatView: View {
-    var mealItem: LoggedMealItem
+    let mealItem: LoggedMealItem
     var viewType : StatViewType = .img
     var primaryTextColor: Color = .primaryText
     var secondaryTextColor: Color = .secondaryText
@@ -114,7 +116,7 @@ struct MealCalorieStatView: View {
 }
 
 struct ServingSizeView: View {
-    var foodItem: FoodItem
+    let foodItem: FoodItem
     var viewType : StatViewType = .img
     var primaryTextColor: Color = .primaryText
     var secondaryTextColor: Color = .secondaryText
@@ -140,7 +142,7 @@ struct ServingSizeView: View {
 }
 
 struct MealServingSizeView: View {
-    var mealItem: LoggedMealItem
+    let mealItem: LoggedMealItem
     var viewType : StatViewType = .img
     var primaryTextColor: Color = .primaryText
     var secondaryTextColor: Color = .secondaryText
@@ -168,8 +170,8 @@ struct MealServingSizeView: View {
     }
 }
 
-func ServingSizeText(_ foodItem: FoodItem) -> String {
-    let servingTotal = foodItem.servingAmount
+func ServingSizeText(_ foodItem: FoodItem, multiplier: Double = 1) -> String {
+    let servingTotal = foodItem.servingAmount * multiplier
     let isUnitMultiple = servingTotal > 1
     
     return "\(RoundingDouble(servingTotal)) \(isUnitMultiple ? foodItem.servingUnitMultiple : foodItem.servingUnit)"

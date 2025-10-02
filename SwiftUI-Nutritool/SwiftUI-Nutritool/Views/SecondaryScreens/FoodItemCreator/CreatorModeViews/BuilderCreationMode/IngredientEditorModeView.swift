@@ -72,15 +72,15 @@ private struct IngredientListEditorialView: View {
     
     var body: some View {
         VStack(spacing: 12) {
-            ForEach(draftFoodItem.ingredientList) { ingredient in
+            ForEach($draftFoodItem.ingredientList) { $ingredient in
                 SwipeableRow {
                     deleteIngredient(ingredient.ingredient)
                 } content: {
-                    FoodItemView(
-                        foodItem: ingredient.ingredient,
-                        viewModel: viewModel,
-                        showGroupInfo: false,
-                        editingAllowed: false
+                    IngredientEntryView(
+                        ingredientEntry: $ingredient,
+                        latestVersionOfIngredient: viewModel.currentVersionOf(foodItemID: ingredient.ingredient.foodItemID),
+                        associatedGroup: viewModel.group(for: ingredient.ingredient),
+                        showGroupInfo: false
                     )
                 }
             }

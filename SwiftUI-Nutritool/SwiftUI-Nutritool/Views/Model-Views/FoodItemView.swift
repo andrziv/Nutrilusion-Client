@@ -22,15 +22,11 @@ struct FoodItemView: View {
     
     let editingAction: ((MealGroup, FoodItem) -> Void)? = nil
     
-    private var associatedGroups: [MealGroup] {
-        viewModel.mealGroups.filter { $0.foodIDs.contains(foodItem.foodItemID) }
-    }
-    
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             VStack(alignment: .leading, spacing: 8) {
                 FoodItemHeader(foodItem: foodItem,
-                               mealGroup: associatedGroups.first,
+                               mealGroup: viewModel.group(for: foodItem),
                                mostCurrentVersion: viewModel.currentVersionOf(foodItemID: foodItem.foodItemID),
                                showGroupInfo: showGroupInfo,
                                isExpanded: isExpanded)
@@ -51,7 +47,7 @@ struct FoodItemView: View {
                     if let editingAction = editingAction, let newGroup = potentialNewGroup {
                         editingAction(newGroup, editedFoodItem)
                     } else if let newGroup = potentialNewGroup {
-                        let currentGroup = associatedGroups.first
+                        let currentGroup = viewModel.group(for: foodItem)
                         if let currentGroup = currentGroup, currentGroup.id != newGroup.id {
                             viewModel.moveFood(editedFoodItem, from: currentGroup, to: newGroup)
                         }
@@ -245,7 +241,7 @@ private struct FoodItemIngredientShowcase: View {
                 
                 Spacer()
                 
-                Text(ServingSizeText(ingredient.ingredient))
+                Text(ServingSizeText(ingredient.ingredient, multiplier: ingredient.servingMultiplier))
                     .font(.footnote)
                     .foregroundStyle(.secondaryText)
             }

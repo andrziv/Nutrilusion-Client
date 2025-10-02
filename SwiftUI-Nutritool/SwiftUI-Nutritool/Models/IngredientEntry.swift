@@ -25,6 +25,6 @@ struct IngredientEntry: Identifiable, Equatable {
         self.ingredientID = id
         self.version = version
         self.ingredient = ingredient
-        self.version = version
+        self.servingMultiplier = servingMultiplier
     }
 }

@@ -89,7 +89,7 @@ struct LogNewItemView: View {
                 })
                 
             case .creatingTransientRecipe:
-                RecipeEditorView(foodItem: FoodItem(name: ""), viewModel: viewModel) {
+                RecipeEditorView(foodItem: FoodItem(name: "", servingUnit: "", servingUnitMultiple: ""), viewModel: viewModel) {
                     self.mode = nil
                 } onSaveAction: { selectedGroup, foodItem in
                     switchChosenFood(mealGroup: selectedGroup, foodItem: foodItem)
@@ -245,7 +245,7 @@ private struct ServingSizeChangeView: View {
     
     var body: some View {
         EditFieldView(title: "Servings") {
-            GranularValueTextField(topChangeValue: 1, interval: 0.5, value: $servingSize, actionBackgroundColour: background)
+            GranularValueTextField(topChangeValue: 1, interval: 0.5, value: $servingSize, background: background)
         }
     }
 }
@@ -322,69 +322,6 @@ private struct SelectedImportantNutrientView: View {
                     .foregroundStyle(extraInfo.1)
                     .overlay(Text(extraInfo.0).foregroundStyle(extraInfo.1))
             }
-    }
-}
-
-private struct GranularValueTextField: View {
-    var topChangeValue: Double = 1
-    var interval: Double = 0.5
-    @Binding var value: Double
-    var actionBackgroundColour: Color = .gray
-    
-    var body: some View {
-        HStack(spacing: 4) {
-            ImagedButton(title: "1", icon: "minus",
-                         imageFont: .subheadline.weight(.regular), textFont: .subheadline.weight(.regular),
-                         circleColour: .clear,
-                         cornerRadius: 7,
-                         verticalPadding: 6,
-                         horizontalPadding: 6,
-                         backgroundColour: actionBackgroundColour,
-                         iconPlacement: .leading) {
-                value = Swift.max(0, value - topChangeValue)
-            }
-            ImagedButton(title: "0.5", icon: "minus",
-                         imageFont: .subheadline.weight(.regular), textFont: .subheadline.weight(.regular),
-                         circleColour: .clear,
-                         cornerRadius: 7,
-                         verticalPadding: 6,
-                         horizontalPadding: 6,
-                         backgroundColour: actionBackgroundColour,
-                         iconPlacement: .leading) {
-                value = Swift.max(0, value - topChangeValue + interval)
-            }
-            
-            BasicTextField("", value: $value, format: .number,
-                           font: .subheadline,
-                           fontWeight: .regular,
-                           cornerRadius: 7,
-                           outline: .clear, outlineWidth: 0,
-                           background: actionBackgroundColour,
-                           horizontalPadding: 6,
-                           verticalPadding: 6)
-            .multilineTextAlignment(.center)
-            
-            ImagedButton(title: "0.5", icon: "plus",
-                         imageFont: .subheadline.weight(.regular), textFont: .subheadline.weight(.regular),
-                         circleColour: .clear,
-                         cornerRadius: 7,
-                         verticalPadding: 6,
-                         horizontalPadding: 6,
-                         backgroundColour: actionBackgroundColour,
-                         iconPlacement: .leading) {
-                value += topChangeValue - interval
-            }
-            ImagedButton(title: "1", icon: "plus",
-                         imageFont: .subheadline.weight(.regular), textFont: .subheadline.weight(.regular),
-                         circleColour: .clear,
-                         cornerRadius: 7,
-                         verticalPadding: 6,
-                         horizontalPadding: 6,
-                         backgroundColour: actionBackgroundColour,
-                         iconPlacement: .leading) {
-                value += topChangeValue
-            }
-        }
     }
 }
 
