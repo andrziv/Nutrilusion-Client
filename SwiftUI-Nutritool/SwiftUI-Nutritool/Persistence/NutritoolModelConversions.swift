@@ -174,7 +174,7 @@ extension FoodItemVersionEntity {
         for ingredient in model.ingredientList {
             if let existing = oldIngredients.first(where: { $0.compositeID == ingredient.id }) {
                 if existing.version == ingredient.version {
-                    let unused = existing.update(from: ingredient, in: context)
+                    _ = existing.update(from: ingredient, in: context)
                     oldIngredients.remove(existing)
                     self.addToIngredients(existing)
                     continue

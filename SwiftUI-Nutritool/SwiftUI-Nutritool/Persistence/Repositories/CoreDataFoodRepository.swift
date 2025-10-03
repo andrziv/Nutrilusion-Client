@@ -353,11 +353,11 @@ class CoreDataFoodRepository: NutriToolFoodRepositoryProtocol {
                 remaining = output.1
             }
             
-            guard let entityNutrientID = entity.id else {
+            guard let entityID = entity.id else {
                 return (nutrientItem, [:])
             }
             
-            if !existing.isEquivalent(to: nutrientItem) && existing.isReferencedElsewhere(foodItemID: entityNutrientID, currentVersion: plannedVersion, in: context) {
+            if !existing.isEquivalent(to: nutrientItem) && existing.isReferencedElsewhere(foodItemID: entityID, currentVersion: plannedVersion, in: context) {
                 updatedNutrient.withVersion(updatedNutrient.version + 1)
             }
             remaining.removeValue(forKey: nutrientItem.nutrientID)
@@ -402,7 +402,7 @@ class CoreDataFoodRepository: NutriToolFoodRepositoryProtocol {
         var updatedIngredient = ingredientEntry
         
         if let existing = remaining[ingredientEntry.ingredientID] {
-            guard let entityID = entity.id else {
+            guard entity.id != nil else {
                 return (ingredientEntry, [:])
             }
             
