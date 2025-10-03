@@ -70,6 +70,10 @@ private struct IngredientListEditorialView: View {
         draftFoodItem.removeIngredient(ingredient)
     }
     
+    private func modifyIngredient(_ ingredient: IngredientEntry, old oldValue: Double, new newValue: Double) {
+        draftFoodItem.modifyIngredient(ingredient, oldMultiplier: oldValue, newMultiplier: newValue)
+    }
+    
     var body: some View {
         VStack(spacing: 12) {
             ForEach($draftFoodItem.ingredientList) { $ingredient in
@@ -82,6 +86,9 @@ private struct IngredientListEditorialView: View {
                         associatedGroup: viewModel.group(for: ingredient.ingredient),
                         showGroupInfo: false
                     )
+                    .onChange(of: ingredient.servingMultiplier) { oldValue, newValue in
+                        modifyIngredient(ingredient, old: oldValue, new: newValue)
+                    }
                 }
             }
         }

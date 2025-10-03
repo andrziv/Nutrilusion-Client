@@ -108,12 +108,12 @@ struct NutrientItem: Identifiable, Equatable {
      - Returns: `true` if modification occurred, `false` otherwise.
      */
     @discardableResult
-    mutating func modify(_ targetName: String, newValue: Double? = nil, newUnit: NutrientUnit? = nil) -> Bool {
-        return modifyInternal(targetName, newValue: newValue, newUnit: newUnit, optimizeUnitPropagation: true) != nil
+    mutating func modify(_ targetName: String, newValue: Double? = nil, newUnit: NutrientUnit? = nil, propagateChanges: Bool = true) -> Bool {
+        return modifyInternal(targetName, newValue: newValue, newUnit: newUnit, propagateChanges: propagateChanges, optimizeUnitPropagation: true) != nil
     }
     
     /// Recursive helper: returns delta in grams if modification occurred
-    private mutating func modifyInternal(_ targetName: String, newValue: Double?, newUnit: NutrientUnit?, optimizeUnitPropagation: Bool = false) -> Double? {
+    private mutating func modifyInternal(_ targetName: String, newValue: Double?, newUnit: NutrientUnit?, propagateChanges: Bool, optimizeUnitPropagation: Bool = false) -> Double? {
         // Case 1: this node matches
         if name == targetName {
             let oldGrams = unit.convertTo(amount)
@@ -124,8 +124,14 @@ struct NutrientItem: Identifiable, Equatable {
         
         // Case 2: search children
         for i in childNutrients.indices {
-            if let delta = childNutrients[i].modifyInternal(targetName, newValue: newValue, newUnit: newUnit, optimizeUnitPropagation: optimizeUnitPropagation) {
-                applyDelta(delta, optimizeUnit: optimizeUnitPropagation)
+            if let delta = childNutrients[i].modifyInternal(targetName,
+                                                            newValue: newValue,
+                                                            newUnit: newUnit,
+                                                            propagateChanges: propagateChanges,
+                                                            optimizeUnitPropagation: optimizeUnitPropagation) {
+                if propagateChanges {
+                    applyDelta(delta, optimizeUnit: optimizeUnitPropagation)
+                }
                 return delta
             }
         }
