@@ -38,7 +38,7 @@ struct LoggerView: View {
     @EnvironmentObject var foodViewModel: NutriToolFoodViewModel
     
     @State private var selectedDay = SelectedDay(
-        day: WeekDayType.fullWeek[Calendar.current.component(.weekday, from: Date()) - 1],
+        day: WeekDayType.fullWeek[Calendar.current.component(.weekday, from: Date()) - 2],
         date: Date()
     )
     
@@ -52,9 +52,9 @@ struct LoggerView: View {
         let filteredSortedMeals = filteredMeals.sorted { $0.date < $1.date }
         
         VStack {
-            WeekDayButtonSet(selectedDay: $selectedDay)
+            WeekDayButtonSet(selectedDay: $selectedDay, isShowingLoggingModal: $isShowingLoggingModal)
                 .frame(maxWidth: .infinity)
-            
+
             Group {
                 if isShowingLoggingModal {
                     LogNewItemView(viewModel: foodViewModel, logDate: Date()) {
@@ -101,6 +101,7 @@ struct LoggerView: View {
 
 struct WeekDayButtonSet: View {
     @Binding fileprivate var selectedDay: SelectedDay
+    @Binding var isShowingLoggingModal: Bool
     
     private func positionType(_ index: Int) -> Position {
         if index == 0 {
@@ -123,8 +124,14 @@ struct WeekDayButtonSet: View {
                 let day = WeekDayType.fullWeek[index]
                 let date = Calendar.current.date(byAdding: .day, value: index - (currentDayIndex - 1), to: Date())!
                 let calendarDay = Calendar.current.component(.day, from: date)
-                
+
                 Button {
+                    if selectedDay.day == day {
+                        withAnimation {
+                            isShowingLoggingModal = false
+                        }
+                        return
+                    }
                     selectedDay.day = day
                     selectedDay.date = date
                 } label: {
