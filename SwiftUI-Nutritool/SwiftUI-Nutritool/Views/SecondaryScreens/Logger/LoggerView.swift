@@ -93,6 +93,7 @@ struct LoggerView: View {
                     }
                 }
             }
+            .fixedSize(horizontal: false, vertical: true)
         }
         .padding(.horizontal, 8)
     }
@@ -224,7 +225,7 @@ private struct LogCurrentTimeButton: View {
                      textFont: .callout.weight(.regular),
                      circleColour: .clear,
                      cornerRadius: 7,
-                     maxWidth: 110, maxHeight: 50,
+                     maxWidth: 110, maxHeight: 45,
                      backgroundColour: .secondaryComplement,
                      action: action)
         .scaledToFit()
