@@ -70,7 +70,9 @@ struct LoggerView: View {
                         TimelineLogHeader(selectedDay: selectedDay)
                             .padding([.trailing, .leading], 15)
                         
-                        TimelineLogView(selectedDate: selectedDay.date, loggedMealItems: .constant(filteredSortedMeals), isHidden: $isShowingLoggingModal)
+                        TimelineLogView(selectedDate: selectedDay.date, loggedMealItems: filteredSortedMeals, isHidden: $isShowingLoggingModal) { deletedItem in
+                            foodViewModel.removeLoggedMeal(deletedItem)
+                        }
                     }
                     .background(.secondaryComplement)
                     .clipShape(RoundedRectangle(cornerRadius: 7))

@@ -26,14 +26,17 @@ struct IngredientEditorModeView: View {
             } isItemDisabled: { candidate in
                 candidate.foodItemID == draftFoodItem.foodItemID ||
                 candidate.containsIngredient(draftFoodItem) ||
-                !candidate.ingredientList.filter({ $0.ingredient.foodItemID == draftFoodItem.foodItemID }).isEmpty
+                !candidate.ingredientList.filter({ $0.ingredient.foodItemID == draftFoodItem.foodItemID }).isEmpty ||
+                !draftFoodItem.ingredientList.filter({ $0.ingredient.foodItemID == candidate.foodItemID }).isEmpty
             } overlayProvider: { candidate in
                 if candidate.foodItemID == draftFoodItem.foodItemID {
                     return AnyView(BlockedOverlay(label: "Item Being Edited", colour: .red))
                 } else if candidate.containsIngredient(draftFoodItem) {
-                    return AnyView(BlockedOverlay(label: "Contains Current Item", colour: .orange))
+                    return AnyView(BlockedOverlay(label: "Contains Item Currently Editing", colour: .orange))
                 } else if !candidate.ingredientList.filter({ $0.ingredient.foodItemID == draftFoodItem.foodItemID }).isEmpty {
-                    return AnyView(BlockedOverlay(label: "Contains Version of Current Item", colour: .orange))
+                    return AnyView(BlockedOverlay(label: "Contains Version of Item Currently Editing", colour: .orange))
+                } else if !draftFoodItem.ingredientList.filter({ $0.ingredient.foodItemID == candidate.foodItemID }).isEmpty {
+                    return AnyView(BlockedOverlay(label: "Already Added to Ingredients", colour: .orange))
                 }
                 return AnyView(EmptyView())
             }

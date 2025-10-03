@@ -27,4 +27,9 @@ struct IngredientEntry: Identifiable, Equatable {
         self.ingredient = ingredient
         self.servingMultiplier = servingMultiplier
     }
+    
+    mutating func withVersion(_ version: Int) {
+        self.version = version
+        self.id = compositeId(self.ingredientID, version: version)
+    }
 }

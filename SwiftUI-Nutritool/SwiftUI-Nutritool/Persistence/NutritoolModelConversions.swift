@@ -173,12 +173,15 @@ extension FoodItemVersionEntity {
         self.ingredients = NSSet()
         for ingredient in model.ingredientList {
             if let existing = oldIngredients.first(where: { $0.compositeID == ingredient.id }) {
-                oldIngredients.remove(existing)
-                self.addToIngredients(existing)
-                continue
-            }
-            
-            if let entity = fetchIngredientEntryEntity(by: ingredient.id, in: context) {
+                if existing.version == ingredient.version {
+                    let unused = existing.update(from: ingredient, in: context)
+                    oldIngredients.remove(existing)
+                    self.addToIngredients(existing)
+                    continue
+                }
+                    
+                self.removeFromIngredients(existing)
+            } else if let entity = fetchIngredientEntryEntity(by: ingredient.id, in: context) {
                 self.addToIngredients(entity)
                 continue
             }
@@ -242,7 +245,9 @@ extension FoodItemVersionEntity {
         
         // nutrient checks
         let currentNutrients = (self.nutrients as? Set<NutrientItemEntity>) ?? []
-        if currentNutrients.count != model.nutritionList.count {
+        let entityNutrientIDs = Set(currentNutrients.compactMap { $0.compositeID })
+        let modelNutrientIDs = Set(model.getAllNutrients().map { $0.id })
+        if entityNutrientIDs != modelNutrientIDs {
             return false
         }
         
@@ -250,8 +255,7 @@ extension FoodItemVersionEntity {
         for currentNutrient in currentNutrients {
             if let nutrientId = currentNutrient.id {
                 currentByBaseID[nutrientId] = currentNutrient
-            }
-            else {
+            } else {
                 return false
             }
         }
@@ -363,7 +367,6 @@ extension IngredientEntryEntity {
         self.version = Int32(model.version)
         self.servingMultiplier = model.servingMultiplier
         
-        // TODO: add FoodItemVersionEntity management...
         var unusedFoodItemVersion: FoodItemVersionEntity? = nil
         if let currentIngredient = self.ingredient, !currentIngredient.isEquivalent(to: model.ingredient) {
             if let entity = fetchFoodVersionEntity(by: model.ingredient.id, in: context) {

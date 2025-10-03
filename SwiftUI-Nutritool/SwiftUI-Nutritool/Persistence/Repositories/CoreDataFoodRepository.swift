@@ -83,8 +83,11 @@ class CoreDataFoodRepository: NutriToolFoodRepositoryProtocol {
             
             context.delete(mealEntity)
             
-            removeUnreferencedFoodVersions(for: meal.meal.foodItemID, in: context)
-            removeUnreferencedNutrientVersions(for: meal.meal.foodItemID, in: context)
+            resolveDeletionScenario(foodItemID: meal.meal.foodItemID,
+                                    currentVersion: meal.meal.version,
+                                    foodItems: [mealEntity.meal!],
+                                    nutrientItems: [],
+                                    in: context)
             _ = save()
         }
     }
@@ -199,10 +202,9 @@ class CoreDataFoodRepository: NutriToolFoodRepositoryProtocol {
             
             // If latest is not referenced anywhere upstream, mutate in-place without bumping version
             if !latest.isReferencedUpstream(in: background) {
-                var inPlaceModel = food
-                inPlaceModel.withVersion(Int(latest.version)) // keep version
-                let output = resolveNutrientUpdates(for: inPlaceModel, latest: foodItem, insitu: true, in: background)
-                inPlaceModel = output.0
+                let currentVersion = Int(latest.version)
+                let inPlaceModel = resolveUpdates(for: food, latest: foodItem, plannedVersion: currentVersion, in: background)
+                
                 let updateOutput = foodItem.update(from: inPlaceModel, in: background)
                 resolveDeletionScenario(foodItemID: inPlaceModel.foodItemID,
                                         currentVersion: inPlaceModel.version,
@@ -217,10 +219,7 @@ class CoreDataFoodRepository: NutriToolFoodRepositoryProtocol {
             }
             
             let newVersion = Int(latest.version) + 1
-            var updatedModel = food
-            updatedModel.withVersion(newVersion)
-            let output = resolveNutrientUpdates(for: updatedModel, latest: foodItem, insitu: false, in: background)
-            updatedModel = output.0
+            let updatedModel = resolveUpdates(for: food, latest: foodItem, plannedVersion: newVersion, in: background)
             
             let newEntity = FoodItemVersionEntity(context: background)
             foodItem.swapCurrentVersion(to: newEntity, in: background)
@@ -297,9 +296,20 @@ class CoreDataFoodRepository: NutriToolFoodRepositoryProtocol {
         }
     }
     
+    private func resolveUpdates(for foodItem: FoodItem,
+                                latest entity: FoodItemEntity,
+                                plannedVersion: Int,
+                                in context: NSManagedObjectContext) -> FoodItem {
+        var updatedModel = foodItem
+        updatedModel.withVersion(plannedVersion)
+        updatedModel = resolveNutrientUpdates(for: updatedModel, latest: entity, plannedVersion: plannedVersion, in: context).0
+        updatedModel = resolveIngredientUpdates(for: updatedModel, latest: entity, plannedVersion: plannedVersion, in: context).0
+        return updatedModel
+    }
+    
     private func resolveNutrientUpdates(for foodItem: FoodItem,
                                         latest entity: FoodItemEntity,
-                                        insitu: Bool,
+                                        plannedVersion: Int,
                                         in context: NSManagedObjectContext) -> (FoodItem, [NutrientItemEntity]) {
         let existingNutrients = (entity.currentVersion?.nutrients as? Set<NutrientItemEntity>) ?? []
         var existingByBaseID: [UUID: NutrientItemEntity] = [:]
@@ -315,7 +325,7 @@ class CoreDataFoodRepository: NutriToolFoodRepositoryProtocol {
             let output = resolveNutrientUpdates(for: nutrientModel,
                                                 with: existingByBaseID,
                                                 latest: entity,
-                                                insitu: insitu,
+                                                plannedVersion: plannedVersion,
                                                 in: context)
             updatedFoodItem.nutritionList[nutrientIndex] = output.0
             existingByBaseID = output.1
@@ -327,7 +337,7 @@ class CoreDataFoodRepository: NutriToolFoodRepositoryProtocol {
     private func resolveNutrientUpdates(for nutrientItem: NutrientItem,
                                         with entityNutrientMap: [UUID: NutrientItemEntity],
                                         latest entity: FoodItemEntity,
-                                        insitu: Bool,
+                                        plannedVersion: Int,
                                         in context: NSManagedObjectContext) -> (NutrientItem, [UUID: NutrientItemEntity]) {
         var remaining = entityNutrientMap
         var updatedNutrient = nutrientItem
@@ -337,26 +347,72 @@ class CoreDataFoodRepository: NutriToolFoodRepositoryProtocol {
                 let output = resolveNutrientUpdates(for: nutrientItem.childNutrients[nutrientIndex],
                                                     with: remaining,
                                                     latest: entity,
-                                                    insitu: insitu,
+                                                    plannedVersion: plannedVersion,
                                                     in: context)
                 updatedNutrient.childNutrients[nutrientIndex] = output.0
                 remaining = output.1
             }
             
-            let currentVersion = Int(entity.currentVersion?.version ?? 0)
-            let newestPlannedVersion = insitu ? currentVersion : currentVersion + 1
-            
             guard let entityNutrientID = entity.id else {
                 return (nutrientItem, [:])
             }
             
-            if !existing.isEquivalent(to: nutrientItem) && existing.isReferencedElsewhere(foodItemID: entityNutrientID, currentVersion: newestPlannedVersion, in: context) {
+            if !existing.isEquivalent(to: nutrientItem) && existing.isReferencedElsewhere(foodItemID: entityNutrientID, currentVersion: plannedVersion, in: context) {
                 updatedNutrient.withVersion(updatedNutrient.version + 1)
             }
             remaining.removeValue(forKey: nutrientItem.nutrientID)
         }
         
         return (updatedNutrient, remaining)
+    }
+    
+    private func resolveIngredientUpdates(for foodItem: FoodItem,
+                                          latest entity: FoodItemEntity,
+                                          plannedVersion: Int,
+                                          in context: NSManagedObjectContext) -> (FoodItem, [IngredientEntryEntity]) {
+        let existingIngredients = (entity.currentVersion?.ingredients as? Set<IngredientEntryEntity>) ?? []
+        var existingByBaseID: [UUID: IngredientEntryEntity] = [:]
+        for n in existingIngredients {
+            if let base = n.id {
+                existingByBaseID[base] = n
+            }
+        }
+        
+        var updatedFoodItem = foodItem
+        
+        for (ingredientIndex, ingredientModel) in foodItem.ingredientList.enumerated() {
+            let output = resolveIngredientUpdates(for: ingredientModel,
+                                                  with: existingByBaseID,
+                                                  latest: entity,
+                                                  plannedVersion: plannedVersion,
+                                                  in: context)
+            updatedFoodItem.ingredientList[ingredientIndex] = output.0
+            existingByBaseID = output.1
+        }
+        
+        return (updatedFoodItem, Array(existingByBaseID.values))
+    }
+    
+    private func resolveIngredientUpdates(for ingredientEntry: IngredientEntry,
+                                          with entityIngredientMap: [UUID: IngredientEntryEntity],
+                                          latest entity: FoodItemEntity,
+                                          plannedVersion: Int,
+                                          in context: NSManagedObjectContext) -> (IngredientEntry, [UUID: IngredientEntryEntity]) {
+        var remaining = entityIngredientMap
+        var updatedIngredient = ingredientEntry
+        
+        if let existing = remaining[ingredientEntry.ingredientID] {
+            guard let entityID = entity.id else {
+                return (ingredientEntry, [:])
+            }
+            
+            if !existing.isEquivalent(to: ingredientEntry) && existing.isReferenced(in: context) {
+                updatedIngredient.withVersion(updatedIngredient.version + 1)
+            }
+            remaining.removeValue(forKey: updatedIngredient.ingredientID)
+        }
+        
+        return (updatedIngredient, remaining)
     }
     
     private func resolveDeletionScenario(foodItemID: UUID,
@@ -370,13 +426,13 @@ class CoreDataFoodRepository: NutriToolFoodRepositoryProtocol {
         removeUnreferencedIngredientEntries(ingredientEntries, in: context)
     }
     
-    private func removeUnreferencedIngredientEntries(_ ingredientEntries: [IngredientEntryEntity], in context: NSManagedObjectContext) {
+    private func removeUnreferencedIngredientEntries(_ ingredientEntries: [IngredientEntryEntity], removeIngredientFood: Bool = true, in context: NSManagedObjectContext) {
         for ingredient in ingredientEntries {
             if !ingredient.isReferenced(in: context) {
                 context.delete(ingredient)
                 print("Deleted existing IngredientEntry \(ingredient.ingredient?.name ?? "(nil)") (id: \(ingredient.id!), version \(ingredient.version)).")
                 
-                if let foodItemIngredient = ingredient.ingredient {
+                if let foodItemIngredient = ingredient.ingredient, removeIngredientFood {
                     removeUnreferencedFoodItems([foodItemIngredient], in: context)
                 }
             }
@@ -385,11 +441,11 @@ class CoreDataFoodRepository: NutriToolFoodRepositoryProtocol {
     
     private func removeUnreferencedFoodItems(_ foodItems: [FoodItemVersionEntity], in context: NSManagedObjectContext) {
         var foodCandidates = Set(foodItems)
-
+        
         for food in foodItems {
             collectRecursively(from: food, into: &foodCandidates)
         }
-
+        
         for food in foodCandidates {
             if !food.isReferenced(in: context) {
                 context.delete(food)
@@ -399,6 +455,10 @@ class CoreDataFoodRepository: NutriToolFoodRepositoryProtocol {
                     let foodItemID = food.parentItem!.id!
                     let currentVersion = Int(food.version)
                     removeUnreferencedNutrientItems(Array(nutrients), foodItemID: foodItemID, currentVersion: currentVersion, in: context)
+                }
+                
+                if let ingredients = food.ingredients as? Set<IngredientEntryEntity> {
+                    removeUnreferencedIngredientEntries(Array(ingredients), removeIngredientFood: false, in: context)
                 }
             }
         }
@@ -434,8 +494,8 @@ class CoreDataFoodRepository: NutriToolFoodRepositoryProtocol {
     
     private func removeUnreferencedFoodVersions(for foodItemID: UUID, in context: NSManagedObjectContext) {
         let fetch: NSFetchRequest<FoodItemVersionEntity> = FoodItemVersionEntity.fetchRequest()
-        fetch.predicate = NSPredicate(format: "parent.id == %@", foodItemID as CVarArg)
-
+        fetch.predicate = NSPredicate(format: "parentItem.id == %@", foodItemID as CVarArg)
+        
         do {
             let versions = try context.fetch(fetch)
             for version in versions {
@@ -447,11 +507,11 @@ class CoreDataFoodRepository: NutriToolFoodRepositoryProtocol {
             print("Failed to clean up FoodItemVersions for \(foodItemID): \(error)")
         }
     }
-
+    
     private func removeUnreferencedNutrientVersions(for foodItemID: UUID, in context: NSManagedObjectContext) {
         let fetch: NSFetchRequest<NutrientItemEntity> = NutrientItemEntity.fetchRequest()
-        fetch.predicate = NSPredicate(format: "ANY foodItemVersions.parent.id == %@", foodItemID as CVarArg)
-
+        fetch.predicate = NSPredicate(format: "ANY nutrientOf.parentItem.id == %@", foodItemID as CVarArg)
+        
         do {
             let nutrients = try context.fetch(fetch)
             for nutrient in nutrients {

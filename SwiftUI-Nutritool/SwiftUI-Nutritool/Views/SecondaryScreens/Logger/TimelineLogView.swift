@@ -9,8 +9,10 @@ import SwiftUI
 
 struct TimelineLogView: View {
     let selectedDate: Date
-    @Binding var loggedMealItems: [LoggedMealItem]
+    let loggedMealItems: [LoggedMealItem]
     @Binding var isHidden: Bool
+    
+    let deleteAction: (LoggedMealItem) -> Void
     
     @State private var initialScrollPerformed = false
     @State private var timeSlotScale: CGFloat = 1.0
@@ -40,6 +42,7 @@ struct TimelineLogView: View {
                     ZStack(alignment: .topLeading) {
                         TimelineDayView(loggedMealItems: loggedMealItems,
                                         selectedDate: selectedDate,
+                                        deleteAction: deleteAction,
                                         hourSpacing: hourSpacing,
                                         backgroundView: animBackground)
                         .padding([.leading, .trailing], 16)
@@ -63,8 +66,9 @@ struct TimelineLogView: View {
 }
 
 struct TimelineDayView<Content: View>: View {
-    var loggedMealItems: [LoggedMealItem]
+    let loggedMealItems: [LoggedMealItem]
     let selectedDate: Date
+    let deleteAction: (LoggedMealItem) -> Void
     let hourSpacing: CGFloat
     let backgroundView: Content
     
@@ -73,6 +77,7 @@ struct TimelineDayView<Content: View>: View {
             ForEach(0..<25) { hour in
                 TimelineHourView(hour: hour,
                                  loggedMealItems: loggedMealItems,
+                                 deleteAction: deleteAction,
                                  backgroundView: backgroundView)
             }
         }
@@ -83,7 +88,8 @@ struct TimelineDayView<Content: View>: View {
 struct TimelineHourView<Content: View>: View {
     let hour: Int
     var formattedHour: String = "%d:00"
-    var loggedMealItems: [LoggedMealItem]
+    let loggedMealItems: [LoggedMealItem]
+    let deleteAction: (LoggedMealItem) -> Void
     let backgroundView: Content
     
     private var timeString: String {
@@ -111,7 +117,11 @@ struct TimelineHourView<Content: View>: View {
             }
             VStack(spacing: 10) {
                 ForEach(filteredHourMealItems, id: \.id) { meal in
-                    LoggedMealItemView(loggedItem: meal, backgroundView: backgroundView)
+                    SwipeableRow {
+                        deleteAction(meal)
+                    } content: {
+                        LoggedMealItemView(loggedItem: meal, backgroundView: backgroundView)
+                    }
                 }
             }
         }
@@ -175,5 +185,7 @@ struct TotalNutrientStatView: View {
 }
 
 #Preview{
-    TimelineLogView(selectedDate: Date(), loggedMealItems: .constant(MockData.loggedMeals), isHidden: .constant(false))
+    TimelineLogView(selectedDate: Date(), loggedMealItems: MockData.loggedMeals, isHidden: .constant(false)) { _ in
+        
+    }
 }
