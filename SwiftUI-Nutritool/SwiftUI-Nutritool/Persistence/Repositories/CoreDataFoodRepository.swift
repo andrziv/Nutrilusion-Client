@@ -402,11 +402,11 @@ class CoreDataFoodRepository: NutriToolFoodRepositoryProtocol {
         var updatedIngredient = ingredientEntry
         
         if let existing = remaining[ingredientEntry.ingredientID] {
-            guard entity.id != nil else {
+            guard let entityID = entity.id else {
                 return (ingredientEntry, [:])
             }
             
-            if !existing.isEquivalent(to: ingredientEntry) && existing.isReferenced(in: context) {
+            if !existing.isEquivalent(to: ingredientEntry) && existing.isReferencedElsewhere(foodItemID: entityID, currentVersion: plannedVersion, in: context) {
                 updatedIngredient.withVersion(updatedIngredient.version + 1)
             }
             remaining.removeValue(forKey: updatedIngredient.ingredientID)
@@ -423,12 +423,12 @@ class CoreDataFoodRepository: NutriToolFoodRepositoryProtocol {
                                          in context: NSManagedObjectContext) {
         removeUnreferencedNutrientItems(nutrientItems, foodItemID: foodItemID, currentVersion: currentVersion, in: context)
         removeUnreferencedFoodItems(foodItems, in: context)
-        removeUnreferencedIngredientEntries(ingredientEntries, in: context)
+        removeUnreferencedIngredientEntries(ingredientEntries, foodItemID: foodItemID, currentVersion: currentVersion, in: context)
     }
     
-    private func removeUnreferencedIngredientEntries(_ ingredientEntries: [IngredientEntryEntity], removeIngredientFood: Bool = true, in context: NSManagedObjectContext) {
+    private func removeUnreferencedIngredientEntries(_ ingredientEntries: [IngredientEntryEntity], foodItemID: UUID, currentVersion: Int, removeIngredientFood: Bool = true, in context: NSManagedObjectContext) {
         for ingredient in ingredientEntries {
-            if !ingredient.isReferenced(in: context) {
+            if !ingredient.isReferencedElsewhere(foodItemID: foodItemID, currentVersion: currentVersion, in: context) {
                 context.delete(ingredient)
                 print("Deleted existing IngredientEntry \(ingredient.ingredient?.name ?? "(nil)") (id: \(ingredient.id!), version \(ingredient.version)).")
                 
@@ -443,22 +443,34 @@ class CoreDataFoodRepository: NutriToolFoodRepositoryProtocol {
         var foodCandidates = Set(foodItems)
         
         for food in foodItems {
-            collectRecursively(from: food, into: &foodCandidates)
+            food.collectRecursively(into: &foodCandidates)
         }
         
         for food in foodCandidates {
-            if !food.isReferenced(in: context) {
+            if !food.isReferenced(ignore: foodCandidates, in: context) {
+                var ingredientsToCheck: Set<IngredientEntryEntity> = []
+                if let ingredientToList = food.ingredientTo as? Set<IngredientEntryEntity> {
+                    ingredientsToCheck.formUnion(ingredientToList)
+                }
+                
                 context.delete(food)
                 print("Deleted existing FoodItem \(food.name ?? "(nil)") (id: \(food.parentItem!.id!), version \(food.version)).")
                 
+                guard let parentItem = food.parentItem, let foodItemID = parentItem.id else {
+                    return
+                }
+                let currentVersion = Int(food.version)
+                
                 if let nutrients = food.nutrients as? Set<NutrientItemEntity> {
-                    let foodItemID = food.parentItem!.id!
-                    let currentVersion = Int(food.version)
                     removeUnreferencedNutrientItems(Array(nutrients), foodItemID: foodItemID, currentVersion: currentVersion, in: context)
                 }
                 
                 if let ingredients = food.ingredients as? Set<IngredientEntryEntity> {
-                    removeUnreferencedIngredientEntries(Array(ingredients), removeIngredientFood: false, in: context)
+                    ingredientsToCheck.formUnion(ingredients)
+                }
+                
+                if !ingredientsToCheck.isEmpty {
+                    removeUnreferencedIngredientEntries(Array(ingredientsToCheck), foodItemID: foodItemID, currentVersion: currentVersion, in: context)
                 }
             }
         }
@@ -468,15 +480,6 @@ class CoreDataFoodRepository: NutriToolFoodRepositoryProtocol {
         for nutrient in nutrientItems {
             if !nutrient.isReferencedElsewhere(foodItemID: foodItemID, currentVersion: currentVersion, in: context) {
                 context.delete(nutrient)
-            }
-        }
-    }
-    
-    private func collectRecursively(from food: FoodItemVersionEntity, into foodCandidates: inout Set<FoodItemVersionEntity>) {
-        if let ingredients = food.ingredients as? Set<FoodItemVersionEntity> {
-            for ingredient in ingredients where !foodCandidates.contains(ingredient) {
-                foodCandidates.insert(ingredient)
-                collectRecursively(from: ingredient, into: &foodCandidates)
             }
         }
     }

@@ -219,11 +219,12 @@ extension FoodItemVersionEntity {
             self.removeFromIngredients(unusedIngredient)
         }
         
-        for unusedNutrient in oldNutrients {
+        let allOldNutrients = NutrientItemEntity.collectAllDescendants(from: Array(oldNutrients), onlyDescendants: false)
+        for unusedNutrient in allOldNutrients {
             self.removeFromNutrients(unusedNutrient)
         }
         
-        unusedNutrients.append(contentsOf: NutrientItemEntity.collectAllDescendants(from: Array(oldNutrients), onlyDescendants: false))
+        unusedNutrients.append(contentsOf: allOldNutrients)
         return (Array(oldIngredients), unusedNutrients)
     }
     
@@ -272,14 +273,14 @@ extension FoodItemVersionEntity {
         return true
     }
     
-    func isReferenced(in context: NSManagedObjectContext) -> Bool {
+    func isReferenced(ignore: Set<FoodItemVersionEntity>? = nil, in context: NSManagedObjectContext) -> Bool {
         do {
             let isReferencedByMealGroup = try isReferencedByMealGroup(in: context)
             if isMostCurrent(in: context) && isReferencedByMealGroup {
                 return true
             }
             
-            if try isReferencedAsIngredient(in: context) {
+            if try isReferencedAsIngredient(ignore: ignore, in: context) {
                 return true
             }
             
@@ -290,9 +291,9 @@ extension FoodItemVersionEntity {
         }
     }
     
-    func isReferencedUpstream(in context: NSManagedObjectContext) -> Bool {
+    func isReferencedUpstream(ignore: Set<FoodItemVersionEntity>? = nil, in context: NSManagedObjectContext) -> Bool {
         do {
-            if try isReferencedAsIngredient(in: context) {
+            if try isReferencedAsIngredient(ignore: ignore, in: context) {
                 return true
             }
             
@@ -328,15 +329,21 @@ extension FoodItemVersionEntity {
     
     private func isReferencedByMealGroup(in context: NSManagedObjectContext) throws -> Bool {
         let groupReq: NSFetchRequest<MealGroupEntity> = MealGroupEntity.fetchRequest()
-        groupReq.predicate = NSPredicate(format: "ANY foodItems == %@", self)
+        groupReq.predicate = NSPredicate(format: "ANY foodItems.currentVersion == %@", self)
         groupReq.fetchLimit = 1
         
         return !(try context.fetch(groupReq).isEmpty)
     }
     
-    private func isReferencedAsIngredient(in context: NSManagedObjectContext) throws -> Bool {
-        let ingredientReq: NSFetchRequest<IngredientEntryEntity> = IngredientEntryEntity.fetchRequest()
-        ingredientReq.predicate = NSPredicate(format: "ingredient == %@", self)
+    private func isReferencedAsIngredient(ignore: Set<FoodItemVersionEntity>?, in context: NSManagedObjectContext) throws -> Bool {
+        let ingredientReq: NSFetchRequest<FoodItemVersionEntity> = FoodItemVersionEntity.fetchRequest()
+        var predicates: [NSPredicate] = [NSPredicate(format: "ANY ingredients.ingredient == %@", self)]
+        
+        if let ignore, !ignore.isEmpty {
+            predicates.append(NSPredicate(format: "NOT (self IN %@)", ignore as NSSet))
+        }
+        
+        ingredientReq.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
         ingredientReq.fetchLimit = 1
         
         return !(try context.fetch(ingredientReq).isEmpty)
@@ -348,6 +355,24 @@ extension FoodItemVersionEntity {
         loggedReq.fetchLimit = 1
         
         return !(try context.fetch(loggedReq).isEmpty)
+    }
+    
+    func referencedAsIngredientBy(in context: NSManagedObjectContext) throws -> [FoodItemVersionEntity] {
+        let ingredientReq: NSFetchRequest<FoodItemVersionEntity> = FoodItemVersionEntity.fetchRequest()
+        ingredientReq.predicate = NSPredicate(format: "ANY ingredients.ingredient == %@", self)
+        
+        return try context.fetch(ingredientReq)
+    }
+    
+    func collectRecursively(into foodCandidates: inout Set<FoodItemVersionEntity>) {
+        if let ingredients = self.ingredients as? Set<IngredientEntryEntity> {
+            for ingredient in ingredients {
+                if let foodItemIngredient = ingredient.ingredient, !foodCandidates.contains(foodItemIngredient) {
+                    foodCandidates.insert(foodItemIngredient)
+                    foodItemIngredient.collectRecursively(into: &foodCandidates)
+                }
+            }
+        }
     }
 }
 
@@ -394,22 +419,22 @@ extension IngredientEntryEntity {
         return true
     }
     
-    func isReferenced(in context: NSManagedObjectContext) -> Bool {
+    func isReferencedElsewhere(foodItemID: UUID, currentVersion version: Int, in context: NSManagedObjectContext) -> Bool {
         do {
-            let isReferencedAsIngredient = try isReferencedAsIngredient(in: context)
-            if isMostCurrent(in: context) && isReferencedAsIngredient {
-                return true
-            }
+           // let isReferencedAsIngredient = try isReferencedAsIngredient(in: context)
+           // if isMostCurrent(in: context) && isReferencedAsIngredient {
+           //     return true
+           // }
             
-            return false
+            return try isReferencedAsIngredientIgnoring(foodItemID: foodItemID, currentVersion: version, in: context)
         } catch {
-            print("Failed to check references for FoodItemVersionEntity \(self.compositeID ?? "(nil)"): \(error)")
+            print("Failed to check references for IngredientEntryEntity \(self.compositeID ?? "(nil)"): \(error)")
             return true //assume referenced somewhere
         }
     }
     
     private func isMostCurrent(in context: NSManagedObjectContext) -> Bool {
-        let fetch: NSFetchRequest<NutrientItemEntity> = NutrientItemEntity.fetchRequest()
+        let fetch: NSFetchRequest<IngredientEntryEntity> = IngredientEntryEntity.fetchRequest()
         fetch.predicate = NSPredicate(format: "id == %@", self.id! as CVarArg)
         fetch.sortDescriptors = [NSSortDescriptor(key: "version", ascending: false)]
         fetch.fetchLimit = 1
@@ -423,9 +448,9 @@ extension IngredientEntryEntity {
         }
     }
     
-    private func isReferencedAsIngredient(in context: NSManagedObjectContext) throws -> Bool {
+    private func isReferencedAsIngredientIgnoring(foodItemID: UUID, currentVersion version: Int, in context: NSManagedObjectContext) throws -> Bool {
         let ingredientReq: NSFetchRequest<FoodItemVersionEntity> = FoodItemVersionEntity.fetchRequest()
-        ingredientReq.predicate = NSPredicate(format: "ANY ingredients == %@", self)
+        ingredientReq.predicate = NSPredicate(format: "ANY ingredients == %@ AND parentItem.id == %@ AND version != %d", self, foodItemID as CVarArg, version)
         ingredientReq.fetchLimit = 1
         
         return !(try context.fetch(ingredientReq).isEmpty)
