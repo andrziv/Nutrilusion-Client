@@ -19,7 +19,7 @@ struct NutrientChipView: View {
             } label: {
                 HStack(spacing: 4) {
                     Image(systemName: "xmark")
-                    Text("\(nutrient.name) \(nutrient.amount)\(nutrient.unit.description)")
+                    Text("\(nutrient.name) \(RoundingDouble(nutrient.amount))\(nutrient.unit.description)")
                         .lineLimit(1)
                 }
                 .font(.caption)
