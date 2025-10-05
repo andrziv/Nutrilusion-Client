@@ -449,8 +449,18 @@ class CoreDataFoodRepository: NutriToolFoodRepositoryProtocol {
         for food in foodCandidates {
             if !food.isReferenced(ignore: foodCandidates, in: context) {
                 var ingredientsToCheck: Set<IngredientEntryEntity> = []
+                var nutrientsToCheck: Set<NutrientItemEntity> = []
+                
                 if let ingredientToList = food.ingredientTo as? Set<IngredientEntryEntity> {
                     ingredientsToCheck.formUnion(ingredientToList)
+                }
+                
+                if let ingredients = food.ingredients as? Set<IngredientEntryEntity> {
+                    ingredientsToCheck.formUnion(ingredients)
+                }
+                
+                if let nutrients = food.nutrients as? Set<NutrientItemEntity> {
+                    nutrientsToCheck.formUnion(nutrients)
                 }
                 
                 context.delete(food)
@@ -461,12 +471,8 @@ class CoreDataFoodRepository: NutriToolFoodRepositoryProtocol {
                 }
                 let currentVersion = Int(food.version)
                 
-                if let nutrients = food.nutrients as? Set<NutrientItemEntity> {
-                    removeUnreferencedNutrientItems(Array(nutrients), foodItemID: foodItemID, currentVersion: currentVersion, in: context)
-                }
-                
-                if let ingredients = food.ingredients as? Set<IngredientEntryEntity> {
-                    ingredientsToCheck.formUnion(ingredients)
+                if !nutrientsToCheck.isEmpty {
+                    removeUnreferencedNutrientItems(Array(nutrientsToCheck), foodItemID: foodItemID, currentVersion: currentVersion, in: context)
                 }
                 
                 if !ingredientsToCheck.isEmpty {
