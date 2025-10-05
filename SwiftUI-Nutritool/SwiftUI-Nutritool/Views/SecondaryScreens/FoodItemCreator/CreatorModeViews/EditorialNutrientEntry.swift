@@ -27,8 +27,9 @@ struct EditorialNutrientEntry: View {
                                background: .primaryComplement,
                                horizontalPadding: 8,
                                verticalPadding: 6)
-                    .multilineTextAlignment(.center)
-                    .frame(width: 64)
+                .keyboardType(.decimalPad)
+                .multilineTextAlignment(.center)
+                .frame(width: 64)
                 
                 NutrientUnitPicker(selectedUnit: unit, action: unitMenuAction)
                     .foregroundStyle(.primaryText)
@@ -95,8 +96,9 @@ struct EditorialCalorieEntry: View {
                                background: .primaryComplement,
                                horizontalPadding: 8,
                                verticalPadding: 6)
-                    .multilineTextAlignment(.center)
-                    .frame(width: 75)
+                .keyboardType(.decimalPad)
+                .multilineTextAlignment(.center)
+                .frame(width: 75)
                 
                 Text(unit)
                     .foregroundStyle(.primaryText)

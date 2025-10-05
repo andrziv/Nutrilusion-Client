@@ -216,7 +216,7 @@ struct FoodItem: Identifiable, Equatable {
     ///   - addNutrients: If set to `true`, the addition of the ingredient will result in the ingredient's nutrients being added to the caller's nutrition info. If a nutrient does not exist within the caller's nutrient tree, the nutrient will be added outright.
     mutating func addIngredient(_ ingredient: FoodItem, addNutrients: Bool = true) {
         ingredientList.append(IngredientEntry(ingredient: ingredient, servingMultiplier: 1))
-        calories += ingredient.calories
+        calories += max(0, ingredient.calories)
         
         if addNutrients {
             for nutrient in ingredient.nutritionList {
@@ -231,13 +231,14 @@ struct FoodItem: Identifiable, Equatable {
     
     /// Add a FoodItem ingredient to this FoodItem.
     /// - Parameters:
-    ///   - ingredient: The Fooditem ingredient to add.
-    ///   - addNutrients: If set to `true`, the addition of the ingredient will result in the ingredient's nutrients being added to the caller's nutrition info. If a nutrient does not exist within the caller's nutrient tree, the nutrient will be added outright.
+    ///   - ingredient: The IngredientEntry ingredient to modify.
+    ///   - oldMultiplier: The old multiplier for the contained ingredient FoodItem serving amount
+    ///   - newMultiplier: The new multiplier for the contained ingredient FoodItem serving amount
     mutating func modifyIngredient(_ ingredient: IngredientEntry, oldMultiplier: Double, newMultiplier: Double) {
         guard ingredientList.first(where: { $0.id == ingredient.id }) != nil else { return }
         
         let difference = newMultiplier - oldMultiplier
-        calories += Int(difference * Double(ingredient.ingredient.calories))
+        calories += max(0, Int(difference * Double(ingredient.ingredient.calories)))
         
         for nutrient in ingredient.ingredient.getAllNutrients() {
             for index in nutritionList.indices {
@@ -256,18 +257,19 @@ struct FoodItem: Identifiable, Equatable {
     /// - Parameters:
     ///   - ingredient: The Fooditem ingredient to remove. Ingredients are compared by ID.
     ///   - subtractNutrients: If set to `true` and the ingredient is held by the caller, the removal of the ingredient will result in the ingredient's nutrients being subtracted from the caller's nutrition info. If a nutrient ends at zero value, the nutrient will not be automatically removed.
-    mutating func removeIngredient(_ ingredient: FoodItem, subtractNutrients: Bool = true) {
-        if let existsAtIndex = ingredientList.firstIndex(where: { $0.ingredient.id == ingredient.id }) {
-            ingredientList.remove(at: existsAtIndex)
-            calories -= ingredient.calories
-            
-            if subtractNutrients {
-                for nutrient in ingredient.nutritionList {
-                    if let index = nutritionList.firstIndex(where: { $0.name == nutrient.name }) {
-                        nutritionList[index].subtract(nutrient)
-                    } else {
-                        continue
-                    }
+    mutating func removeIngredient(_ ingredient: IngredientEntry, subtractNutrients: Bool = true) {
+        guard let existsAtIndex = ingredientList.firstIndex(where: { $0.id == ingredient.id }) else { return }
+        
+        ingredientList.remove(at: existsAtIndex)
+        calories -= Int(ingredient.servingMultiplier * Double(ingredient.ingredient.calories))
+        calories = max(0, calories)
+        
+        if subtractNutrients {
+            for nutrient in ingredient.ingredient.nutritionList {
+                if let index = nutritionList.firstIndex(where: { $0.name == nutrient.name }) {
+                    nutritionList[index].subtract(nutrient, multiplier: ingredient.servingMultiplier)
+                } else {
+                    continue
                 }
             }
         }

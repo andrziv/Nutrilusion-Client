@@ -69,7 +69,7 @@ private struct IngredientListEditorialView: View {
     @Binding var draftFoodItem: FoodItem
     @ObservedObject var viewModel: NutriToolFoodViewModel
     
-    private func deleteIngredient(_ ingredient: FoodItem) {
+    private func deleteIngredient(_ ingredient: IngredientEntry) {
         draftFoodItem.removeIngredient(ingredient)
     }
     
@@ -81,7 +81,7 @@ private struct IngredientListEditorialView: View {
         VStack(spacing: 12) {
             ForEach($draftFoodItem.ingredientList) { $ingredient in
                 SwipeableRow {
-                    deleteIngredient(ingredient.ingredient)
+                    deleteIngredient(ingredient)
                 } content: {
                     IngredientEntryView(
                         ingredientEntry: $ingredient,

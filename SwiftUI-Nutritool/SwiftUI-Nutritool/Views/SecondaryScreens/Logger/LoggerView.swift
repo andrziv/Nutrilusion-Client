@@ -32,13 +32,27 @@ fileprivate extension WeekDayType {
     static let saturday = WeekDayType("Saturday", "Sat")
     static let sunday = WeekDayType("Sunday", "Sun")
     static let fullWeek = [monday, tuesday, wednesday, thursday, friday, saturday, sunday]
+    
+    static func getType(from weekdayIndex: Int) -> WeekDayType {
+        switch weekdayIndex {
+        case 1: return .sunday
+        case 2: return .monday
+        case 3: return .tuesday
+        case 4: return .wednesday
+        case 5: return .thursday
+        case 6: return .friday
+        case 7: return .saturday
+        default:
+            return .sunday
+        }
+    }
 }
 
 struct LoggerView: View {
     @EnvironmentObject var foodViewModel: NutriToolFoodViewModel
     
     @State private var selectedDay = SelectedDay(
-        day: WeekDayType.fullWeek[Calendar.current.component(.weekday, from: Date()) - 2],
+        day: WeekDayType.getType(from: Calendar.current.component(.weekday, from: Date())),
         date: Date()
     )
     
@@ -126,7 +140,7 @@ struct WeekDayButtonSet: View {
                 let day = WeekDayType.fullWeek[index]
                 let date = Calendar.current.date(byAdding: .day, value: index - (currentDayIndex - 1), to: Date())!
                 let calendarDay = Calendar.current.component(.day, from: date)
-
+                
                 Button {
                     if selectedDay.day == day {
                         withAnimation {
@@ -244,7 +258,6 @@ private struct LogCurrentTimeButton: View {
         }
     }
 }
-
 
 #Preview {
     LoggerView()

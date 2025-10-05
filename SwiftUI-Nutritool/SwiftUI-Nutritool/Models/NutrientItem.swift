@@ -225,18 +225,19 @@ struct NutrientItem: Identifiable, Equatable {
              - 0.001< value in grams < 1: unit is set to milligrams
              - else: value is set to grams
      */
-    mutating func subtract(_ other: NutrientItem, optimizeUnit: Bool = true) {
+    mutating func subtract(_ other: NutrientItem, multiplier: Double = 1, optimizeUnit: Bool = true) {
         if name == other.name {
-            let deltaGrams = -other.unit.convertTo(other.amount, to: .grams)
+            let toRemove = other.amount * multiplier
+            let deltaGrams = -other.unit.convertTo(toRemove, to: .grams)
             applyDelta(deltaGrams, optimizeUnit: optimizeUnit)
             
             for child in other.childNutrients {
                 if let index = childNutrients.firstIndex(where: { $0.name == child.name }) {
-                    childNutrients[index].subtract(child, optimizeUnit: optimizeUnit)
+                    childNutrients[index].subtract(child, multiplier: multiplier, optimizeUnit: optimizeUnit)
                 }
             }
         } else if let index = childNutrients.firstIndex(where: { $0.name == other.name }) {
-            childNutrients[index].subtract(other, optimizeUnit: optimizeUnit)
+            childNutrients[index].subtract(other, multiplier: multiplier, optimizeUnit: optimizeUnit)
         }
     }
     
