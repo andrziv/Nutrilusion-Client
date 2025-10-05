@@ -18,7 +18,7 @@ struct GranularValueTextField: View {
     @FocusState private var isFocused: Bool
     
     var body: some View {
-        HStack(spacing: 4) {
+        HStack(alignment: .center, spacing: 4) {
             ImagedButton(title: "1", icon: "minus",
                          imageFont: .subheadline.weight(.regular), textFont: .subheadline.weight(.regular),
                          circleColour: .clear,
@@ -40,7 +40,8 @@ struct GranularValueTextField: View {
                 value = Swift.max(0, value - topChangeValue + interval)
             }
             
-            HStack {
+            let isUnitTextLong = unitText != nil && unitText!.count > 3
+            SwappingVHStack(vSpacing: 0, hSpacing: 4, hAlignment: .center, vAlignment: .center, useHStack: !isUnitTextLong) {
                 BasicTextField("", value: $value, format: .number,
                                font: .subheadline,
                                fontWeight: .regular,
@@ -48,15 +49,18 @@ struct GranularValueTextField: View {
                                outline: .clear, outlineWidth: 0,
                                background: background,
                                horizontalPadding: 6,
-                               verticalPadding: 6)
+                               verticalPadding: isUnitTextLong ? -1 : 5)
                 .focused($isFocused)
                 .multilineTextAlignment(.center)
                 
-                if let unitText {
+                if let unitText, !unitText.isEmpty {
                     Text(unitText)
+                        .scaledToFit()
+                        .minimumScaleFactor(0.4)
+                        .lineLimit(1)
                         .font(.caption2)
                         .fontWeight(.light)
-                        .padding(.trailing, 4)
+                        .padding(.trailing, isUnitTextLong ? 0 : 4)
                 }
             }
             .background(RoundedRectangle(cornerRadius: 7).fill(background))
