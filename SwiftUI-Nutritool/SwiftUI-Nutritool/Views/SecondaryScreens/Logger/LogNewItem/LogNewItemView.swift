@@ -179,7 +179,7 @@ private struct LoggedFoodItemBuilderView: View {
                 Group {
                     DateChooseView(selectedDate: $logDate)
                     
-                    ServingSizeChangeView(servingSize: $servingsLogged, background: actionBackground)
+                    ServingSizeChangeView(servingSize: $servingsLogged, pluralUnit: chosenFoodItem?.servingUnitMultiple ?? "Servings", background: actionBackground)
                 }
                 .transition(.opacity.combined(with: .scale(scale: 0.95, anchor: .top)))
             }
@@ -241,10 +241,11 @@ private struct DateChooseView: View {
 
 private struct ServingSizeChangeView: View {
     @Binding var servingSize: Double
+    let pluralUnit: String
     let background: Color
     
     var body: some View {
-        EditFieldView(title: "Servings") {
+        EditFieldView(title: "Number of \(pluralUnit.capitalized)") {
             GranularValueTextField(topChangeValue: 1, interval: 0.5, value: $servingSize, background: background)
         }
     }
