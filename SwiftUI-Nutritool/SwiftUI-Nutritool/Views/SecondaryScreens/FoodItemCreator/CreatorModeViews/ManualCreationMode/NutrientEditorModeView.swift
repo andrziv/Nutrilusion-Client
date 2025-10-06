@@ -18,11 +18,14 @@ struct NutrientEditorModeView: View {
             let toggleColourAccent = isValuePropagationActive ? Color.green : Color.red
             let toggleColour = Color.primaryComplement.mix(with: toggleColourAccent, by: 0.5)
             
-            EditorialCalorieBlockEntry(foodItem: $foodItem)
-                .font(.callout)
-                .fontWeight(.heavy)
-            
-            NutrientTreeEditorialView(foodItem: $foodItem, propagateChanges: isValuePropagationActive)
+            VStack {
+                EditorialCalorieBlockEntry(foodItem: $foodItem)
+                    .font(.callout)
+                    .fontWeight(.heavy)
+                
+                NutrientTreeEditorialView(foodItem: $foodItem, propagateChanges: isValuePropagationActive)
+            }
+            .padding(.horizontal, 8)
             
             HStack(spacing: 12){
                 Toggle(isOn: $isValuePropagationActive) {

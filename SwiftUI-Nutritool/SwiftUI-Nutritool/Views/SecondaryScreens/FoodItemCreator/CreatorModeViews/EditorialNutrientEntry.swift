@@ -36,7 +36,6 @@ struct EditorialNutrientEntry: View {
                     .multilineTextAlignment(.center)
             }
         }
-        .padding(.horizontal, 8)
         .background(
             RoundedRectangle(cornerRadius: 10, style: .continuous)
                 .fill(.primaryComplement)
@@ -111,7 +110,6 @@ struct EditorialCalorieEntry: View {
                     )
             }
         }
-        .padding(.horizontal, 8)
         .background(
             RoundedRectangle(cornerRadius: 10, style: .continuous)
                 .fill(.primaryComplement)
