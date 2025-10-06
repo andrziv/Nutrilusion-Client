@@ -52,8 +52,10 @@ struct RecipeListView: View {
                               editingAllowed: true,
                               isExpanded: !mealGroup.foodIDs.isEmpty) { foodItem in
                     foodTapAction(mealGroup, foodItem)
-                } deleteAction: { mealGroup in
-                    viewModel.deleteGroup(mealGroup)
+                } deleteGroupAction: { mealGroupToDelete in
+                    viewModel.deleteGroup(mealGroupToDelete)
+                } deleteItemAction: { foodItemToDelete in
+                    viewModel.removeFood(foodItemToDelete, from: mealGroup)
                 }
                 .padding(.bottom, viewModel.mealGroups.last == mealGroup ? 65 : 0)
             }

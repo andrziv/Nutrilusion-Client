@@ -15,13 +15,14 @@ struct MealGroupView: View {
     @State var isExpanded: Bool = false
     
     var foodTapAction: (FoodItem) -> Void = { _ in }
-    var deleteAction: ((MealGroup) -> Void)? = nil
+    var deleteGroupAction: ((MealGroup) -> Void)? = nil
+    var deleteItemAction: (FoodItem) -> Void = { _ in }
     
     var body: some View {
         let emblem = Color(hex: group.colour)
         
         VStack(spacing: 0) {
-            MealGroupHeader(group: group, isExpanded: $isExpanded, emblem: emblem, deleteAction: deleteAction)
+            MealGroupHeader(group: group, isExpanded: $isExpanded, emblem: emblem, deleteAction: deleteGroupAction)
                 .background(emblem.opacity(0.4))
             
             MealGroupBody(viewModel: viewModel,
@@ -29,7 +30,8 @@ struct MealGroupView: View {
                           editingAllowed: editingAllowed,
                           isExpanded: isExpanded,
                           emblem: emblem,
-                          foodTapAction: foodTapAction)
+                          foodTapAction: foodTapAction,
+                          deleteItemAction: deleteItemAction)
             .transition(.asymmetric(
                 insertion: .move(edge: .top).combined(with: .opacity),
                 removal: .opacity
@@ -96,16 +98,21 @@ struct MealGroupBody: View {
     let emblem: Color
     
     let foodTapAction: (FoodItem) -> Void
+    let deleteItemAction: (FoodItem) -> Void
     
     var body: some View {
         if isExpanded {
             LazyVScroll(items: viewModel.foods(in: group), spacing: 12) { meal in
-                Button {
-                    foodTapAction(meal)
-                } label: {
-                    FoodItemView(foodItem: meal, viewModel: viewModel, editingAllowed: editingAllowed)
+                SwipeableRow {
+                    deleteItemAction(meal)
+                } content: {
+                    Button {
+                        foodTapAction(meal)
+                    } label: {
+                        FoodItemView(foodItem: meal, viewModel: viewModel, editingAllowed: editingAllowed)
+                    }
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
             }
             .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
             .padding()

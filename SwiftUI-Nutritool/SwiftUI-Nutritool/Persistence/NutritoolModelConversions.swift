@@ -145,6 +145,19 @@ extension FoodItemEntity {
         self.currentVersion = newVersion
         self.addToVersions(newVersion)
     }
+    
+    func hasVersionsAttached(in context: NSManagedObjectContext) -> Bool {
+        let request: NSFetchRequest<FoodItemVersionEntity> = FoodItemVersionEntity.fetchRequest()
+        request.predicate = NSPredicate(format: "parentItem == %@", self)
+        request.fetchLimit = 1
+        
+        do {
+            return !(try context.fetch(request).isEmpty)
+        } catch {
+            print("Failed to check most current version for IngredientEntryEntity \(self.id?.uuidString ?? "(nil)"): \(error)")
+            return false
+        }
+    }
 }
 
 extension FoodItemVersionEntity {

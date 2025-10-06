@@ -50,18 +50,20 @@ struct SwipeableRow<Content: View>: View {
             
             content()
                 .offset(x: -offset)
-                .simultaneousGesture(
+                .highPriorityGesture(
                     // future ref: minDistance was used to tweak sweet spot between
                     //   scrollview vertical drag and row deletion horizontal drag
                     DragGesture(minimumDistance: 18, coordinateSpace: .local)
                         .onChanged { value in
-                            if value.translation.width < 0 { // left swipe
+                            if abs(value.translation.width) > abs(value.translation.height) && value.translation.width < 0 {
                                 offset = min(-value.translation.width, maxSwipeDistance)
                             }
                         }
                         .onEnded { value in
-                            if value.translation.width < -minRequiredSwipeDistance {
-                                withAnimation(.spring()) { onDelete() }
+                            if abs(value.translation.width) > abs(value.translation.height) && value.translation.width < -minRequiredSwipeDistance {
+                                withAnimation(.spring()) {
+                                    onDelete()
+                                }
                             } else {
                                 offset = 0
                             }

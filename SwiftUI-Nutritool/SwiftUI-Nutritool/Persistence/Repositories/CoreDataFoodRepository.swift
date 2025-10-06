@@ -170,15 +170,35 @@ class CoreDataFoodRepository: NutriToolFoodRepositoryProtocol {
     func removeFood(_ food: FoodItem, from group: MealGroup) {
         context.performAndWait {
             guard let groupEntity = fetchMealGroupEntity(by: group.id, in: context) else {
+                print("Tried to remove food from non-existing group \(group.name), id: \(group.id). Aborting.")
                 return
             }
             
-            if let latest = fetchLatestFoodEntity(by: food.foodItemID, in: context) {
-                groupEntity.removeFromFoodItems(latest)
+            guard let foodItemEntity = fetchLatestFoodEntity(by: food.foodItemID, in: context) else {
+                print("Tried to remove non-existent food using model paramaters: \(food.name) (id: \(food.id)). Aborting.")
+                return
             }
             
-            removeUnreferencedFoodVersions(for: food.foodItemID, in: context)
-            removeUnreferencedNutrientVersions(for: food.foodItemID, in: context)
+            guard let latestVersion = foodItemEntity.currentVersion, let foodId = foodItemEntity.id else {
+                context.delete(foodItemEntity)
+                print("Food item with id \(food.id) did not have any current version. Deleting.")
+                return
+            }
+            
+            groupEntity.removeFromFoodItems(foodItemEntity)
+            
+            if !latestVersion.isReferenced(in: context) {
+                resolveDeletionScenario(foodItemID: foodId,
+                                        currentVersion: Int(latestVersion.version),
+                                        foodItems: [latestVersion],
+                                        nutrientItems: [],
+                                        in: context)
+                
+                if !foodItemEntity.hasVersionsAttached(in: context) {
+                    context.delete(foodItemEntity)
+                }
+            }
+
             _ = save()
         }
     }
