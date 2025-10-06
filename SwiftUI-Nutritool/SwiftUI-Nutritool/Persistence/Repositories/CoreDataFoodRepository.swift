@@ -274,6 +274,7 @@ class CoreDataFoodRepository: NutriToolFoodRepositoryProtocol {
         context.performAndWait {
             let entity = MealGroupEntity(context: context)
             entity.update(from: group, in: context)
+            print("Creating meal group: \(entity.name ?? "(nil)") (id: \(entity.id?.uuidString ?? "(nil)")).")
             _ = save()
         }
     }
@@ -289,7 +290,8 @@ class CoreDataFoodRepository: NutriToolFoodRepositoryProtocol {
     
     func deleteMealGroup(_ group: MealGroup) {
         context.performAndWait {
-            if let entity = fetchMealGroupEntity(by: group.id, in: context) {
+            if let entity = fetchMealGroupEntity(by: group.id, in: context), !entity.hasFoodItems() {
+                print("Deleting meal group: \(entity.name ?? "(nil)") (id: \(entity.id?.uuidString ?? "(nil)")).")
                 context.delete(entity)
                 _ = save()
             }

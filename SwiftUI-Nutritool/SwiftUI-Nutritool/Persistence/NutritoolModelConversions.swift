@@ -48,6 +48,10 @@ extension MealGroupEntity {
             }
         }
     }
+    
+    func hasFoodItems() -> Bool {
+        return (self.foodItems?.count ?? 0) > 0
+    }
 }
 
 extension LoggedMealItemEntity {

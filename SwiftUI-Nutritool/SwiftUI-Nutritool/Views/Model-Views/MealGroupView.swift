@@ -15,12 +15,13 @@ struct MealGroupView: View {
     @State var isExpanded: Bool = false
     
     var foodTapAction: (FoodItem) -> Void = { _ in }
+    var deleteAction: ((MealGroup) -> Void)? = nil
     
     var body: some View {
         let emblem = Color(hex: group.colour)
         
         VStack(spacing: 0) {
-            MealGroupHeader(group: group, isExpanded: $isExpanded, emblem: emblem)
+            MealGroupHeader(group: group, isExpanded: $isExpanded, emblem: emblem, deleteAction: deleteAction)
                 .background(emblem.opacity(0.4))
             
             MealGroupBody(viewModel: viewModel,
@@ -48,6 +49,8 @@ struct MealGroupHeader: View {
     @Binding var isExpanded: Bool
     let emblem: Color
     
+    let deleteAction: ((MealGroup) -> Void)?
+    
     var body: some View {
         HStack {
             Text(group.name)
@@ -56,16 +59,29 @@ struct MealGroupHeader: View {
             
             Spacer()
             
-            Button {
-                withAnimation { isExpanded.toggle() }
-            } label: {
-                Image(systemName: "chevron.down.circle.fill")
-                    .font(.title2)
-                    .rotationEffect(.degrees(isExpanded ? 180 : 0))
-                    .foregroundStyle(emblem.mix(with: .primaryText, by: 0.3))
-                    .symbolRenderingMode(.hierarchical)
+            if let deleteAction, group.foodIDs.isEmpty {
+                Button {
+                    deleteAction(group)
+                } label: {
+                    Image(systemName: "trash.circle.fill")
+                        .font(.title2)
+                        .rotationEffect(.degrees(isExpanded ? 180 : 0))
+                        .foregroundStyle(emblem.mix(with: .primaryText, by: 0.3))
+                        .symbolRenderingMode(.hierarchical)
+                }
+                .buttonStyle(.plain)
+            } else {
+                Button {
+                    withAnimation { isExpanded.toggle() }
+                } label: {
+                    Image(systemName: "chevron.down.circle.fill")
+                        .font(.title2)
+                        .rotationEffect(.degrees(isExpanded ? 180 : 0))
+                        .foregroundStyle(emblem.mix(with: .primaryText, by: 0.3))
+                        .symbolRenderingMode(.hierarchical)
+                }
+                .buttonStyle(.plain)
             }
-            .buttonStyle(.plain)
         }
         .padding(.vertical, isExpanded ? 8 : nil)
         .padding(.horizontal)
