@@ -730,10 +730,10 @@
             "name": "Sodium",
             "translations": {
                 "en": [
-                    "Sodium"
+                    "Sodium", "Salt"
                 ],
                 "fr": [
-                    "Sodium"
+                    "Sodium", "Sel"
                 ]
             }
         },
