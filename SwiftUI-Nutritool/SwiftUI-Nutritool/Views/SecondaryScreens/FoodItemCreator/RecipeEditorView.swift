@@ -68,7 +68,7 @@ struct RecipeEditorView: View {
         self.selectedMealGroup = viewModel.mealGroups.first { group in
             group.foodIDs.contains(foodItem.foodItemID)
         } ?? viewModel.mealGroups.first
-        self.selectedMode = .nutrient
+        self.selectedMode = .ingredient
     }
     
     var body: some View {
