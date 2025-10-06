@@ -38,7 +38,7 @@ struct TimelineLogView: View {
         
         VStack {
             ScrollViewReader { scrollProxy in
-                ScrollView(.vertical, showsIndicators: false) {
+                ScrollView(.vertical) {
                     ZStack(alignment: .topLeading) {
                         TimelineDayView(loggedMealItems: loggedMealItems,
                                         selectedDate: selectedDate,
@@ -48,6 +48,7 @@ struct TimelineLogView: View {
                         .padding([.leading, .trailing], 16)
                     }
                 }
+                .scrollIndicators(.hidden)
                 .onAppear {
                     if !initialScrollPerformed {
                         let calendar = Calendar.current

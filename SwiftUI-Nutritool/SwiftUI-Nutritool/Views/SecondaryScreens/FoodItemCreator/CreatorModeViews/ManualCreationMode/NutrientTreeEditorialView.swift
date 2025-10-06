@@ -22,6 +22,7 @@ struct NutrientTreeEditorialView: View {
             }
             .padding(.top, 0.5) // just to make it so that the value textfield outline isn't clipping the top
         }
+        .scrollIndicators(.hidden)
         .font(.footnote)
         .labelStyle(CustomLabel(spacing: 7))
     }
