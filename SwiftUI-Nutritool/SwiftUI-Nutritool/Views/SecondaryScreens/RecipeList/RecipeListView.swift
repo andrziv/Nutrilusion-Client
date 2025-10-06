@@ -62,7 +62,7 @@ struct RecipeListView: View {
         }
         .basicBackground(shadowRadius: 0, background: .backgroundColour)
         .ignoresSafeArea(.all, edges: .bottom)
-        .fullScreenCover(item: $mode) { mode in
+        .sheet(item: $mode) { mode in
             switch mode {
             case .search:
                 SearchFoodItemView(foodViewModel: viewModel, allowEditing: true) {
