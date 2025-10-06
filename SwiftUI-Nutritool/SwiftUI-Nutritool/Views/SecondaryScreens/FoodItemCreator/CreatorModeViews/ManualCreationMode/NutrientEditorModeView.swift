@@ -26,6 +26,7 @@ struct NutrientEditorModeView: View {
                 NutrientTreeEditorialView(foodItem: $foodItem, propagateChanges: isValuePropagationActive)
             }
             .padding(.horizontal, 8)
+            .scrollDismissesKeyboard(.immediately)
             
             HStack(spacing: 12){
                 Toggle(isOn: $isValuePropagationActive) {
