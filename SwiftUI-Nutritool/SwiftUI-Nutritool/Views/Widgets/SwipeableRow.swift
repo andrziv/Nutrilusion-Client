@@ -8,6 +8,7 @@
 
 import SwiftUI
 
+// note: this exists because the built-in .swipeActions modifier only works in Lists which we don't use.
 struct SwipeableRow<Content: View>: View {
     var maxSwipeDistance: CGFloat = 150
     var minRequiredSwipeDistance: CGFloat = 80
@@ -17,20 +18,39 @@ struct SwipeableRow<Content: View>: View {
     
     @State private var offset: CGFloat = 0
     
+    private var revealWidth: CGFloat {
+        min(offset, maxSwipeDistance)
+    }
+    
+    private var deleteTextOpacity: Double {
+        Double(revealWidth / maxSwipeDistance)
+    }
+    
     var body: some View {
         ZStack(alignment: .trailing) {
-            HStack {
-                Spacer()
-                
-                Button(role: .destructive, action: onDelete) {
-                    Label("Delete", systemImage: "trash")
-                }
-                .padding(.trailing, 20)
-            }
+            Color.clear
+                .overlay(
+                    HStack {
+                        Spacer()
+                        
+                        Label("Delete", systemImage: "trash")
+                            .foregroundColor(.red)
+                            .opacity(deleteTextOpacity)
+                            .padding(.trailing, 20)
+                    },
+                    alignment: .trailing
+                )
+                .mask(
+                    HStack(spacing: 0) {
+                        Spacer()
+                        Rectangle()
+                            .frame(width: revealWidth)
+                    }
+                )
             
             content()
                 .offset(x: -offset)
-                .gesture(
+                .simultaneousGesture(
                     // future ref: minDistance was used to tweak sweet spot between
                     //   scrollview vertical drag and row deletion horizontal drag
                     DragGesture(minimumDistance: 18, coordinateSpace: .local)
