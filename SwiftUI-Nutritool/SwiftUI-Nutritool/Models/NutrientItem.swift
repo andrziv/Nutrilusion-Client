@@ -197,7 +197,7 @@ struct NutrientItem: Identifiable, Equatable {
         
         let rest = Array(path.dropFirst())
         
-        guard let next = rest.first else { return false }
+        guard let next = rest.first else { return true }
         
         if let index = childNutrients.firstIndex(where: { $0.name == next }) { // further down the existing chain
             childNutrients[index].insertAlongPath(path: rest, other: other, propagateChanges: propagateChanges, adjustAmounts: adjustAmounts, optimizeUnit: optimizeUnit)

@@ -99,7 +99,7 @@ struct FoodItem: Identifiable, Equatable {
         }
         
         for i in nutritionList.indices {
-            let result = nutritionList[i].add(nutrientToAdd, propagateChanges: propagateAmounts, directInsert: false)
+            let result = nutritionList[i].add(nutrientToAdd, propagateChanges: propagateAmounts, adjustAmounts: false, directInsert: false)
             if result {
                 return false
             }
