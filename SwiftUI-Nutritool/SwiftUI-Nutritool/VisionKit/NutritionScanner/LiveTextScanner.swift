@@ -193,7 +193,7 @@ extension LiveTextScanner: AVCapturePhotoCaptureDelegate {
             if !outcome {
                 // if nutrient was already created as part of the hierarchy process,
                 //  modify it to match what was captured by the camera
-                foodItem.modifyNutrient(nutrient.name, newValue: nutrient.amount, newUnit: nutrient.unit)
+                foodItem.modifyNutrient(nutrient.name, newValue: nutrient.amount, newUnit: nutrient.unit, propagateChanges: false)
             }
         }
         

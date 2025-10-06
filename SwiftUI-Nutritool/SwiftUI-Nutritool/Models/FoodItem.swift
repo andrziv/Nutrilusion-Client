@@ -154,16 +154,16 @@ struct FoodItem: Identifiable, Equatable {
      - Returns: `true` if modification occurred, `false` otherwise.
      */
     @discardableResult
-    mutating func modifyNutrient(_ targetName: String, newValue: Double? = nil, newUnit: NutrientUnit? = nil) -> Bool {
+    mutating func modifyNutrient(_ targetName: String, newValue: Double? = nil, newUnit: NutrientUnit? = nil, propagateChanges: Bool) -> Bool {
         for i in nutritionList.indices {
             if nutritionList[i].name == targetName {
-                nutritionList[i].modify(targetName, newValue: newValue, newUnit: newUnit)
+                nutritionList[i].modify(targetName, newValue: newValue, newUnit: newUnit, propagateChanges: propagateChanges)
                 return true
             }
         }
         
         for i in nutritionList.indices {
-            if nutritionList[i].modify(targetName, newValue: newValue, newUnit: newUnit) {
+            if nutritionList[i].modify(targetName, newValue: newValue, newUnit: newUnit, propagateChanges: propagateChanges) {
                 return true
             }
         }

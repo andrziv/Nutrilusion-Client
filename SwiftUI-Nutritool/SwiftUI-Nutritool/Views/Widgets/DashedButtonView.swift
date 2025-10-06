@@ -22,7 +22,7 @@ struct DashedButtonView: View {
             .padding(.vertical, 8)
             .background(.clear)
             .overlay{
-                RoundedRectangle(cornerRadius: 15)
+                RoundedRectangle(cornerRadius: cornerRadius)
                     .stroke(style: StrokeStyle(lineWidth: 1, dash: [8]))
                     .foregroundStyle(.primaryText.mix(with: .backgroundColour, by: 0.5))
             }

@@ -64,13 +64,11 @@ struct RecipeEditorView: View {
         self.onExitAction = onExitAction
         self.onSaveAction = onSaveAction
         
-        self._draftFoodItem = State(initialValue: foodItem)
-        self._selectedMealGroup = State(initialValue:
-                                            viewModel.mealGroups.first { group in
+        self.draftFoodItem = foodItem
+        self.selectedMealGroup = viewModel.mealGroups.first { group in
             group.foodIDs.contains(foodItem.foodItemID)
         } ?? viewModel.mealGroups.first
-        )
-        self._selectedMode = State(initialValue: .ingredient)
+        self.selectedMode = .nutrient
     }
     
     var body: some View {

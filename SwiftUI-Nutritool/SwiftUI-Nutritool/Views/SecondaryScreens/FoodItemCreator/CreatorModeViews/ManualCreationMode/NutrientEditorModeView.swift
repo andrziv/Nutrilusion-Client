@@ -11,19 +11,36 @@ import SwiftUI
 struct NutrientEditorModeView: View {
     @Binding var foodItem: FoodItem
     @State private var showNutritionList: Bool = false
+    @State private var isValuePropagationActive: Bool = false
     
     var body: some View {
         VStack {
+            let toggleColourAccent = isValuePropagationActive ? Color.green : Color.red
+            let toggleColour = Color.primaryComplement.mix(with: toggleColourAccent, by: 0.5)
+            
             EditorialCalorieBlockEntry(foodItem: $foodItem)
                 .font(.callout)
                 .fontWeight(.heavy)
             
-            NutrientTreeEditorialView(foodItem: $foodItem)
+            NutrientTreeEditorialView(foodItem: $foodItem, propagateChanges: isValuePropagationActive)
             
-            Button {
-                showNutritionList = true
-            } label: {
-                DashedButtonView(imageName: "plus")
+            HStack(spacing: 12){
+                Toggle(isOn: $isValuePropagationActive) {
+                    Text("Propagate")
+                        .lineLimit(1)
+                        .font(.callout)
+                }
+                .toggleStyle(CheckBoxStyle())
+                .foregroundStyle(.primaryText)
+                .padding(.vertical, 8)
+                .padding(.horizontal)
+                .background(RoundedRectangle(cornerRadius: 7).fill(toggleColour))
+                
+                Button {
+                    showNutritionList = true
+                } label: {
+                    DashedButtonView(imageName: "plus", cornerRadius: 7)
+                }
             }
         }
         .fullScreenCover(isPresented: $showNutritionList) {
