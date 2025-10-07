@@ -40,13 +40,13 @@ struct SwipeableRow<Content: View>: View {
                     },
                     alignment: .trailing
                 )
-                .mask(
+                .mask {
                     HStack(spacing: 0) {
                         Spacer()
                         Rectangle()
                             .frame(width: revealWidth)
                     }
-                )
+                }
             
             content()
                 .offset(x: -offset)

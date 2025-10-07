@@ -24,42 +24,40 @@ struct FoodItemView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            VStack(alignment: .leading, spacing: 8) {
-                FoodItemHeader(foodItem: foodItem,
-                               mealGroup: viewModel.group(for: foodItem),
-                               mostCurrentVersion: viewModel.currentVersionOf(foodItemID: foodItem.foodItemID),
-                               showGroupInfo: showGroupInfo,
-                               isExpanded: isExpanded)
-                
-                if !isExpanded {
-                    Line()
-                        .frame(height: 0.5)
-                        .background(.secondaryText)
-                        .opacity(0.5)
-                }
-                
-                FoodItemBody(foodItem: foodItem, editingAllowed: editingAllowed, isExpanded: $isExpanded, showFoodEditor: $showFoodEditor)
+            FoodItemHeader(foodItem: foodItem,
+                           mealGroup: viewModel.group(for: foodItem),
+                           mostCurrentVersion: viewModel.currentVersionOf(foodItemID: foodItem.foodItemID),
+                           showGroupInfo: showGroupInfo,
+                           isExpanded: isExpanded)
+            
+            if !isExpanded {
+                Line()
+                    .frame(height: 0.5)
+                    .background(.secondaryText)
+                    .opacity(0.5)
             }
-            .sheet(isPresented: $showFoodEditor) {
-                RecipeEditorView(foodItem: foodItem, viewModel: viewModel, onExitAction: { showFoodEditor = false }) { potentialNewGroup, editedFoodItem in
-                    showFoodEditor = false
-                    
-                    if let editingAction = editingAction, let newGroup = potentialNewGroup {
-                        editingAction(newGroup, editedFoodItem)
-                    } else if let newGroup = potentialNewGroup {
-                        let currentGroup = viewModel.group(for: foodItem)
-                        if let currentGroup = currentGroup, currentGroup.id != newGroup.id {
-                            viewModel.moveFood(editedFoodItem, from: currentGroup, to: newGroup)
-                        }
-                        viewModel.updateFood(editedFoodItem)
-                    }
-                }
-            }
-            .padding()
-            .background(.secondaryComplement)
-            .clipShape(RoundedRectangle(cornerRadius: 7))
-            .animation(.easeInOut(duration: 0.25), value: isExpanded)
+            
+            FoodItemBody(foodItem: foodItem, editingAllowed: editingAllowed, isExpanded: $isExpanded, showFoodEditor: $showFoodEditor)
         }
+        .sheet(isPresented: $showFoodEditor) {
+            RecipeEditorView(foodItem: foodItem, viewModel: viewModel, onExitAction: { showFoodEditor = false }) { potentialNewGroup, editedFoodItem in
+                showFoodEditor = false
+                
+                if let editingAction = editingAction, let newGroup = potentialNewGroup {
+                    editingAction(newGroup, editedFoodItem)
+                } else if let newGroup = potentialNewGroup {
+                    let currentGroup = viewModel.group(for: foodItem)
+                    if let currentGroup = currentGroup, currentGroup.id != newGroup.id {
+                        viewModel.moveFood(editedFoodItem, from: currentGroup, to: newGroup)
+                    }
+                    viewModel.updateFood(editedFoodItem)
+                }
+            }
+        }
+        .padding()
+        .background(.secondaryComplement)
+        .clipShape(RoundedRectangle(cornerRadius: 7))
+        .animation(.easeInOut(duration: 0.25), value: isExpanded)
     }
 }
 
@@ -73,7 +71,6 @@ private struct FoodItemHeader: View {
     var subtextColour: Color = .secondaryText
     
     var body: some View {
-        
         HStack {
             VStack(alignment: .leading) {
                 Text(foodItem.name)
@@ -103,7 +100,6 @@ private struct FoodItemHeader: View {
                     }
                 }
             }
-            
             
             if !isExpanded {
                 Spacer()
@@ -142,15 +138,14 @@ private struct FoodItemBody: View {
             }
             
             if !foodItem.nutritionList.isEmpty {
-                FoodItemNutrientShowcase(foodItem: foodItem,
-                                         isExpanded: isExpanded)
-            }
-            
-            if isExpanded && !foodItem.ingredientList.isEmpty {
-                FoodItemIngredientShowcase(foodItem: foodItem)
+                FoodItemNutrientShowcase(foodItem: foodItem, isExpanded: isExpanded)
             }
             
             if isExpanded {
+                if !foodItem.ingredientList.isEmpty {
+                    FoodItemIngredientShowcase(foodItem: foodItem)
+                }
+                
                 ExpandedFoodItemControlRow(foodItem: foodItem, editingAllowed: editingAllowed, isExpanded: $isExpanded, showRecipeEditor: $showFoodEditor)
             } else {
                 Spacer()
