@@ -16,16 +16,18 @@ struct ScrollCommand: Equatable {
         let calendar = Calendar.current
         let currentHour = calendar.component(.hour, from: Date())
         
-        return ScrollCommand(hour: max(currentHour - 1, 0))
+        return ScrollCommand(hour: max(currentHour, 0))
     }
     
     static func scrollToHour(_ scrollProxy: ScrollViewProxy, hour: Int) {
         withAnimation {
-            scrollProxy.scrollTo("hour-\(hour)", anchor: .top)
+            let topPoint: UnitPoint = .top
+            scrollProxy.scrollTo("hour-\(hour)", anchor: .init(x: topPoint.x, y: topPoint.y + 0.1))
         }
     }
     
     static func scrollToHourNoAnimation(_ scrollProxy: ScrollViewProxy, hour: Int) {
-        scrollProxy.scrollTo("hour-\(hour)", anchor: .top)
+        let topPoint: UnitPoint = .top
+        scrollProxy.scrollTo("hour-\(hour)", anchor: .init(x: topPoint.x, y: topPoint.y + 0.1))
     }
 }
