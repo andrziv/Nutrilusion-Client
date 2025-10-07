@@ -72,7 +72,7 @@ struct LoggerView: View {
 
             Group {
                 if isShowingLoggingModal {
-                    LogNewItemView(viewModel: foodViewModel, logDate: Date()) {
+                    LogNewItemView(viewModel: foodViewModel, logDate: selectedDay.date) {
                         withAnimation {
                             isShowingLoggingModal = false
                         }
