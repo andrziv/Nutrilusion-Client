@@ -42,7 +42,10 @@ struct MealGroupView: View {
             RoundedRectangle(cornerRadius: 7, style: .continuous)
                 .fill(.primaryComplement)
         )
-        .animation(.spring(response: 0.5, dampingFraction: 0.75), value: isExpanded)
+        .animation(.spring(response: 0.5, dampingFraction: 0.8), value: isExpanded)
+        .onChange(of: group.foodIDs) {
+            isExpanded = !group.foodIDs.isEmpty
+        }
     }
 }
 

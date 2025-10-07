@@ -50,7 +50,7 @@ struct RecipeListView: View {
                 MealGroupView(viewModel: viewModel,
                               group: mealGroup,
                               editingAllowed: true,
-                              isExpanded: !mealGroup.foodIDs.isEmpty) { foodItem in
+                              isExpanded: true) { foodItem in
                     foodTapAction(mealGroup, foodItem)
                 } deleteGroupAction: { mealGroupToDelete in
                     viewModel.deleteGroup(mealGroupToDelete)
