@@ -95,6 +95,7 @@ struct LoggerView: View {
             .transition(.asymmetric(
                 insertion: .opacity.combined(with: .move(edge: .trailing)),
                 removal: .opacity.combined(with: .move(edge: .leading))))
+            .tapToHideKeyboard()
             
             SwappingVHStack(vSpacing: 8, hSpacing: 8, useHStack: !isShowingLoggingModal) {
                 DailyStatProgressView(mealItems: filteredSortedMeals)

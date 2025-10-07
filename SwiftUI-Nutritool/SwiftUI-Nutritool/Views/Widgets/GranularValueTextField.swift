@@ -51,6 +51,7 @@ struct GranularValueTextField: View {
                                horizontalPadding: 6,
                                verticalPadding: isUnitTextLong ? -1 : 5)
                 .focused($isFocused)
+                .keyboardType(.decimalPad)
                 .multilineTextAlignment(.center)
                 
                 if let unitText, !unitText.isEmpty {

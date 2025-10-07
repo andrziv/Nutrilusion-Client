@@ -102,10 +102,7 @@ struct RecipeEditorView: View {
                          background: LinearGradient(colors: [backgroundColour, .backgroundColour, .backgroundColour, .backgroundColour],
                                                     startPoint: .top,
                                                     endPoint: .bottom))
-        .onTapGesture {
-            // note: this nastiness is required becaused SwiftUI basically has no good way to deactivate a keyboard when tapping outside of it
-            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-        }
+        .tapToHideKeyboard()
     }
 }
 
