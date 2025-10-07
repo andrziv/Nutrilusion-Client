@@ -11,8 +11,12 @@ struct LoggedMealItemView<Content: View>: View {
     let loggedItem: LoggedMealItem
     let backgroundView: Content
     
-    private func amPm(hour: Int) -> String {
-        hour < 12 ? "AM" : "PM"
+    func formattedTime(from date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "h:mm a"
+        formatter.amSymbol = "AM"
+        formatter.pmSymbol = "PM"
+        return formatter.string(from: date)
     }
     
     var body: some View {
@@ -30,12 +34,7 @@ struct LoggedMealItemView<Content: View>: View {
                     
                     Spacer()
                     
-                    let calendar = Calendar.current
-                    let date = loggedItem.date
-                    let hour = calendar.component(.hour, from: date)
-                    let minute = calendar.component(.minute, from: date)
-                    
-                    Text("\(hour > 12 ? hour - 12 : hour):\(minute < 10 ? "0" : "")\(minute) \(amPm(hour: hour))")
+                    Text(formattedTime(from: loggedItem.date))
                         .font(.subheadline)
                         .fontWeight(.semibold)
                         .foregroundStyle(Color(red: 0.85, green: 0.85, blue: 0.85))

@@ -57,6 +57,7 @@ struct LoggerView: View {
     )
     
     @State private var isShowingLoggingModal: Bool = false
+    @State private var scollTarget: ScrollCommand = ScrollCommand(hour: ScrollCommand.recentHour())
     
     var body: some View {
         let filteredMeals = foodViewModel.loggedMeals.filter {
@@ -66,7 +67,7 @@ struct LoggerView: View {
         let filteredSortedMeals = filteredMeals.sorted { $0.date < $1.date }
         
         VStack {
-            WeekDayButtonSet(selectedDay: $selectedDay, isShowingLoggingModal: $isShowingLoggingModal)
+            WeekDayButtonSet(selectedDay: $selectedDay, isShowingLoggingModal: $isShowingLoggingModal, scollTarget: $scollTarget)
                 .frame(maxWidth: .infinity)
 
             Group {
@@ -78,13 +79,17 @@ struct LoggerView: View {
                     } finalizeCreation: { loggedItem in
                         foodViewModel.addLoggedMeal(loggedItem)
                         isShowingLoggingModal = false
+                        scollTarget = ScrollCommand(hour: Calendar.current.component(.hour, from: loggedItem.date))
                     }
                 } else {
                     VStack(spacing: 0) {
                         TimelineLogHeader(selectedDay: selectedDay)
                             .padding([.trailing, .leading], 15)
                         
-                        TimelineLogView(selectedDate: selectedDay.date, loggedMealItems: filteredSortedMeals, isHidden: $isShowingLoggingModal) { deletedItem in
+                        TimelineLogView(selectedDate: selectedDay.date,
+                                        loggedMealItems: filteredSortedMeals,
+                                        isHidden: $isShowingLoggingModal,
+                                        scrollCommand: $scollTarget) { deletedItem in
                             foodViewModel.removeLoggedMeal(deletedItem)
                         }
                     }
@@ -119,6 +124,7 @@ struct LoggerView: View {
 struct WeekDayButtonSet: View {
     @Binding fileprivate var selectedDay: SelectedDay
     @Binding var isShowingLoggingModal: Bool
+    @Binding var scollTarget: ScrollCommand
     
     private func positionType(_ index: Int) -> Position {
         if index == 0 {
@@ -146,6 +152,7 @@ struct WeekDayButtonSet: View {
                     if selectedDay.day == day {
                         withAnimation {
                             isShowingLoggingModal = false
+                            scollTarget = ScrollCommand(hour: ScrollCommand.recentHour())
                         }
                         return
                     }

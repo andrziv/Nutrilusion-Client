@@ -11,6 +11,7 @@ struct TimelineLogView: View {
     let selectedDate: Date
     let loggedMealItems: [LoggedMealItem]
     @Binding var isHidden: Bool
+    @Binding var scrollCommand: ScrollCommand
     
     let deleteAction: (LoggedMealItem) -> Void
     
@@ -27,7 +28,7 @@ struct TimelineLogView: View {
     private var hourSpacing: CGFloat {
         defaultHourSpacing * timeSlotScale
     }
-    
+
     var body: some View {
         let animBackground = AnimatedBackgroundGradient(colours: [
             whiteness, whiteness, whiteness, .clear,
@@ -49,24 +50,18 @@ struct TimelineLogView: View {
                     }
                 }
                 .scrollIndicators(.hidden)
+                .onChange(of: scrollCommand) { _, command in
+                    ScrollCommand.scrollToHour(scrollProxy, hour: command.hour)
+                }
                 .onAppear {
-                    if !initialScrollPerformed {
-                        let calendar = Calendar.current
-                        let currentHour = calendar.component(.hour, from: Date())
-                        
-                        // target one hour before current for user to see a recent time
-                        let targetHour = max(currentHour - 1, 0)
-                        
-                        scrollProxy.scrollTo("hour-\(targetHour)", anchor: .top)
-                        initialScrollPerformed = true
-                    }
+                    ScrollCommand.scrollToHour(scrollProxy, hour: scrollCommand.hour)
                 }
             }
         }
     }
 }
 
-struct TimelineDayView<Content: View>: View {
+private struct TimelineDayView<Content: View>: View {
     let loggedMealItems: [LoggedMealItem]
     let selectedDate: Date
     let deleteAction: (LoggedMealItem) -> Void
@@ -75,7 +70,7 @@ struct TimelineDayView<Content: View>: View {
     
     var body: some View {
         VStack(alignment: .trailing, spacing: hourSpacing) {
-            ForEach(0..<25) { hour in
+            ForEach(0..<24) { hour in
                 TimelineHourView(hour: hour,
                                  loggedMealItems: loggedMealItems,
                                  deleteAction: deleteAction,
@@ -86,19 +81,17 @@ struct TimelineDayView<Content: View>: View {
     }
 }
 
-struct TimelineHourView<Content: View>: View {
+private struct TimelineHourView<Content: View>: View {
     let hour: Int
-    var formattedHour: String = "%d:00"
     let loggedMealItems: [LoggedMealItem]
     let deleteAction: (LoggedMealItem) -> Void
     let backgroundView: Content
     
     private var timeString: String {
-        String(format: formattedHour, hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour))
-    }
-    
-    private var amPm: String {
-        hour < 12 ? "AM" : "PM"
+        let minutes = "00"
+        let twelveHour = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour)
+        let period = hour < 12 ? "AM" : "PM"
+        return "\(twelveHour):\(minutes)\(period)"
     }
     
     var body: some View {
@@ -108,7 +101,7 @@ struct TimelineHourView<Content: View>: View {
         
         VStack {
             HStack {
-                Text(timeString + amPm)
+                Text(timeString)
                     .font(.footnote)
                     .fontWeight(.semibold)
                     .foregroundStyle(.secondaryText)
@@ -130,7 +123,7 @@ struct TimelineHourView<Content: View>: View {
     }
 }
 
-struct TimelineHourStatView: View {
+private struct TimelineHourStatView: View {
     var mealItems: [LoggedMealItem]
     
     var body: some View {
@@ -172,7 +165,7 @@ struct TimelineHourStatView: View {
     }
 }
 
-struct TotalNutrientStatView: View {
+private struct TotalNutrientStatView: View {
     var nutrientOfInterest: String
     var mealItems: [LoggedMealItem]
     
@@ -186,7 +179,10 @@ struct TotalNutrientStatView: View {
 }
 
 #Preview{
-    TimelineLogView(selectedDate: Date(), loggedMealItems: MockData.loggedMeals, isHidden: .constant(false)) { _ in
+    TimelineLogView(selectedDate: Date(),
+                    loggedMealItems: MockData.loggedMeals,
+                    isHidden: .constant(false),
+                    scrollCommand: .constant(ScrollCommand(hour: 0))) { _ in
         
     }
 }
