@@ -78,8 +78,10 @@ struct LoggerView: View {
                         }
                     } finalizeCreation: { loggedItem in
                         foodViewModel.addLoggedMeal(loggedItem)
-                        isShowingLoggingModal = false
                         scollTarget = ScrollCommand(hour: Calendar.current.component(.hour, from: loggedItem.date))
+                        withAnimation {
+                            isShowingLoggingModal = false
+                        }
                     }
                 } else {
                     VStack(spacing: 0) {
