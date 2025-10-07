@@ -19,19 +19,19 @@ func getCalories(_ food: LoggedMealItem) -> Double {
     return food.servingMultiple * Double(food.meal.calories)
 }
 
-func sumNutrients(_ nutrientType: String, _ foods: [LoggedMealItem]) -> Double {
-    var totalNutrient = 0.0
+func sumNutrients(_ nutrientType: String, _ foods: [LoggedMealItem]) -> (Double, NutrientUnit) {
+    var totalNutrientGrams = 0.0
     for food in foods {
-        totalNutrient += getNutrientValue(nutrientType, food)
+        totalNutrientGrams += getNutrientValueGrams(nutrientType, food)
     }
-    return totalNutrient
+    
+    let bestUnit = NutrientUnit.bestUnit(for: totalNutrientGrams)
+    return (NutrientUnit.grams.convertTo(totalNutrientGrams, to: bestUnit), bestUnit)
 }
 
-func getNutrientValue(_ nutrientType: String, _ food: LoggedMealItem) -> Double {
+private func getNutrientValueGrams(_ nutrientType: String, _ food: LoggedMealItem) -> Double {
     if let nutrient = food.meal.getNutrient(nutrientType) {
-        return food.servingMultiple * nutrient.amount
+        return food.servingMultiple * nutrient.unit.convertTo(nutrient.amount, to: NutrientUnit.grams)
     }
     return 0
 }
-
-

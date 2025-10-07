@@ -20,6 +20,14 @@ enum NutrientUnit: String, Codable, CustomStringConvertible, CaseIterable, Ident
         }
     }
     
+    public var shortDescription: String {
+        switch self {
+        case .grams:  return ""
+        case .milligrams: return "m"
+        case .micrograms: return "µ"
+        }
+    }
+    
     func convertTo(_ value: Double, to: NutrientUnit = .grams) -> Double {
         return (value * self.unitValue) / to.unitValue
     }

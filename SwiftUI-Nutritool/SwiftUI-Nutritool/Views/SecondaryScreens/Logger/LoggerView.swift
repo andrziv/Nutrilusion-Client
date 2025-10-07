@@ -69,7 +69,7 @@ struct LoggerView: View {
         VStack {
             WeekDayButtonSet(selectedDay: $selectedDay, isShowingLoggingModal: $isShowingLoggingModal, scollTarget: $scollTarget)
                 .frame(maxWidth: .infinity)
-
+            
             Group {
                 if isShowingLoggingModal {
                     LogNewItemView(viewModel: foodViewModel, logDate: selectedDay.date) {
@@ -234,9 +234,9 @@ private struct ScaledTotalNutrientStatView: View {
                   systemImage: NutrientSymbolMapper.shared.symbol(for: "Calories"))
             .labelStyle(CustomLabel(spacing: 3))
         } else {
-            Label(RoundingDouble(sumNutrients(nutrientOfInterest, mealItems)),
-                  systemImage: NutrientSymbolMapper.shared.symbol(for: nutrientOfInterest))
-            .labelStyle(CustomLabel(spacing: 3))
+            let nutrientSumInfo = sumNutrients(nutrientOfInterest, mealItems)
+            NutrientItemImageView(nutrientName: nutrientOfInterest, amount: nutrientSumInfo.0, unit: nutrientSumInfo.1)
+                .labelStyle(CustomLabel(spacing: 3))
         }
     }
 }

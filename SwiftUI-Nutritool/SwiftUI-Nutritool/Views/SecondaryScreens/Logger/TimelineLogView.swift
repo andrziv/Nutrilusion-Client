@@ -28,7 +28,7 @@ struct TimelineLogView: View {
     private var hourSpacing: CGFloat {
         defaultHourSpacing * timeSlotScale
     }
-
+    
     var body: some View {
         let animBackground = AnimatedBackgroundGradient(colours: [
             whiteness, whiteness, whiteness, .clear,
@@ -173,7 +173,8 @@ private struct TotalNutrientStatView: View {
         if nutrientOfInterest == "Calories" {
             Label(RoundingDouble(sumCalories(mealItems)), systemImage: NutrientSymbolMapper.shared.symbol(for: "Calories"))
         } else {
-            Label(RoundingDouble(sumNutrients(nutrientOfInterest, mealItems)), systemImage: NutrientSymbolMapper.shared.symbol(for: nutrientOfInterest))
+            let nutrientSumInfo = sumNutrients(nutrientOfInterest, mealItems)
+            NutrientItemImageView(nutrientName: nutrientOfInterest, amount: nutrientSumInfo.0, unit: nutrientSumInfo.1)
         }
     }
 }

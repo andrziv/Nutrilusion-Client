@@ -22,7 +22,10 @@ struct NutrientItemView: View {
     var body: some View {
         switch viewType {
         case .img:
-            Label(RoundingDouble(nutrientOfInterest.amount * multiplier), systemImage: NutrientSymbolMapper.shared.symbol(for: nutrientOfInterest.name))
+            let amountInGrams = nutrientOfInterest.unit.convertTo(multiplier * nutrientOfInterest.amount, to: .grams)
+            let bestUnit = NutrientUnit.bestUnit(for: amountInGrams)
+            let amount = NutrientUnit.grams.convertTo(amountInGrams, to: bestUnit)
+            NutrientItemImageView(nutrientName: nutrientOfInterest.name, amount: amount, unit: bestUnit)
                 .foregroundStyle(primaryTextColor)
         case .txt:
             HStack {
@@ -38,28 +41,23 @@ struct NutrientItemView: View {
     }
 }
 
-struct MealNutrientItemView: View {
-    let nutrientOfInterest: NutrientItem
-    var mealItem: LoggedMealItem
-    var viewType : StatViewType = .img
-    var primaryTextColor: Color = .primaryText
-    var secondaryTextColor: Color = .secondaryText
+struct NutrientItemImageView: View {
+    let nutrientName: String
+    let amount: Double
+    let unit: NutrientUnit
     
     var body: some View {
-        switch viewType {
-        case .img:
-            Label(RoundingDouble(mealItem.servingMultiple * nutrientOfInterest.amount), systemImage: NutrientSymbolMapper.shared.symbol(for: nutrientOfInterest.name))
-                .foregroundStyle(primaryTextColor)
-        case .txt:
-            HStack {
-                Text("\(nutrientOfInterest.name)")
-                    .foregroundStyle(primaryTextColor)
-                
-                Spacer()
-                
-                Text("\(RoundingDouble(mealItem.servingMultiple * nutrientOfInterest.amount)) \(nutrientOfInterest.unit.description)")
-                    .foregroundStyle(secondaryTextColor)
+        Label {
+            HStack(alignment: .firstTextBaseline, spacing: 0) {
+                Text(RoundingDouble(amount))
+                if !unit.shortDescription.isEmpty{
+                    Text(unit.shortDescription)
+                        .font(.system(size: 10, weight: .semibold))
+                        .italic()
+                }
             }
+        } icon: {
+            Image(systemName: NutrientSymbolMapper.shared.symbol(for: nutrientName))
         }
     }
 }
@@ -90,42 +88,17 @@ struct CalorieStatView: View {
     }
 }
 
-struct MealCalorieStatView: View {
-    let mealItem: LoggedMealItem
-    var viewType : StatViewType = .img
-    var primaryTextColor: Color = .primaryText
-    var secondaryTextColor: Color = .secondaryText
-    
-    var body: some View {
-        switch viewType {
-        case .img:
-            Label(RoundingDouble(mealItem.servingMultiple * Double(mealItem.meal.calories)), systemImage: NutrientSymbolMapper.shared.symbol(for: "Calories"))
-                .foregroundStyle(primaryTextColor)
-        case .txt:
-            HStack {
-                Text("Calories")
-                    .foregroundStyle(primaryTextColor)
-                
-                Spacer()
-                
-                Text("\(RoundingDouble(mealItem.servingMultiple * Double(mealItem.meal.calories))) kcal")
-                    .foregroundStyle(secondaryTextColor)
-            }
-        }
-    }
-}
-
 struct ServingSizeView: View {
     let foodItem: FoodItem
+    var multiplier: Double = 1
     var viewType : StatViewType = .img
     var primaryTextColor: Color = .primaryText
     var secondaryTextColor: Color = .secondaryText
     
     var body: some View {
-        
         switch viewType {
         case .img:
-            Label(ServingSizeText(foodItem), systemImage: "dot.square")
+            Label(ServingSizeText(foodItem, multiplier: multiplier), systemImage: "dot.square")
                 .foregroundStyle(primaryTextColor)
         case .txt:
             HStack {
@@ -134,36 +107,7 @@ struct ServingSizeView: View {
                 
                 Spacer()
                 
-                Text(ServingSizeText(foodItem))
-                    .foregroundStyle(secondaryTextColor)
-            }
-        }
-    }
-}
-
-struct MealServingSizeView: View {
-    let mealItem: LoggedMealItem
-    var viewType : StatViewType = .img
-    var primaryTextColor: Color = .primaryText
-    var secondaryTextColor: Color = .secondaryText
-    
-    var body: some View {
-        let servingTotal = mealItem.servingMultiple * mealItem.meal.servingAmount
-        let isUnitMultiple = servingTotal > 1
-        switch viewType {
-        case .img:
-            Label("\(RoundingDouble(servingTotal)) " +
-                  "\(isUnitMultiple ? mealItem.meal.servingUnitMultiple : mealItem.meal.servingUnit)",
-                  systemImage: "dot.square")
-            .foregroundStyle(primaryTextColor)
-        case .txt:
-            HStack {
-                Text("Serving Size")
-                    .foregroundStyle(primaryTextColor)
-                
-                Spacer()
-                
-                Text("\(RoundingDouble(servingTotal)) \(isUnitMultiple ? mealItem.meal.servingUnitMultiple : mealItem.meal.servingUnit)")
+                Text(ServingSizeText(foodItem, multiplier: multiplier))
                     .foregroundStyle(secondaryTextColor)
             }
         }

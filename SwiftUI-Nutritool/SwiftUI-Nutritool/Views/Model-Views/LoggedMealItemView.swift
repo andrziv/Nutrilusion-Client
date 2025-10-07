@@ -43,16 +43,22 @@ struct LoggedMealItemView<Content: View>: View {
                 let shownNutrients = min(3, loggedItem.importantNutrients.count)
                 VStack(alignment: .leading) {
                     HStack(spacing: 15) {
-                        MealCalorieStatView(mealItem: loggedItem, primaryTextColor: Color(red: 0.85, green: 0.85, blue: 0.85))
-                            .labelStyle(CustomLabel(spacing: 7))
+                        CalorieStatView(foodItem: loggedItem.meal,
+                                        multiplier: loggedItem.servingMultiple,
+                                        primaryTextColor: Color(red: 0.85, green: 0.85, blue: 0.85))
+                        .labelStyle(CustomLabel(spacing: 7))
                         ForEach(0..<shownNutrients, id: \.self) { index in
-                            MealNutrientItemView(nutrientOfInterest: loggedItem.importantNutrients[index], mealItem: loggedItem, primaryTextColor: Color(red: 0.85, green: 0.85, blue: 0.85))
-                                .labelStyle(CustomLabel(spacing: 7))
+                            NutrientItemView(nutrientOfInterest: loggedItem.importantNutrients[index],
+                                             multiplier: loggedItem.servingMultiple,
+                                             primaryTextColor: Color(red: 0.85, green: 0.85, blue: 0.85))
+                            .labelStyle(CustomLabel(spacing: 7))
                         }
                     }
                     
-                    MealServingSizeView(mealItem: loggedItem, primaryTextColor: Color(red: 0.85, green: 0.85, blue: 0.85))
-                        .labelStyle(CustomLabel(spacing: 5))
+                    ServingSizeView(foodItem: loggedItem.meal,
+                                    multiplier: loggedItem.servingMultiple,
+                                    primaryTextColor: Color(red: 0.85, green: 0.85, blue: 0.85))
+                    .labelStyle(CustomLabel(spacing: 5))
                 }
                 .font(.footnote)
             }
