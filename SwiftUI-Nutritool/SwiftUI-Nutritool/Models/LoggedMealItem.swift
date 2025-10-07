@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct LoggedMealItem {
+struct LoggedMealItem: Identifiable, Equatable {
     var id: UUID = UUID()
     var date: Date = Date()
     var meal: FoodItem

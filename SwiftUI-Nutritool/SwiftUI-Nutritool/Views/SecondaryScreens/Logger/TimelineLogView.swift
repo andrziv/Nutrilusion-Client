@@ -77,6 +77,7 @@ private struct TimelineDayView<Content: View>: View {
                                  backgroundView: backgroundView)
             }
         }
+        .animation(.spring(response: 0.4, dampingFraction: 0.9), value: loggedMealItems)
         .padding(.bottom, 40)
     }
 }
@@ -118,6 +119,8 @@ private struct TimelineHourView<Content: View>: View {
                     }
                 }
             }
+            .animation(.spring(response: 0.35, dampingFraction: 0.9), value: filteredHourMealItems)
+            .clipped()
         }
         .padding(.vertical, filteredHourMealItems.isEmpty ? 15 : 0)
     }
@@ -127,15 +130,15 @@ private struct TimelineHourStatView: View {
     var mealItems: [LoggedMealItem]
     
     var body: some View {
-        if mealItems.count > 0 {
-            HStack(spacing: 8) {
-                Line()
-                    .stroke(style: StrokeStyle(lineWidth: 1, dash: [5]))
-                    .fill(.secondaryText)
-                    .frame(height: 1)
-                    .frame(maxWidth: .infinity)
-                    .layoutPriority(0)
-                
+        HStack(spacing: 8) {
+            Line()
+                .stroke(style: StrokeStyle(lineWidth: 1, dash: [5]))
+                .fill(.secondaryText)
+                .frame(height: 1)
+                .frame(maxWidth: .infinity)
+                .layoutPriority(0)
+            
+            if mealItems.count > 0 {
                 HStack {
                     TotalNutrientStatView(nutrientOfInterest: "Calories", mealItems: mealItems)
                     TotalNutrientStatView(nutrientOfInterest: "Proteins", mealItems: mealItems)
@@ -147,7 +150,7 @@ private struct TimelineHourStatView: View {
                 .padding(.horizontal, 5)
                 .background(.clear)
                 .clipShape(RoundedRectangle(cornerRadius: 15))
-                .layoutPriority(1)  // priority for no info squashing between lines
+                .layoutPriority(1)
                 
                 Line()
                     .stroke(style: StrokeStyle(lineWidth: 1, dash: [5]))
@@ -156,11 +159,6 @@ private struct TimelineHourStatView: View {
                     .frame(maxWidth: .infinity)
                     .layoutPriority(0)
             }
-        } else {
-            Line()
-                .stroke(style: StrokeStyle(lineWidth: 1, dash: [5]))
-                .fill(.secondaryText)
-                .frame(height: 1)
         }
     }
 }
