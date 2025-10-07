@@ -123,7 +123,7 @@ struct LoggerView: View {
     }
 }
 
-struct WeekDayButtonSet: View {
+private struct WeekDayButtonSet: View {
     @Binding fileprivate var selectedDay: SelectedDay
     @Binding var isShowingLoggingModal: Bool
     @Binding var scollTarget: ScrollCommand
@@ -175,7 +175,7 @@ struct WeekDayButtonSet: View {
     }
 }
 
-struct TimelineLogHeader: View {
+private struct TimelineLogHeader: View {
     fileprivate let selectedDay: SelectedDay
     
     var body: some View {
@@ -192,7 +192,7 @@ struct TimelineLogHeader: View {
     }
 }
 
-struct DailyStatProgressView: View {
+private struct DailyStatProgressView: View {
     var mealItems: [LoggedMealItem]
     
     var body: some View {
@@ -206,7 +206,7 @@ struct DailyStatProgressView: View {
     }
 }
 
-struct DailyNutrientProgressView: View {
+private struct DailyNutrientProgressView: View {
     var nutrientOfInterest: String
     var mealItems: [LoggedMealItem]
     var progress: Double = 1
@@ -224,7 +224,7 @@ struct DailyNutrientProgressView: View {
     }
 }
 
-struct ScaledTotalNutrientStatView: View {
+private struct ScaledTotalNutrientStatView: View {
     var nutrientOfInterest: String
     var mealItems: [LoggedMealItem]
     
