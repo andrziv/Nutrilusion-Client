@@ -54,7 +54,7 @@ struct TimelineLogView: View {
                     ScrollCommand.scrollToHour(scrollProxy, hour: command.hour)
                 }
                 .onAppear {
-                    ScrollCommand.scrollToHour(scrollProxy, hour: scrollCommand.hour)
+                    ScrollCommand.scrollToHourNoAnimation(scrollProxy, hour: scrollCommand.hour)
                 }
             }
         }

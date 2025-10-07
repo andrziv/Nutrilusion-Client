@@ -12,25 +12,20 @@ struct ScrollCommand: Equatable {
     let hour: Int
     let id = UUID()
     
-    static func recentHour() -> Int {
+    static func recentHourCommand() -> ScrollCommand {
         let calendar = Calendar.current
         let currentHour = calendar.component(.hour, from: Date())
         
-        return max(currentHour - 1, 0)
-    }
-    
-    static func scrollToRecentHour(_ scrollProxy: ScrollViewProxy) {
-        // target one hour before current for user to see a recent time
-        let targetHour = recentHour()
-
-        withAnimation {
-            scrollProxy.scrollTo("hour-\(targetHour)", anchor: .top)
-        }
+        return ScrollCommand(hour: max(currentHour - 1, 0))
     }
     
     static func scrollToHour(_ scrollProxy: ScrollViewProxy, hour: Int) {
         withAnimation {
             scrollProxy.scrollTo("hour-\(hour)", anchor: .top)
         }
+    }
+    
+    static func scrollToHourNoAnimation(_ scrollProxy: ScrollViewProxy, hour: Int) {
+        scrollProxy.scrollTo("hour-\(hour)", anchor: .top)
     }
 }

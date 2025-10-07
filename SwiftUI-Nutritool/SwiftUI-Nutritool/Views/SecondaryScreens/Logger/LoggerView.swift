@@ -57,7 +57,7 @@ struct LoggerView: View {
     )
     
     @State private var isShowingLoggingModal: Bool = false
-    @State private var scollTarget: ScrollCommand = ScrollCommand(hour: ScrollCommand.recentHour())
+    @State private var scollTarget: ScrollCommand = ScrollCommand.recentHourCommand()
     
     var body: some View {
         let filteredMeals = foodViewModel.loggedMeals.filter {
@@ -154,7 +154,7 @@ struct WeekDayButtonSet: View {
                     if selectedDay.day == day {
                         withAnimation {
                             isShowingLoggingModal = false
-                            scollTarget = ScrollCommand(hour: ScrollCommand.recentHour())
+                            scollTarget = ScrollCommand.recentHourCommand()
                         }
                         return
                     }
