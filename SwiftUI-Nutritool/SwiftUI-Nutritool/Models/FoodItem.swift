@@ -216,7 +216,8 @@ struct FoodItem: Identifiable, Equatable {
     ///   - addNutrients: If set to `true`, the addition of the ingredient will result in the ingredient's nutrients being added to the caller's nutrition info. If a nutrient does not exist within the caller's nutrient tree, the nutrient will be added outright.
     mutating func addIngredient(_ ingredient: FoodItem, addNutrients: Bool = true) {
         ingredientList.append(IngredientEntry(ingredient: ingredient, servingMultiplier: 1))
-        calories += max(0, ingredient.calories)
+        
+        modifyCaloriesBy(amount: ingredient.calories)
         
         if addNutrients {
             for nutrient in ingredient.nutritionList {
@@ -238,7 +239,8 @@ struct FoodItem: Identifiable, Equatable {
         guard ingredientList.first(where: { $0.id == ingredient.id }) != nil else { return }
         
         let difference = newMultiplier - oldMultiplier
-        calories += max(0, Int(difference * Double(ingredient.ingredient.calories)))
+        let amountToModifyCaloriesBy = difference * Double(ingredient.ingredient.calories)
+        modifyCaloriesBy(amount: amountToModifyCaloriesBy)
         
         for nutrient in ingredient.ingredient.getAllNutrients() {
             for index in nutritionList.indices {
@@ -261,8 +263,9 @@ struct FoodItem: Identifiable, Equatable {
         guard let existsAtIndex = ingredientList.firstIndex(where: { $0.id == ingredient.id }) else { return }
         
         ingredientList.remove(at: existsAtIndex)
-        calories -= Int(ingredient.servingMultiplier * Double(ingredient.ingredient.calories))
-        calories = max(0, calories)
+        
+        let amountToModifyCaloriesBy = -ingredient.servingMultiplier * Double(ingredient.ingredient.calories)
+        modifyCaloriesBy(amount: amountToModifyCaloriesBy)
         
         if subtractNutrients {
             for nutrient in ingredient.ingredient.nutritionList {
@@ -326,6 +329,15 @@ struct FoodItem: Identifiable, Equatable {
                 return
             }
         }
+    }
+    
+    private mutating func modifyCaloriesBy(amount: Double) {
+        modifyCaloriesBy(amount: Int(amount))
+    }
+    
+    private mutating func modifyCaloriesBy(amount: Int) {
+        calories += amount
+        calories = max(0, calories)
     }
 }
 
