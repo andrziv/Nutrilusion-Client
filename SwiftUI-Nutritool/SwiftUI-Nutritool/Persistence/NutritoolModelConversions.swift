@@ -62,7 +62,7 @@ extension LoggedMealItemEntity {
             meal: self.meal!.toModel(),
             servingMultiple: self.servingMultiple,
             importantNutrients: (self.importantNutrients as? Set<NutrientItemEntity>)?.map({ $0.toModel() }) ?? [],
-            emblemColour: Color(hex: self.emblemColour!)
+            emblemColour: self.emblemColour ?? "ffffff"
         )
     }
     
@@ -70,7 +70,7 @@ extension LoggedMealItemEntity {
         self.id = model.id
         self.date = model.date
         self.servingMultiple = model.servingMultiple
-        self.emblemColour = model.emblemColour.toHex()
+        self.emblemColour = model.emblemColour
         
         var unusedOldMeal: FoodItemVersionEntity? = nil
         if let currentMeal = self.meal, !currentMeal.isEquivalent(to: model.meal) {

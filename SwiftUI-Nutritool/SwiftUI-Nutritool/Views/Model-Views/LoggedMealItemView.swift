@@ -20,8 +20,6 @@ struct LoggedMealItemView<Content: View>: View {
     }
     
     var body: some View {
-        let emblem = loggedItem.emblemColour
-        
         ZStack {
             backgroundView
             
@@ -64,7 +62,7 @@ struct LoggedMealItemView<Content: View>: View {
             }
             .padding()
         }
-        .background(emblem)
+        .background(loggedItem.getColour())
         .clipShape(RoundedRectangle(cornerRadius: 7))
     }
 }

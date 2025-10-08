@@ -8,7 +8,7 @@
 import Foundation
 
 // Used for both Recipes and Ingredients
-struct FoodItem: Identifiable, Equatable {
+struct FoodItem: Identifiable, Equatable, Codable {
     var id: String
     let foodItemID: UUID
     var version: Int

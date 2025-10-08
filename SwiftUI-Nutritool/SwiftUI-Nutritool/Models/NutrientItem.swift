@@ -56,7 +56,7 @@ enum NutrientUnit: String, Codable, CustomStringConvertible, CaseIterable, Ident
     }
 }
 
-struct NutrientItem: Identifiable, Equatable {
+struct NutrientItem: Identifiable, Equatable, Codable {
     var id: String
     let nutrientID: UUID
     var version: Int

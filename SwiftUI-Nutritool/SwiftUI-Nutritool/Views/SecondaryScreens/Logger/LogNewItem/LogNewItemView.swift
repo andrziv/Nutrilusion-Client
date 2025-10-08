@@ -122,7 +122,7 @@ private struct LoggedMealPreviewView: View {
                                                    meal: foodItem,
                                                    servingMultiple: servingSize,
                                                    importantNutrients: importantNutrients,
-                                                   emblemColour: colourPicked)
+                                                   emblemColour: colourPicked.toHex())
             LoggedMealItemView(loggedItem: previewLoggedItem, backgroundView: animBackground)
                 .padding()
             
@@ -220,7 +220,7 @@ private struct LoggerActionButtonSet: View {
                                                   meal: chosenFoodItem,
                                                   servingMultiple: servingsLogged,
                                                   importantNutrients: importantNutrients,
-                                                  emblemColour: colour),
+                                                  emblemColour: colour.toHex()),
                              action: finalizeCreation)
             }
         }

@@ -10,9 +10,22 @@
 		615F5C0F2E6DF9E9006F0CE4 /* SwiftUI-Nutritool.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SwiftUI-Nutritool.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		6117FAD42E95F6E8008B1834 /* Exceptions for "SwiftUI-Nutritool" folder in "SwiftUI-Nutritool" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 615F5C0E2E6DF9E9006F0CE4 /* SwiftUI-Nutritool */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		615F5C112E6DF9E9006F0CE4 /* SwiftUI-Nutritool */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				6117FAD42E95F6E8008B1834 /* Exceptions for "SwiftUI-Nutritool" folder in "SwiftUI-Nutritool" target */,
+			);
 			path = "SwiftUI-Nutritool";
 			sourceTree = "<group>";
 		};
@@ -258,6 +271,7 @@
 				DEVELOPMENT_TEAM = 3Y57J4BS6G;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "SwiftUI-Nutritool/Info.plist";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Camera access is required to scan nutrition labels.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -288,6 +302,7 @@
 				DEVELOPMENT_TEAM = 3Y57J4BS6G;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "SwiftUI-Nutritool/Info.plist";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Camera access is required to scan nutrition labels.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
