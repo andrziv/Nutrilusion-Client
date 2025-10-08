@@ -9,31 +9,23 @@
 import SwiftUI
 
 struct CameraImporterModeView: View {
-    @Binding var foodItem: FoodItem
+    let successfulReturn: (FoodItem) -> Void
     @State private var intermediateResult: FoodItem?
-    
-    init(foodItem: Binding<FoodItem>) {
-        self._foodItem = foodItem
-        self.intermediateResult = foodItem.wrappedValue
-    }
     
     var body: some View {
         VStack {
-            if intermediateResult != nil {
-                NutrientEditorModeView(foodItem: $foodItem)
-                    .padding(10)
-            } else {
+            if intermediateResult == nil {
                 NutritionScannerView(foodItem: $intermediateResult)
             }
         }
         .onChange(of: intermediateResult) { _, newValue in
-            if let newValue = newValue {
-                foodItem = newValue 
+            if let newValue {
+                successfulReturn(newValue)
             }
         }
     }
 }
 
 #Preview {
-    CameraImporterModeView(foodItem: .constant(MockData.sampleFoodItem))
+    CameraImporterModeView() { _ in }
 }

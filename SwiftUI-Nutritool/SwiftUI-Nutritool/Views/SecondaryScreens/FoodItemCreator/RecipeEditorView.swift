@@ -91,7 +91,7 @@ struct RecipeEditorView: View {
             .padding(10)
             .background(RoundedRectangle(cornerRadius: 7).fill(.primaryComplement))
             
-            ContentView(foodItem: $draftFoodItem, viewModel: viewModel, mode: selectedMode)
+            ContentView(foodItem: $draftFoodItem, viewModel: viewModel, mode: $selectedMode)
                 .background(RoundedRectangle(cornerRadius: 7).fill(.primaryComplement))
                 .clipShape(RoundedRectangle(cornerRadius: 7))
             
@@ -268,7 +268,18 @@ private struct ModeSwitcherView: View {
 private struct ContentView: View {
     @Binding var foodItem: FoodItem
     let viewModel: NutriToolFoodViewModel
-    var mode: RecipeEditorMode
+    @Binding var mode: RecipeEditorMode
+    
+    private func merge(with other: FoodItem) -> FoodItem {
+        var result = other
+        
+        result.name = foodItem.name
+        result.servingAmount = foodItem.servingAmount
+        result.servingUnit = foodItem.servingUnit
+        result.servingUnitMultiple = foodItem.servingUnitMultiple
+        
+        return result
+    }
     
     var body: some View {
         switch mode {
@@ -279,7 +290,10 @@ private struct ContentView: View {
             IngredientEditorModeView(draftFoodItem: $foodItem, viewModel: viewModel)
                 .padding(10)
         case .camera:
-            CameraImporterModeView(foodItem: $foodItem)
+            CameraImporterModeView() { scannedFood in
+                foodItem = merge(with: scannedFood)
+                mode = .nutrient
+            }
         }
     }
 }
