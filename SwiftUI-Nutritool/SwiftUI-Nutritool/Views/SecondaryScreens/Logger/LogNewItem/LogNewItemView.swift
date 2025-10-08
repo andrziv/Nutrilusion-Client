@@ -19,58 +19,63 @@ private enum LogItemViewMode: Identifiable {
 }
 
 struct LogNewItemView: View {
-    @ObservedObject var viewModel: NutriToolFoodViewModel
-    @State var logDate: Date
-    @State private var chosenFoodItem: FoodItem? = nil
-    @State private var importantNutrients: [NutrientItem] = []
-    @State private var servingsLogged: Double = 1
-    @State private var colour: Color = .gray
+    @ObservedObject private var viewModel: NutriToolFoodViewModel
+    @State private var draftLoggedMealItem: LoggedMealItem
+    @State private var chosenFoodItem: FoodItem?
     
-    @State private var mode: LogItemViewMode? = nil
-    @State private var choosingNutrients: Bool = false
+    private let exitWithoutComplete: () -> Void
+    private let finalizeCreation: (LoggedMealItem) -> Void
     
-    let exitWithoutComplete: () -> Void
-    let finalizeCreation: (LoggedMealItem) -> Void
+    @State private var mode: LogItemViewMode?
+    @State private var choosingNutrients: Bool
+    
+    init(viewModel: NutriToolFoodViewModel,
+         date: Date, loggedMealItem: LoggedMealItem? = nil,
+         exitWithoutComplete: @escaping () -> Void,
+         finalizeCreation: @escaping (LoggedMealItem) -> Void) {
+        self.viewModel = viewModel
+        self.draftLoggedMealItem = loggedMealItem ?? LogNewItemView.generateLoggedMeal(with: date)
+        self.chosenFoodItem = loggedMealItem?.meal
+        
+        self.exitWithoutComplete = exitWithoutComplete
+        self.finalizeCreation = finalizeCreation
+        
+        self.mode = nil
+        self.choosingNutrients = false
+    }
+    
+    private static func generateLoggedMeal(with date: Date) -> LoggedMealItem {
+        LoggedMealItem(date: date, meal: FoodItem(name: ""), emblemColour: Color.gray.toHex())
+    }
     
     private func switchChosenFood(mealGroup: MealGroup?, foodItem: FoodItem) {
         chosenFoodItem = foodItem
+        draftLoggedMealItem.meal = foodItem
         if let selectedGroup = mealGroup {
-            colour = Color(hex: selectedGroup.colour)
+            draftLoggedMealItem.emblemColour = selectedGroup.colour
         }
-        importantNutrients = []
+        draftLoggedMealItem.importantNutrients = []
         self.mode = nil
     }
     
     var body: some View {
         VStack {
             VStack {
-                LoggedMealPreviewView(chosenFoodItem: chosenFoodItem,
-                                      logDate: logDate,
-                                      servingSize: servingsLogged,
-                                      importantNutrients: importantNutrients,
-                                      colourPicked: colour)
-                .frame(maxHeight: 125)
+                LoggedMealPreviewView(draftLoggedMeal: draftLoggedMealItem, chosenFoodItem: chosenFoodItem)
+                    .frame(maxHeight: 125)
                 
                 HStack {
                     FoodItemSelectionButtonSet(mode: $mode)
                     
-                    SquareColourPickerView(selection: $colour)
+                    LoggedMealEmblemColourPickerView(emblemColourHex: $draftLoggedMealItem.emblemColour)
                 }
                 
-                LoggedFoodItemBuilderView(logDate: $logDate,
-                                          chosenFoodItem: $chosenFoodItem,
-                                          importantNutrients: $importantNutrients,
-                                          servingsLogged: $servingsLogged,
-                                          colour: $colour,
-                                          choosingNutrients: $choosingNutrients)
+                LoggedFoodItemBuilderView(draftLoggedMeal: $draftLoggedMealItem, chosenFoodItem: $chosenFoodItem, choosingNutrients: $choosingNutrients)
             }
             .basicBackground(shadowRadius: 0, background: .secondaryComplement)
             
-            LoggerActionButtonSet(logDate: $logDate,
-                                  chosenFoodItem: $chosenFoodItem,
-                                  importantNutrients: $importantNutrients,
-                                  servingsLogged: $servingsLogged,
-                                  colour: $colour,
+            LoggerActionButtonSet(draftLoggedMeal: draftLoggedMealItem,
+                                  chosenFoodItem: chosenFoodItem,
                                   exitWithoutComplete: exitWithoutComplete,
                                   finalizeCreation: finalizeCreation)
         }
@@ -100,11 +105,8 @@ struct LogNewItemView: View {
 }
 
 private struct LoggedMealPreviewView: View {
+    let draftLoggedMeal: LoggedMealItem
     let chosenFoodItem: FoodItem?
-    let logDate: Date
-    let servingSize: Double
-    let importantNutrients: [NutrientItem]
-    let colourPicked: Color
     
     var body: some View {
         ZStack(alignment: .top) {
@@ -116,13 +118,13 @@ private struct LoggedMealPreviewView: View {
                 whiteness, whiteness, whiteness, .clear,
                 whiteness, whiteness, whiteness, .clear,
                 whiteness, whiteness, whiteness, .clear
-            ], radius: 0, cornerRadius: 7, isActive: .constant(true))
+            ], radius: 0, cornerRadius: 7, isActive: true)
             
-            let previewLoggedItem = LoggedMealItem(date: logDate,
+            let previewLoggedItem = LoggedMealItem(date: draftLoggedMeal.date,
                                                    meal: foodItem,
-                                                   servingMultiple: servingSize,
-                                                   importantNutrients: importantNutrients,
-                                                   emblemColour: colourPicked.toHex())
+                                                   servingMultiple: draftLoggedMeal.servingMultiple,
+                                                   importantNutrients: draftLoggedMeal.importantNutrients,
+                                                   emblemColour: draftLoggedMeal.emblemColour)
             LoggedMealItemView(loggedItem: previewLoggedItem, backgroundView: animBackground)
                 .padding()
             
@@ -163,12 +165,28 @@ private struct FoodItemSelectionButtonSet: View {
     }
 }
 
+private struct LoggedMealEmblemColourPickerView: View {
+    @Binding var emblemColourHex: String
+    
+    private func colourBinding() -> Binding<Color> {
+        Binding<Color>(
+            get: {
+                Color(hex: emblemColourHex)
+            },
+            set: { newColor in
+                emblemColourHex = newColor.toHex()
+            }
+        )
+    }
+    
+    var body: some View {
+        SquareColourPickerView(selection: colourBinding())
+    }
+}
+
 private struct LoggedFoodItemBuilderView: View {
-    @Binding var logDate: Date
+    @Binding var draftLoggedMeal: LoggedMealItem
     @Binding var chosenFoodItem: FoodItem?
-    @Binding var importantNutrients: [NutrientItem]
-    @Binding var servingsLogged: Double
-    @Binding var colour: Color
     
     @Binding var choosingNutrients: Bool
     
@@ -177,14 +195,20 @@ private struct LoggedFoodItemBuilderView: View {
             let actionBackground = chosenFoodItem == nil ? .clear : Color.secondaryText.mix(with: .primaryComplement, by: 0.85)
             if !choosingNutrients {
                 Group {
-                    DateChooseView(selectedDate: $logDate)
+                    DateChooseView(selectedDate: $draftLoggedMeal.date)
                     
-                    ServingSizeChangeView(servingSize: $servingsLogged, pluralUnit: chosenFoodItem?.servingUnitMultiple ?? "Servings", background: actionBackground)
+                    ServingSizeChangeView(servingMultiple: $draftLoggedMeal.servingMultiple,
+                                          servingSize: chosenFoodItem?.servingAmount ?? 1,
+                                          pluralUnit: chosenFoodItem?.servingUnitMultiple ?? "Servings",
+                                          background: actionBackground)
                 }
                 .transition(.opacity.combined(with: .scale(scale: 0.95, anchor: .top)))
             }
             
-            ImportantNutrientChooseView(availableNutrients: chosenFoodItem?.nutritionList ?? [], selectedNutrients: $importantNutrients, isChoosingActive: $choosingNutrients, background: actionBackground)
+            ImportantNutrientChooseView(availableNutrients: chosenFoodItem?.nutritionList ?? [],
+                                        selectedNutrients: $draftLoggedMeal.importantNutrients,
+                                        isChoosingActive: $choosingNutrients,
+                                        background: actionBackground)
         }
         .overlay(RoundedRectangle(cornerRadius: 7).fill(chosenFoodItem == nil ? .gray.opacity(0.08) : .clear))
         .disabled(chosenFoodItem == nil)
@@ -192,14 +216,24 @@ private struct LoggedFoodItemBuilderView: View {
 }
 
 private struct LoggerActionButtonSet: View {
-    @Binding var logDate: Date
-    @Binding var chosenFoodItem: FoodItem?
-    @Binding var importantNutrients: [NutrientItem]
-    @Binding var servingsLogged: Double
-    @Binding var colour: Color
+    var loggedMealItem: LoggedMealItem
+    var chosenFoodItem: FoodItem?
     
     let exitWithoutComplete: () -> Void
     let finalizeCreation: (LoggedMealItem) -> Void
+    
+    init(draftLoggedMeal: LoggedMealItem,
+         chosenFoodItem: FoodItem?,
+         exitWithoutComplete: @escaping () -> Void,
+         finalizeCreation: @escaping (LoggedMealItem) -> Void) {
+        self.loggedMealItem = draftLoggedMeal
+        if let chosenFoodItem {
+            self.loggedMealItem.meal = chosenFoodItem
+        }
+        self.chosenFoodItem = chosenFoodItem
+        self.exitWithoutComplete = exitWithoutComplete
+        self.finalizeCreation = finalizeCreation
+    }
     
     var body: some View {
         HStack {
@@ -210,17 +244,13 @@ private struct LoggerActionButtonSet: View {
                          backgroundColour: .secondaryComplement,
                          action: exitWithoutComplete)
             
-            if let chosenFoodItem = chosenFoodItem {
+            if chosenFoodItem != nil {
                 ImagedButton(title: "Log", icon: "checkmark.circle.fill",
                              circleColour: .clear,
                              cornerRadius: 7,
                              maxWidth: .infinity,
                              backgroundColour: .secondaryComplement,
-                             item: LoggedMealItem(date: logDate,
-                                                  meal: chosenFoodItem,
-                                                  servingMultiple: servingsLogged,
-                                                  importantNutrients: importantNutrients,
-                                                  emblemColour: colour.toHex()),
+                             item: loggedMealItem,
                              action: finalizeCreation)
             }
         }
@@ -240,13 +270,25 @@ private struct DateChooseView: View {
 }
 
 private struct ServingSizeChangeView: View {
-    @Binding var servingSize: Double
+    @Binding var servingMultiple: Double
+    let servingSize: Double
     let pluralUnit: String
     let background: Color
     
+    private func servingBinding() -> Binding<Double> {
+        Binding<Double>(
+            get: {
+                servingMultiple * servingSize
+            },
+            set: { newValue in
+                servingMultiple = newValue / servingSize
+            }
+        )
+    }
+    
     var body: some View {
         EditFieldView(title: "Number of \(pluralUnit.capitalized)") {
-            GranularValueTextField(topChangeValue: 1, interval: 0.5, value: $servingSize, background: background)
+            GranularValueTextField(topChangeValue: 1, interval: 0.5, value: servingBinding(), background: background)
         }
     }
 }
@@ -348,7 +390,7 @@ private struct EditFieldView<Content: View>: View {
 
 
 #Preview {
-    LogNewItemView(viewModel: NutriToolFoodViewModel(repository: MockFoodRepository()), logDate: Date()) {
+    LogNewItemView(viewModel: NutriToolFoodViewModel(repository: MockFoodRepository()), date: Date()) {
         
     } finalizeCreation: { loggedItem in
         

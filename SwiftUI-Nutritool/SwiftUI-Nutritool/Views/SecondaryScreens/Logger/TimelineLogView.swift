@@ -10,10 +10,11 @@ import SwiftUI
 struct TimelineLogView: View {
     let selectedDate: Date
     let loggedMealItems: [LoggedMealItem]
-    @Binding var isHidden: Bool
+    let isHidden: Bool
     @Binding var scrollCommand: ScrollCommand
     
     let deleteAction: (LoggedMealItem) -> Void
+    let editAction: (LoggedMealItem) -> Void
     
     @State private var initialScrollPerformed = false
     @State private var timeSlotScale: CGFloat = 1.0
@@ -35,7 +36,7 @@ struct TimelineLogView: View {
             whiteness, whiteness, whiteness, .clear,
             whiteness, whiteness, whiteness, .clear,
             whiteness, whiteness, whiteness, .clear
-        ], radius: 0, cornerRadius: 7, isActive: $isHidden)
+        ], radius: 0, cornerRadius: 7, isActive: isHidden)
         
         VStack {
             ScrollViewReader { scrollProxy in
@@ -43,9 +44,10 @@ struct TimelineLogView: View {
                     ZStack(alignment: .topLeading) {
                         TimelineDayView(loggedMealItems: loggedMealItems,
                                         selectedDate: selectedDate,
-                                        deleteAction: deleteAction,
                                         hourSpacing: hourSpacing,
-                                        backgroundView: animBackground)
+                                        backgroundView: animBackground,
+                                        deleteAction: deleteAction,
+                                        editAction: editAction)
                         .padding([.leading, .trailing], 16)
                     }
                 }
@@ -64,17 +66,21 @@ struct TimelineLogView: View {
 private struct TimelineDayView<Content: View>: View {
     let loggedMealItems: [LoggedMealItem]
     let selectedDate: Date
-    let deleteAction: (LoggedMealItem) -> Void
+
     let hourSpacing: CGFloat
     let backgroundView: Content
+    
+    let deleteAction: (LoggedMealItem) -> Void
+    let editAction: (LoggedMealItem) -> Void
     
     var body: some View {
         VStack(alignment: .trailing, spacing: hourSpacing) {
             ForEach(0..<24) { hour in
                 TimelineHourView(hour: hour,
                                  loggedMealItems: loggedMealItems,
+                                 backgroundView: backgroundView,
                                  deleteAction: deleteAction,
-                                 backgroundView: backgroundView)
+                                 editAction: editAction)
             }
         }
         .animation(.spring(response: 0.4, dampingFraction: 0.9), value: loggedMealItems)
@@ -85,8 +91,10 @@ private struct TimelineDayView<Content: View>: View {
 private struct TimelineHourView<Content: View>: View {
     let hour: Int
     let loggedMealItems: [LoggedMealItem]
-    let deleteAction: (LoggedMealItem) -> Void
     let backgroundView: Content
+    
+    let deleteAction: (LoggedMealItem) -> Void
+    let editAction: (LoggedMealItem) -> Void
     
     private var timeString: String {
         let minutes = "00"
@@ -115,7 +123,7 @@ private struct TimelineHourView<Content: View>: View {
                     SwipeableRow {
                         deleteAction(meal)
                     } onRightSwipe: {
-                        print()
+                        editAction(meal)
                     } content: {
                         LoggedMealItemView(loggedItem: meal, backgroundView: backgroundView)
                     }
@@ -182,8 +190,10 @@ private struct TotalNutrientStatView: View {
 #Preview{
     TimelineLogView(selectedDate: Date(),
                     loggedMealItems: MockData.loggedMeals,
-                    isHidden: .constant(false),
+                    isHidden: false,
                     scrollCommand: .constant(ScrollCommand(hour: 0))) { _ in
+        
+    } editAction: { _ in
         
     }
 }

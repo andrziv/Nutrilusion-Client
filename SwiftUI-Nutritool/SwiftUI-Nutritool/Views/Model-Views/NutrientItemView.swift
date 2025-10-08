@@ -118,5 +118,5 @@ func ServingSizeText(_ foodItem: FoodItem, multiplier: Double = 1) -> String {
     let servingTotal = foodItem.servingAmount * multiplier
     let isUnitMultiple = servingTotal > 1
     
-    return "\(RoundingDouble(servingTotal)) \(isUnitMultiple ? foodItem.servingUnitMultiple : foodItem.servingUnit)"
+    return "\(RoundingDouble(servingTotal, precision: 2)) \(isUnitMultiple ? foodItem.servingUnitMultiple : foodItem.servingUnit)"
 }

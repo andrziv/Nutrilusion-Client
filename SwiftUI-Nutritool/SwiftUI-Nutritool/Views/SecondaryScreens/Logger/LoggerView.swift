@@ -48,6 +48,21 @@ fileprivate extension WeekDayType {
     }
 }
 
+private struct LoggingModalInfo {
+    var isActive: Bool
+    var meal: LoggedMealItem?
+    
+    mutating func reset() {
+        self.meal = nil
+        self.isActive = false
+    }
+    
+    mutating func activate(with mealItem: LoggedMealItem?) {
+        self.meal = mealItem
+        self.isActive = true
+    }
+}
+
 struct LoggerView: View {
     @EnvironmentObject var foodViewModel: NutriToolFoodViewModel
     
@@ -56,7 +71,7 @@ struct LoggerView: View {
         date: Date()
     )
     
-    @State private var isShowingLoggingModal: Bool = false
+    @State private var loggingModalWith = LoggingModalInfo(isActive: false)
     @State private var scollTarget: ScrollCommand = ScrollCommand.recentHourCommand()
     
     var body: some View {
@@ -67,20 +82,25 @@ struct LoggerView: View {
         let filteredSortedMeals = filteredMeals.sorted { $0.date < $1.date }
         
         VStack {
-            WeekDayButtonSet(selectedDay: $selectedDay, isShowingLoggingModal: $isShowingLoggingModal, scollTarget: $scollTarget)
+            WeekDayButtonSet(selectedDay: $selectedDay, isLoggingModalActive: $loggingModalWith.isActive, scollTarget: $scollTarget)
                 .frame(maxWidth: .infinity)
             
             Group {
-                if isShowingLoggingModal {
-                    LogNewItemView(viewModel: foodViewModel, logDate: selectedDay.date) {
+                if loggingModalWith.isActive {
+                    LogNewItemView(viewModel: foodViewModel, date: selectedDay.date, loggedMealItem: loggingModalWith.meal) {
                         withAnimation {
-                            isShowingLoggingModal = false
+                            loggingModalWith.reset()
                         }
                     } finalizeCreation: { loggedItem in
-                        foodViewModel.addLoggedMeal(loggedItem)
+                        if loggingModalWith.meal != nil {
+                            foodViewModel.updateLoggedMeal(loggedItem)
+                        } else {
+                            foodViewModel.addLoggedMeal(loggedItem)
+                        }
+                        
                         scollTarget = ScrollCommand(hour: Calendar.current.component(.hour, from: loggedItem.date))
                         withAnimation {
-                            isShowingLoggingModal = false
+                            loggingModalWith.reset()
                         }
                     }
                 } else {
@@ -90,9 +110,11 @@ struct LoggerView: View {
                         
                         TimelineLogView(selectedDate: selectedDay.date,
                                         loggedMealItems: filteredSortedMeals,
-                                        isHidden: $isShowingLoggingModal,
+                                        isHidden: loggingModalWith.isActive,
                                         scrollCommand: $scollTarget) { deletedItem in
                             foodViewModel.removeLoggedMeal(deletedItem)
+                        } editAction: { itemToEdit in
+                            loggingModalWith.activate(with: itemToEdit)
                         }
                     }
                     .background(.secondaryComplement)
@@ -104,15 +126,15 @@ struct LoggerView: View {
                 removal: .opacity.combined(with: .move(edge: .leading))))
             .tapToHideKeyboard()
             
-            SwappingVHStack(vSpacing: 8, hSpacing: 8, useHStack: !isShowingLoggingModal) {
+            SwappingVHStack(vSpacing: 8, hSpacing: 8, useHStack: !loggingModalWith.isActive) {
                 DailyStatProgressView(mealItems: filteredSortedMeals)
                     .padding(12)
                     .background(.secondaryComplement, in: RoundedRectangle(cornerRadius: 7))
                 
-                if !isShowingLoggingModal {
+                if !loggingModalWith.isActive {
                     LogCurrentTimeButton() {
                         withAnimation {
-                            isShowingLoggingModal.toggle()
+                            loggingModalWith.activate(with: nil)
                         }
                     }
                 }
@@ -125,7 +147,7 @@ struct LoggerView: View {
 
 private struct WeekDayButtonSet: View {
     @Binding fileprivate var selectedDay: SelectedDay
-    @Binding var isShowingLoggingModal: Bool
+    @Binding var isLoggingModalActive: Bool
     @Binding var scollTarget: ScrollCommand
     
     private func positionType(_ index: Int) -> Position {
@@ -153,7 +175,7 @@ private struct WeekDayButtonSet: View {
                 Button {
                     if selectedDay.day == day {
                         withAnimation {
-                            isShowingLoggingModal = false
+                            isLoggingModalActive = false
                             scollTarget = ScrollCommand.recentHourCommand()
                         }
                         return

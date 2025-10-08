@@ -8,11 +8,11 @@
 import SwiftUI
 
 struct AnimatedBackgroundGradient: View {
-    var colours: [Color]
+    let colours: [Color]
     var radius: CGFloat = 15
     var cornerRadius: CGFloat = 15
     var clipToShape: Bool = true
-    @Binding var isActive: Bool
+    let isActive: Bool
     
     var body: some View {
         TimelineView(.animation(minimumInterval: 0.1, paused: isActive)) { context in
