@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct IngredientEntry: Identifiable, Equatable, Codable {
+struct IngredientEntry: Identifiable, Equatable {
     var id: String
     var ingredientID: UUID
     var version: Int = 0

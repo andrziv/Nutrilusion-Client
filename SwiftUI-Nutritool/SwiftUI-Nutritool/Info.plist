@@ -3,21 +3,6 @@
 <plist version="1.0">
 <dict>
 	<key>UTExportedTypeDeclarations</key>
-	<array>
-		<dict>
-			<key>UTTypeConformsTo</key>
-			<array>
-				<string>com.public.data</string>
-			</array>
-			<key>UTTypeDescription</key>
-			<string>LoggedMealItem</string>
-			<key>UTTypeIconFiles</key>
-			<array/>
-			<key>UTTypeIdentifier</key>
-			<string>akiswifts.SwiftUI-Nutritool.loggedMealItem</string>
-			<key>UTTypeTagSpecification</key>
-			<dict/>
-		</dict>
-	</array>
+	<array/>
 </dict>
 </plist>

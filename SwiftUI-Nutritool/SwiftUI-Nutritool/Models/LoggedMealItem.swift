@@ -8,7 +8,7 @@
 import SwiftUI
 import UniformTypeIdentifiers
 
-struct LoggedMealItem: Identifiable, Equatable, Codable, Transferable {
+struct LoggedMealItem: Identifiable, Equatable {
     var id: UUID = UUID()
     var date: Date = Date()
     var meal: FoodItem
@@ -18,10 +18,6 @@ struct LoggedMealItem: Identifiable, Equatable, Codable, Transferable {
     
     func getColour() -> Color {
         return Color(hex: emblemColour)
-    }
-    
-    static var transferRepresentation: some TransferRepresentation {
-        CodableRepresentation(contentType: .loggedMealItem)
     }
 }
 

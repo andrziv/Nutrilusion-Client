@@ -11,7 +11,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		6117FAD42E95F6E8008B1834 /* Exceptions for "SwiftUI-Nutritool" folder in "SwiftUI-Nutritool" target */ = {
+		61E3DAEB2E96D3DF00848F91 /* Exceptions for "SwiftUI-Nutritool" folder in "SwiftUI-Nutritool" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -24,7 +24,7 @@
 		615F5C112E6DF9E9006F0CE4 /* SwiftUI-Nutritool */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				6117FAD42E95F6E8008B1834 /* Exceptions for "SwiftUI-Nutritool" folder in "SwiftUI-Nutritool" target */,
+				61E3DAEB2E96D3DF00848F91 /* Exceptions for "SwiftUI-Nutritool" folder in "SwiftUI-Nutritool" target */,
 			);
 			path = "SwiftUI-Nutritool";
 			sourceTree = "<group>";
