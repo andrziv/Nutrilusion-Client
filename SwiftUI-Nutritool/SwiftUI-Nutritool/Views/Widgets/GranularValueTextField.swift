@@ -27,7 +27,7 @@ struct GranularValueTextField: View {
                          horizontalPadding: 6,
                          backgroundColour: background,
                          iconPlacement: .leading) {
-                value = Swift.max(0, value - topChangeValue)
+                value = max(0, value - topChangeValue)
             }
             ImagedButton(title: "0.5", icon: "minus",
                          imageFont: .subheadline.weight(.regular), textFont: .subheadline.weight(.regular),
@@ -37,7 +37,7 @@ struct GranularValueTextField: View {
                          horizontalPadding: 6,
                          backgroundColour: background,
                          iconPlacement: .leading) {
-                value = Swift.max(0, value - topChangeValue + interval)
+                value = max(0, value - topChangeValue + interval)
             }
             
             let isUnitTextLong = unitText != nil && unitText!.count > 3
@@ -53,6 +53,9 @@ struct GranularValueTextField: View {
                 .focused($isFocused)
                 .keyboardType(.decimalPad)
                 .multilineTextAlignment(.center)
+                .onChange(of: value) { _, newValue in
+                    value = max(0, newValue)
+                }
                 
                 if let unitText, !unitText.isEmpty {
                     Text(unitText)

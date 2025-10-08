@@ -86,7 +86,8 @@ struct RecipeEditorView: View {
             
             FoodItemBasicInfoEditors(titleInput: $draftFoodItem.name,
                                      unitSingularInput: $draftFoodItem.servingUnit,
-                                     unitPluralInput: $draftFoodItem.servingUnitMultiple)
+                                     unitPluralInput: $draftFoodItem.servingUnitMultiple,
+                                     amountOfServings: $draftFoodItem.servingAmount)
             .padding(10)
             .background(RoundedRectangle(cornerRadius: 7).fill(.primaryComplement))
             
@@ -110,6 +111,7 @@ private struct FoodItemBasicInfoEditors: View {
     @Binding var titleInput: String
     @Binding var unitSingularInput: String
     @Binding var unitPluralInput: String
+    @Binding var amountOfServings: Double
     
     var body: some View {
         VStack(spacing: 5) {
@@ -118,7 +120,16 @@ private struct FoodItemBasicInfoEditors: View {
             BasicInfoEditorView(placeholder: "Name of the Recipe", text: $titleInput, font: .title3, emptyColour: emptyInputColour)
                 .disableAutocorrection(true)
             
-            HStack(spacing: 5) {
+            HStack(alignment: .center, spacing: 5) {
+                HStack(spacing: 0){
+                    NumberInfoEditorView(placeholder: "Amount", amount: $amountOfServings, font: .headline)
+                        .frame(maxWidth: 75)
+                        .disableAutocorrection(true)
+                        .textInputAutocapitalization(.never)
+                    
+                    Image(systemName: "dot.square")
+                }
+                
                 BasicInfoEditorView(placeholder: "Unit Name", text: $unitSingularInput, font: .headline, emptyColour: emptyInputColour)
                     .disableAutocorrection(true)
                     .textInputAutocapitalization(.never)
@@ -130,7 +141,6 @@ private struct FoodItemBasicInfoEditors: View {
                     .textInputAutocapitalization(.never)
             }
         }
-        
     }
 }
 
@@ -143,10 +153,30 @@ private struct BasicInfoEditorView: View {
     var body: some View {
         BasicTextField(placeholder, text: $text,
                        font: font, fontWeight: .semibold,
-                       cornerRadius: 4, outline: .secondaryText, outlineWidth: 0,
+                       cornerRadius: 4, outline: .clear, outlineWidth: 0,
                        background: text.isEmpty ? emptyColour : .clear,
                        horizontalPadding: 6,
                        verticalPadding: 3)
+        .multilineTextAlignment(.center)
+    }
+}
+
+private struct NumberInfoEditorView: View {
+    let placeholder: String
+    @Binding var amount: Double
+    let font: Font
+    
+    var body: some View {
+        BasicTextField(placeholder, value: $amount, format: .number,
+                       font: font, fontWeight: .semibold,
+                       cornerRadius: 4, outline: .clear, outlineWidth: 0,
+                       background: .clear,
+                       horizontalPadding: 6,
+                       verticalPadding: 3)
+        .onChange(of: amount) { _, newValue in
+            amount = max(0, newValue)
+        }
+        .keyboardType(.decimalPad)
         .multilineTextAlignment(.center)
     }
 }
