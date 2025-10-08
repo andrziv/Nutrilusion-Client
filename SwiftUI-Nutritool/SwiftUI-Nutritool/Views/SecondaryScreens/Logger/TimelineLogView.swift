@@ -114,6 +114,8 @@ private struct TimelineHourView<Content: View>: View {
                 ForEach(filteredHourMealItems, id: \.id) { meal in
                     SwipeableRow {
                         deleteAction(meal)
+                    } onRightSwipe: {
+                        print()
                     } content: {
                         LoggedMealItemView(loggedItem: meal, backgroundView: backgroundView)
                     }
