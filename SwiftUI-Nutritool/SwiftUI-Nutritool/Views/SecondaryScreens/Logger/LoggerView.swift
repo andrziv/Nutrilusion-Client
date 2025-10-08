@@ -87,7 +87,7 @@ struct LoggerView: View {
             
             Group {
                 if loggingModalWith.isActive {
-                    LogNewItemView(viewModel: foodViewModel, date: selectedDay.date, loggedMealItem: loggingModalWith.meal) {
+                    LoggedItemEditorView(viewModel: foodViewModel, date: selectedDay.date, loggedMealItem: loggingModalWith.meal) {
                         withAnimation {
                             loggingModalWith.reset()
                         }

@@ -1,5 +1,5 @@
 //
-//  LogNewItemView.swift
+//  LoggedItemEditorView.swift
 //  SwiftUI-Nutritool
 //
 //  Created by Andrej Zivkovic on 2025-09-28.
@@ -18,7 +18,7 @@ private enum LogItemViewMode: Identifiable {
     }
 }
 
-struct LogNewItemView: View {
+struct LoggedItemEditorView: View {
     @ObservedObject private var viewModel: NutriToolFoodViewModel
     @State private var draftLoggedMealItem: LoggedMealItem
     @State private var chosenFoodItem: FoodItem?
@@ -34,7 +34,7 @@ struct LogNewItemView: View {
          exitWithoutComplete: @escaping () -> Void,
          finalizeCreation: @escaping (LoggedMealItem) -> Void) {
         self.viewModel = viewModel
-        self.draftLoggedMealItem = loggedMealItem ?? LogNewItemView.generateLoggedMeal(with: date)
+        self.draftLoggedMealItem = loggedMealItem ?? LoggedItemEditorView.generateLoggedMeal(with: date)
         self.chosenFoodItem = loggedMealItem?.meal
         
         self.exitWithoutComplete = exitWithoutComplete
@@ -390,7 +390,7 @@ private struct EditFieldView<Content: View>: View {
 
 
 #Preview {
-    LogNewItemView(viewModel: NutriToolFoodViewModel(repository: MockFoodRepository()), date: Date()) {
+    LoggedItemEditorView(viewModel: NutriToolFoodViewModel(repository: MockFoodRepository()), date: Date()) {
         
     } finalizeCreation: { loggedItem in
         
