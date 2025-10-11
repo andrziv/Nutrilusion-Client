@@ -190,6 +190,16 @@ private struct LoggedFoodItemBuilderView: View {
     
     @Binding var choosingNutrients: Bool
     
+    private var title: String {
+        guard let pluralUnit = chosenFoodItem?.servingUnitMultiple else { return "Number of Servings" }
+        
+        if pluralUnit.count > 3 {
+            return "Number of \(pluralUnit.capitalized)"
+        }
+        
+        return "Serving Size (\(pluralUnit))"
+    }
+    
     var body: some View {
         Group {
             let actionBackground = chosenFoodItem == nil ? .clear : Color.secondaryText.mix(with: .primaryComplement, by: 0.85)
@@ -197,9 +207,9 @@ private struct LoggedFoodItemBuilderView: View {
                 Group {
                     DateChooseView(selectedDate: $draftLoggedMeal.date)
                     
-                    ServingSizeChangeView(servingMultiple: $draftLoggedMeal.servingMultiple,
+                    ServingSizeChangeView(title: title,
+                                          servingMultiple: $draftLoggedMeal.servingMultiple,
                                           servingSize: chosenFoodItem?.servingAmount ?? 1,
-                                          pluralUnit: chosenFoodItem?.servingUnitMultiple ?? "Servings",
                                           background: actionBackground)
                 }
                 .transition(.opacity.combined(with: .scale(scale: 0.95, anchor: .top)))
@@ -270,9 +280,9 @@ private struct DateChooseView: View {
 }
 
 private struct ServingSizeChangeView: View {
+    let title: String
     @Binding var servingMultiple: Double
     let servingSize: Double
-    let pluralUnit: String
     let background: Color
     
     private func servingBinding() -> Binding<Double> {
@@ -287,8 +297,12 @@ private struct ServingSizeChangeView: View {
     }
     
     var body: some View {
-        EditFieldView(title: "Number of \(pluralUnit.capitalized)") {
-            GranularValueTextField(topChangeValue: 1, interval: 0.5, value: servingBinding(), background: background)
+        EditFieldView(title: title) {
+            let logValue = log10(abs(servingSize))
+            let orderOfMagnitude = floor(logValue)
+            let topChangeValue = servingSize >= 100 ? pow(10, orderOfMagnitude) : 1
+            let interval = topChangeValue - topChangeValue / (topChangeValue >= 100 ? 10 : 2)
+            GranularValueTextField(topChangeValue: topChangeValue, interval: interval, value: servingBinding(), background: background)
         }
     }
 }

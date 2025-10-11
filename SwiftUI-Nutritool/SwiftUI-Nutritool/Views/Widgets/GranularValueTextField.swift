@@ -19,7 +19,7 @@ struct GranularValueTextField: View {
     
     var body: some View {
         HStack(alignment: .center, spacing: 4) {
-            ImagedButton(title: "1", icon: "minus",
+            ImagedButton(title: RoundingDouble(topChangeValue), icon: "minus",
                          imageFont: .subheadline.weight(.regular), textFont: .subheadline.weight(.regular),
                          circleColour: .clear,
                          cornerRadius: 7,
@@ -29,7 +29,7 @@ struct GranularValueTextField: View {
                          iconPlacement: .leading) {
                 value = max(0, value - topChangeValue)
             }
-            ImagedButton(title: "0.5", icon: "minus",
+            ImagedButton(title: RoundingDouble(topChangeValue - interval), icon: "minus",
                          imageFont: .subheadline.weight(.regular), textFont: .subheadline.weight(.regular),
                          circleColour: .clear,
                          cornerRadius: 7,
@@ -72,7 +72,7 @@ struct GranularValueTextField: View {
                 isFocused = true
             }
             
-            ImagedButton(title: "0.5", icon: "plus",
+            ImagedButton(title: RoundingDouble(topChangeValue - interval), icon: "plus",
                          imageFont: .subheadline.weight(.regular), textFont: .subheadline.weight(.regular),
                          circleColour: .clear,
                          cornerRadius: 7,
@@ -82,7 +82,7 @@ struct GranularValueTextField: View {
                          iconPlacement: .leading) {
                 value += topChangeValue - interval
             }
-            ImagedButton(title: "1", icon: "plus",
+            ImagedButton(title: RoundingDouble(topChangeValue), icon: "plus",
                          imageFont: .subheadline.weight(.regular), textFont: .subheadline.weight(.regular),
                          circleColour: .clear,
                          cornerRadius: 7,
