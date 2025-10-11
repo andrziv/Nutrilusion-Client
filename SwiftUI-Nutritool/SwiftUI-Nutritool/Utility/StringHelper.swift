@@ -8,6 +8,7 @@
 import Foundation
 
 func RoundingDouble(_ number: Double, precision: Int = 1) -> String {
-    let isInteger = number.truncatingRemainder(dividingBy: 1) == 0
-    return isInteger ? String(Int(number)) : String(format: "%.\(precision)f", number)
+    let roundedNumber = round(number, exp: precision)
+    let isInteger = roundedNumber.truncatingRemainder(dividingBy: 1) == 0
+    return isInteger ? String(Int(roundedNumber)) : String(format: "%.\(precision)f", roundedNumber)
 }

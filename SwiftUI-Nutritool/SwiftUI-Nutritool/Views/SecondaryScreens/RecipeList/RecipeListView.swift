@@ -59,6 +59,7 @@ struct RecipeListView: View {
                 }
                 .padding(.bottom, viewModel.mealGroups.last == mealGroup ? 65 : 0)
             }
+            .clipShape(RoundedRectangle(cornerRadius: 7))
             
             FloatingActionMenu(mode: $mode)
                 .padding(.horizontal, 20)
