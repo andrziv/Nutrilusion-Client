@@ -1,4 +1,4 @@
-# Nutritool
+# Nutrilusion
 ## Preamble
 This app was built for me to learn the flow of an iOS developer, but I also made it because I thought it would be fun to make my own free nutrition tool to track my daily nutrition intake (mostly calories...). I plan on continuing its development in the future whenever I have time because I still plan on using it myself. I tried to make it as configurable as possible. Most of the nutrient-centric information is configurable so you can easily add localizations for nutrition items so the OCR system can do multiple languages. The app itself has no localizations for text because I'd only ever use the app in English and I have no plans on marketing the app elsewhere.
 
@@ -39,7 +39,7 @@ I unfortunately do not have an Apple Developer account, so you can't easily inst
         - Enter the code on the Mac to complete the pairing process
     - You should be able to install the app by changing the run configuration to your mobile device. Apple recommends following a second set of steps before installing the app, though:
         - Mac toolbar: Xcode (make sure Xcode is the focused window) > Settings > Apple Accounts > Add Apple Account (the account you want to use for signing)
-        - In the Xcode File Tree, open the Project Settings by clicking on the top-level project file > [Targets] Swiftui-Nutritool > Code and Signing Capabilities > Choose a valid team
+        - In the Xcode File Tree, open the Project Settings by clicking on the top-level project file > [Targets] Swiftui-Nutrilusion > Code and Signing Capabilities > Choose a valid team
         - [Optional] Register the device with your team if you belong to the [Apple Developer Program](https://developer.apple.com/programs/).
         - Enable Developer Mode on your iOS device
 3. Note that this app requires Camera capabilities, so just add "Privacy - Camera Usage Description" under Info in the Project Settings if it wasn't already there
