@@ -4,26 +4,26 @@ This app was built for me to learn the flow of an iOS developer, but I also made
 
 ## The App
 You can log foods to the timeline and see them take up visual space while also being tallied towards the hourly and daily nutrient intake.
-![Timeline screenshot](https://github.com/andrziv/Nutritool-Client/blob/main/readmeImages/appFullHomescreen.png "Timeline screenshot with multiple logged items.")
+![Timeline screenshot](https://github.com/andrziv/Nutrilusion-Client/blob/main/readmeImages/appFullHomescreen.png "Timeline screenshot with multiple logged items.")
 
 You can press the "+ @ (Time)" button to open the creation/editing mode for logged items. You'll need to choose an existing recipe or create a transient recipe that'll only be used this once (maybe you went to a restaurant and only care to quickly log the calories).
-![Empty new log menu screenshot](https://github.com/andrziv/Nutritool-Client/blob/main/readmeImages/appLogNewItemEmpty.png "Log menu with nothing yet chosen.")
+![Empty new log menu screenshot](https://github.com/andrziv/Nutrilusion-Client/blob/main/readmeImages/appLogNewItemEmpty.png "Log menu with nothing yet chosen.")
 
 Pressing "Choose Recipe" brings up all the available recipe listings. You can also: create categories, create new recipes, search for recipes, and edit existing recipes on this screen. The first three options have obvious buttons at the bottom right, but the last option can be done by pressing the expand button on a recipe (V), and then the pencil icon that takes its place at the bottom right.
 Base View             |  Expanded Food Item Details
 :-------------------------:|:-------------------------:
-![Recipe list screenshot](https://github.com/andrziv/Nutritool-Client/blob/main/readmeImages/appRecipeListFull.png "Recipe list with nothing expanded.")  |  ![Recipe list screenshot](https://github.com/andrziv/Nutritool-Client/blob/main/readmeImages/appFoodItemDetails.png "Recipe list with smoothie expanded to show details.")
+![Recipe list screenshot](https://github.com/andrziv/Nutrilusion-Client/blob/main/readmeImages/appRecipeListFull.png "Recipe list with nothing expanded.")  |  ![Recipe list screenshot](https://github.com/andrziv/Nutrilusion-Client/blob/main/readmeImages/appFoodItemDetails.png "Recipe list with smoothie expanded to show details.")
 
 When you edit a food item, you can change the name, the units, the base serving amount, and the ingredient(s), and nutrient(s) associated with it. The ingredient and nutrient views are seperate. The nutrient view allows you to enable (and disable) a mode that will propagate changes to child nutrients to the parents. For example, if Omega-6 increases by 6g, with this option active, the "Fats" category will go up by the same amount. This is pretty helpful if you're creating a food from complete scratch, but most people are just going to read a nutrition label and copy it line by line, so this option is off by default. There is a third mode that makes copying nutrition labels easier: Camera mode. It requires you to allow access to the camera, and when you point the viewfinder at a nutrition label, the app will do its best to copy that over to the app for you to modify it. It doesn't work very well in darker settings or with shiny labels, but in my experience it was somewhat decent and it definitely always made it easier to copy over the information, even if it did get a couple of the values wrong.
 Ingredient             |  Nutrient
 :-------------------------:|:-------------------------:
-![Food item ingredient editing screenshot](https://github.com/andrziv/Nutritool-Client/blob/main/readmeImages/appIngredientEdit.png "Ingredient editing mode for a food item.")  |  ![Food item nutrient editing screenshot](https://github.com/andrziv/Nutritool-Client/blob/main/readmeImages/appNutrientEdit.png "Nutrient editing mode for a food item.")
+![Food item ingredient editing screenshot](https://github.com/andrziv/Nutrilusion-Client/blob/main/readmeImages/appIngredientEdit.png "Ingredient editing mode for a food item.")  |  ![Food item nutrient editing screenshot](https://github.com/andrziv/Nutrilusion-Client/blob/main/readmeImages/appNutrientEdit.png "Nutrient editing mode for a food item.")
 
 When you tap a food item, you'll be taken back to the logging menu you started with the finalize the serving size, time to log, and the nutrients you think are most important at first glance:
-![Log menu screenshot](https://github.com/andrziv/Nutritool-Client/blob/main/readmeImages/appLogNewItem.png "Log menu with a smoothie food item chosen.")
+![Log menu screenshot](https://github.com/andrziv/Nutrilusion-Client/blob/main/readmeImages/appLogNewItem.png "Log menu with a smoothie food item chosen.")
 
 Most of the images above were in light-mode, but dark-mode is fully supported and I think it looks even better in darkmode:
-![Dark mode timeline screenshot](https://github.com/andrziv/Nutritool-Client/blob/main/readmeImages/appFullHomescreenDarkModified.png "Timeline screenshot with multiple logged items in dark mode.")
+![Dark mode timeline screenshot](https://github.com/andrziv/Nutrilusion-Client/blob/main/readmeImages/appFullHomescreenDarkModified.png "Timeline screenshot with multiple logged items in dark mode.")
 
 ## How to Install
 I recommend using an iPhone for this app, it runs on iPads but it just wasn't designed with them in mind. This app should look as designed on modern 6+ inch screen size iPhones (Basic, Air, Pro, Pro Max)
